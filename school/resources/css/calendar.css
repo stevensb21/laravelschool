@@ -1,0 +1,813 @@
+/* Импорт цветовых переменных */
+@import './colors.css';
+
+ @media (max-width: 768px) {
+    body {
+        padding-top: 50px;
+    }
+    
+ } 
+
+
+ @media (max-width: 1024px) {
+    
+    
+ }
+
+body, .container, .content, .main-bg {
+    background: var(--main-bg) !important;
+}
+
+.calendar-container {
+    background-color: var(--card-bg);
+    border-radius: 15px;
+    padding: 15px;
+    box-shadow: 0 4px 6px var(--card-shadow);
+    width: 100%;
+    max-width: 100%;
+    border: 1px solid var(--card-border);
+}
+
+.content {
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+    max-width: 100%;
+}
+
+.content::-webkit-scrollbar {
+    height: 8px;
+    width: 8px;
+}
+
+.content::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+    border-radius: 4px;
+}
+
+.content::-webkit-scrollbar-thumb {
+    background: var(--accent-color);
+    border-radius: 4px;
+}
+
+.content::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-dark);
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.calendar-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 16px;
+    margin: 24px 0 32px 0;
+}
+
+.calendar-controls button {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 16px;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: background 0.2s;
+    box-shadow: none;
+    outline: none;
+    min-width: 32px;
+    min-height: 32px;
+}
+
+.calendar-controls button:hover {
+    background: var(--accent-color);
+}
+
+.currentMonth {
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.filter-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.filter-button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 14px;
+    background-color: var(--btn-accent);
+    color: var(--text-primary);
+}
+
+.filter-button:hover {
+    background-color: var(--btn-accent-hover);
+}
+
+.filter-button.active {
+    background-color: var(--btn-primary);
+    color: var(--text-light);
+}
+
+.filter-button.active:hover {
+    background-color: var(--btn-primary-hover);
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.action-button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 14px;
+}
+
+.add-button {
+    background-color: var(--btn-primary);
+    color: var(--text-light);
+}
+
+.add-button:hover {
+    background-color: var(--btn-primary-hover);
+}
+
+.edit-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--btn-secondary);
+    color: var(--text-light);
+}
+
+.edit-button:hover {
+    background-color: var(--btn-secondary-hover);
+}
+
+.grid-container-calendar {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(16, 37px);
+    min-width: 800px;
+}
+
+.weekday {
+    display: flex;
+    width: 100%;
+    border-radius: 10px 10px 0 0;
+    background-color: var(--card-bg);
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 2px 0 5px var(--card-shadow);
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.time {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-top: 1px solid var(--border-color);
+    box-shadow: 0px 0 5px var(--card-shadow);
+    width: 100%;
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.cell {
+    border-top: 1px solid var(--border-color);
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    color: var(--text-primary);
+    box-shadow: 2px 0 5px var(--card-shadow);
+    width: 100%;
+    background-color: var(--card-bg);
+}
+
+.schedule-filters {
+    display: flex !important;
+  
+    gap: 15px !important;
+    margin-bottom: 10px !important;
+    padding: 15px !important;
+    background-color: var(--bg-secondary) !important;
+    border-radius: 10px !important;
+    box-shadow: 0 2px 4px var(--card-shadow) !important;
+    align-items: center !important;
+}
+
+.schedule-filters .edit-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto !important;
+    padding: 8px 16px !important;
+    background-color: var(--btn-secondary) !important;
+    color: var(--text-light) !important;
+    border: none !important;
+    border-radius: 5px !important;
+    cursor: pointer !important;
+    transition: background-color 0.3s !important;
+}
+
+.schedule-filters .edit-button:hover {
+    background-color: var(--btn-secondary-hover) !important;
+}
+
+.schedule-filter {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 5px !important;
+}
+
+.schedule-filter label {
+    font-size: 14px !important;
+    color: #4A5568 !important;
+    font-weight: 500 !important;
+    margin: 0 !important;
+}
+
+.schedule-filter select {
+    display: flex !important;
+    padding: 8px 12px !important;
+    border: 1px solid #E2E8F0 !important;
+    border-radius: 5px !important;
+    background-color: white !important;
+    color: #2D3748 !important;
+    font-size: 14px !important;
+    min-width: 150px !important;
+    cursor: pointer !important;
+    transition: border-color 0.3s !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 10px center !important;
+    background-size: 15px !important;
+}
+
+.schedule-filter select:hover {
+    border-color: #CBD5E0 !important;
+}
+
+.schedule-filter select:focus {
+    outline: none !important;
+    border-color: #3182CE !important;
+    box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1) !important;
+}
+
+.select-group {
+    display: flex;
+    flex-direction: row;
+    gap: 10px; /* расстояние между фильтрами */
+    width: 90%;
+}
+
+
+@media (max-width: 768px) {
+    .select-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px; /* расстояние между фильтрами */
+      width: 100%;
+    }
+    .select-group select,
+    .schedule-filter .edit-button {
+      width: 100%;
+      box-sizing: border-box;
+      margin-bottom: 5px;
+    }
+
+    .edit-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 40px; /* или auto */
+        padding: 0 16px;
+        font-size: 16px;
+        background: #384034;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+  }
+
+/* Стили для режима редактирования */
+.edit-mode {
+    background-color: #f5f5f5;
+}
+
+.edit-mode .grid-container-calendar {
+    background-color: #f5f5f5;
+}
+
+.edit-mode .cell {
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.edit-mode .cell:hover {
+    background-color: #e0e0e0;
+}
+
+.edit-mode .cell.has-lesson {
+    position: relative;
+}
+
+.edit-mode .cell.has-lesson .delete-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 20px;
+    height: 20px;
+    background-color: #ff4444;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.edit-mode .cell.has-lesson:hover .delete-btn {
+    opacity: 1;
+}
+
+.edit-mode .add-btn {
+    width: 100%;
+    height: 100%;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+    color: #666;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.edit-mode .cell:hover .add-btn {
+    opacity: 1;
+}
+
+/* Стили для кнопок добавления и удаления */
+.add-btn, .delete-btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+}
+
+.add-btn {
+    background-color: #131936;
+    color: white;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 1;
+    transition: opacity 0.2s ease;
+}
+
+.edit-mode .cell:not(.has-lesson):hover .add-btn {
+    opacity: 1;
+}
+
+.add-btn:hover {
+    background-color: var(--btn-primary-hover);
+    transform: translate(-50%, -50%) scale(1.1);
+}
+
+.delete-btn {
+    background-color: #f44336;
+    color: white;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    opacity: 1;
+    transition: opacity 0.2s ease;
+}
+
+.edit-mode .cell.has-lesson:hover .delete-btn {
+    opacity: 1;
+}
+
+.delete-btn:hover {
+    background-color: #d32f2f;
+    transform: scale(1.1);
+}
+
+/* Стили для форм с кнопками */
+.add-lesson-form, .delete-lesson-form {
+    position: absolute;
+    z-index: 10;
+}
+
+.add-lesson-form {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.delete-lesson-form {
+    top: 5px;
+    right: 5px;
+}
+
+/* Стили для ячеек в режиме редактирования */
+.edit-mode .cell {
+    position: relative;
+    transition: background-color 0.2s ease;
+}
+
+.edit-mode .cell:not(.has-lesson):hover {
+    background-color: rgba(200, 200, 200, 0.2);
+}
+
+.edit-mode .cell.has-lesson {
+    position: relative;
+}
+
+/* Стили для модального окна */
+.lesson-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 400px;
+    max-width: 90%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.modal-content h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.form-group select, .form-group input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.form-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.form-buttons button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.form-buttons button[name="save_lesson"] {
+    background-color: #131936;
+    color: white;
+}
+
+.form-buttons .cancel-btn {
+    background-color: #131936;
+    color: white;
+}
+
+.form-buttons button:hover {
+    opacity: 0.9;
+}
+
+
+
+/* Добавляем медиа-запросы для адаптивности */
+@media (max-width: 1200px) {
+    .grid-container-calendar {
+        min-width: 700px;
+    }
+}
+
+@media (max-width: 992px) {
+    .grid-container-calendar {
+        min-width: 600px;
+    }
+}
+
+@media (max-width: 768px) {
+    .grid-container-calendar {
+        min-width: 500px;
+    }
+}
+
+@media (max-width: 576px) {
+    .grid-container-calendar {
+        min-width: 400px;
+    }
+}
+.filters-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.schedule-filters {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+.schedule-filter select {
+    min-width: 150px;
+}
+
+/* Стили для кнопок времени */
+.time-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    width: 100%;
+}
+
+.add-btn {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 2px;
+    font-size: 14px;
+    color: #666;
+    transition: color 0.2s;
+    border-radius: 3px;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    -webkit-user-drag: none;
+    pointer-events: auto;
+}
+
+.add-btn:hover {
+    color: #333;
+}
+
+.cell {
+    position: relative;
+    min-height: 40px;
+    border: 1px solid #e0e0e0;
+    background-color: white;
+    pointer-events: auto;
+}
+
+.add-lesson-form {
+    width: 100%;
+    height: 100%;
+    user-select: none;
+    -webkit-user-drag: none;
+    pointer-events: none;
+}
+
+/* Стили для индикаторов времени */
+.cell.has-lesson[style*="position: relative"]::before,
+.cell.has-lesson[style*="position: relative"]::after {
+    color: #fff;
+    font-size: 12px;
+    font-weight: bold;
+    text-shadow: 1px 1px 1px rgba(0,0,0,0.3);
+}
+
+/* Стили для текста в половине ячейки */
+.half-hour-text {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #000;
+    font-size: 10px;
+    text-align: center;
+    padding: 2px;
+    overflow: hidden;
+    z-index: 10;
+}
+
+/* Стиль для разделительной линии */
+.cell.has-split {
+    position: relative;
+    overflow: hidden;
+}
+
+.cell.has-split::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 100%;
+    height: 0.5px;
+    background-color: rgba(0, 0, 0, 0.3);
+    transform: translateY(-50%);
+    z-index: 15;
+}
+
+.half-hour-text p {
+    margin: 0;
+    line-height: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Стили для модального окна */
+.lesson-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    width: 400px;
+    max-width: 90%;
+}
+
+.modal-content h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #333;
+    font-size: 1.5rem;
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #555;
+}
+
+.form-group select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background-color: #f9f9f9;
+    font-size: 14px;
+    color: #333;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-group select:focus {
+    border-color: #131936;
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+    outline: none;
+}
+
+.form-group select option {
+    padding: 10px;
+}
+
+/* Специальные стили для выпадающего списка времени */
+.form-group select[name="end_time"] {
+    width: auto;
+    min-width: 100px;
+    max-width: 120px;
+    text-align: center;
+    padding: 8px 10px;
+    font-size: 15px;
+    font-weight: 500;
+    background-color: #f0f7ff;
+    border-color: #c0d6f0;
+}
+
+.form-group select[name="end_time"] option {
+    padding: 6px 8px;
+    text-align: center;
+}
+
+/* Стилизация скроллбара для списка времени */
+.form-group select[name="end_time"]::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
+}
+
+.form-group select[name="end_time"] {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+}
+
+/* Ограничение высоты выпадающего списка */
+.form-group select[name="end_time"] {
+    height: auto;
+    max-height: 150px;
+}
+
+.form-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+}
+
+.form-buttons button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.form-buttons button[name="save_lesson"] {
+    background-color: #131936;
+    color: white;
+}
+
+.form-buttons button[name="save_lesson"]:hover {
+    background-color: #404f62;
+}
+
+.form-buttons .cancel-btn {
+    background-color: #f1f1f1;
+    color: #555;
+}
+
+.form-buttons .cancel-btn:hover {
+    background-color: #e0e0e0;
+}

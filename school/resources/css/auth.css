@@ -1,0 +1,114 @@
+@import './colors.css';
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: var(--background-color);
+    font-family: 'Source Serif Pro', Arial, sans-serif;
+    flex-direction: column;
+}
+
+.site-title {
+    margin-bottom: 24px;
+    font-size: 2rem;
+    color: var(--primary-color);
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-align: center;
+}
+
+.container {
+    background: var(--card-bg);
+    width: 340px;
+    min-height: 370px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px var(--card-shadow);
+    padding: 32px 24px 24px 24px;
+}
+
+.person-icon {
+    width: 64px;
+    height: 64px;
+    background-color: var(--accent-color);
+    border-radius: 50%;
+    position: absolute;
+    top: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px var(--card-shadow);
+}
+
+.shoulders {
+    width: 120px;
+    height: 20px;
+    background-color: var(--accent-color);
+    position: absolute;
+    top: 64px;
+    left: -28px;
+    border-top-right-radius: 30px;
+    border-top-left-radius: 30px;
+}
+
+.form-group {
+    margin-top: 100px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 12px;
+}
+
+input {
+    padding: 12px;
+    margin: 0 0 8px 0;
+    border: 1px solid var(--input-border);
+    border-radius: 6px;
+    background: var(--input-bg);
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: border-color 0.2s;
+}
+
+input:focus {
+    border-color: var(--input-focus);
+    outline: none;
+}
+
+button {
+    padding: 12px;
+    margin-top: 8px;
+    background-color: var(--btn-primary);
+    color: var(--text-light);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+button:hover {
+    background-color: var(--btn-primary-hover);
+}
+
+.invalid-feedback {
+    color: var(--error-color);
+    font-size: 0.95em;
+    margin-bottom: 4px;
+}
+
+.form-check-label {
+    color: var(--text-secondary);
+    font-size: 0.98em;
+}
+

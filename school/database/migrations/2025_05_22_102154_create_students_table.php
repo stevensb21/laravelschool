@@ -28,11 +28,15 @@ return new class extends Migration
             $table->float('average_performance');
             $table->float('average_attendance');
             $table->float('average_exam_score');
-            $table->json('achievements');
+            $table->json('achievements')->nullable();
             $table->json('subjects');
         });
+
+        
     }
 
+
+    
     /**
      * Reverse the migrations.
      */

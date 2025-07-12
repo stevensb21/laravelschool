@@ -1,0 +1,544 @@
+/* Импорт цветовых переменных */
+@import './colors.css';
+
+body, .container, .content, .main-bg {
+    background: var(--main-bg) !important;
+}
+
+.homework-container {
+    background-color: var(--card-bg);
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 4px 6px var(--card-shadow);
+    border: 1px solid var(--card-border);
+}
+
+.homework-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.homework-filters {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.homework-filters form {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+
+    .homework-actions {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center; 
+    }
+    body {
+        padding-top: 0px !important;
+    }
+    .select-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px; /* расстояние между фильтрами */
+      width: 100%;
+    }
+    .select-group select,
+    .select-group button {
+      width: 100%;
+      box-sizing: border-box;
+      margin-bottom: 3px;
+    }
+  }
+
+  @media (max-width: 1024px) {
+    body {
+        padding-top: 0px !important;
+    }
+    .select-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px; /* расстояние между фильтрами */
+      width: 100%;
+      
+    }
+    .select-group select,
+    .select-group button,
+    .select-group input,
+    .select-group button {
+      width: 100%;
+      box-sizing: border-box;
+      margin-top: 5px;
+    }
+  }
+
+.homework-filters input,
+.homework-filters select {
+    padding: 10px;
+    border: 1px solid var(--input-border);
+    border-radius: 5px;
+    font-size: 14px;
+    min-width: 150px;
+    color: var(--text-primary);
+    background-color: var(--input-bg);
+}
+
+.filter-btn {
+    padding: 10px 20px;
+    background-color: var(--btn-secondary);
+    color: var(--text-light);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.filter-btn:hover {
+    background-color: var(--btn-secondary-hover);
+}
+
+.clear-btn {
+    padding: 10px 20px;
+    background-color: var(--btn-accent);
+    color: var(--text-light);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.clear-btn:hover {
+    background-color: var(--btn-accent-hover);
+}
+
+.homework-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.homework-item {
+    background-color: var(--bg-secondary);
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 4px var(--card-shadow);
+    border: 1px solid var(--card-border);
+}
+
+.homework-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.homework-title {
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.homework-status {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.status.active {
+    background-color: var(--text-primary);
+    color: var(--text-light);
+}
+
+.status.completed {
+    background-color: var(--text-primary);
+    color: var(--text-light);
+}
+
+.status.overdue {
+    background-color: var(--error-color);
+    color: var(--text-light);
+}
+
+.homework-details {
+    margin-bottom: 15px;
+}
+
+.homework-details p {
+    margin: 5px 0;
+    color: var(--text-secondary);
+}
+
+.homework-details strong {
+    color: var(--text-primary);
+    margin-right: 5px;
+}
+
+.homework-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.homework-actions button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 14px;
+}
+
+.edit-homework {
+    background-color: var(--btn-secondary);
+    color: var(--text-light);
+}
+
+.edit-homework:hover {
+    background-color: var(--btn-secondary-hover);
+}
+
+.delete-homework {
+    background-color: var(--error-color);
+    color: var(--text-light);
+}
+
+.delete-homework:hover {
+    background-color: var(--primary-dark);
+}
+
+.view-submissions {
+    background-color: var(--btn-primary);
+    color: var(--text-light);
+}
+
+.view-submissions:hover {
+    background-color: var(--btn-primary-hover);
+}
+
+/* Стили для ссылки, чтобы она выглядела как кнопка */
+.homework-actions a.view-submissions {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 14px;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    background-color: var(--btn-primary);
+    color: var(--text-light);
+}
+
+.homework-actions a.view-submissions:hover {
+    background-color: var(--btn-primary-hover);
+    text-decoration: none;
+}
+
+.extend-deadline {
+    background-color: var(--btn-secondary);
+    color: var(--text-light);
+}
+
+.extend-deadline:hover {
+    background-color: var(--btn-secondary-hover);
+}
+
+.close-homework {
+    background-color: var(--accent-color);
+    color: var(--text-primary);
+}
+
+.close-homework:hover {
+    background-color: var(--accent-dark);
+}
+
+/* Стили для страницы просмотра работ */
+.back-btn {
+    padding: 8px 16px;
+    background-color: #718096;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.back-btn:hover {
+    background-color: #4A5568;
+    text-decoration: none;
+    color: white;
+}
+
+.homework-info {
+    background-color: #F7FAFC;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.homework-info p {
+    margin: 5px 0;
+    color: #718096;
+}
+
+.submissions-table {
+    background-color: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.submissions-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.submissions-table th,
+.submissions-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #E2E8F0;
+}
+
+.submissions-table th {
+    background-color: #F7FAFC;
+    font-weight: 600;
+    color: #2D3748;
+}
+
+.submissions-table tr:hover {
+    background-color: #F7FAFC;
+}
+
+.submissions-table tr.submitted {
+    background-color: #F0FFF4;
+}
+
+.submissions-table tr.not-submitted {
+    background-color: #FED7D7;
+}
+
+.status.submitted {
+    background-color: #48BB78;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.status.not-submitted {
+    background-color: #E53E3E;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.file-link {
+    color: #3182CE;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.file-link:hover {
+    text-decoration: underline;
+}
+
+.no-file {
+    color: #A0AEC0;
+    font-style: italic;
+}
+
+.grade.has-grade {
+    font-weight: 600;
+    color: #2F855A;
+}
+
+.grade.no-grade {
+    color: #A0AEC0;
+    font-style: italic;
+}
+
+.no-grade {
+    color: #A0AEC0;
+}
+
+.feedback {
+    max-width: 200px;
+    word-wrap: break-word;
+}
+
+.no-feedback {
+    color: #A0AEC0;
+    font-style: italic;
+}
+
+.grade-btn {
+    padding: 6px 12px;
+    background-color: #4299E1;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background-color 0.3s;
+}
+
+.grade-btn:hover {
+    background-color: #3182CE;
+}
+
+.no-action {
+    color: #A0AEC0;
+}
+
+/* Модальное окно */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+    background-color: white;
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 500px;
+    position: relative;
+}
+
+.close {
+    color: #A0AEC0;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: #2D3748;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #2D3748;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #E2E8F0;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.form-group textarea {
+    resize: vertical;
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.save-btn {
+    padding: 8px 16px;
+    background-color: #48BB78;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.save-btn:hover {
+    background-color: #38A169;
+}
+
+.cancel-btn {
+    padding: 8px 16px;
+    background-color: #A0AEC0;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.cancel-btn:hover {
+    background-color: #718096;
+}
+
+/* Стили для модального окна удаления */
+.delete-warning {
+    background-color: #FED7D7;
+    border: 1px solid #E53E3E;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.delete-warning p {
+    margin: 8px 0;
+    color: #2D3748;
+}
+
+.delete-warning ul {
+    margin: 10px 0;
+    padding-left: 20px;
+}
+
+.delete-warning li {
+    margin: 5px 0;
+    color: #2D3748;
+}
+
+.delete-btn {
+    padding: 8px 16px;
+    background-color: #E53E3E;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.delete-btn:hover {
+    background-color: #C53030;
+}
+
+table tr, table td, table th {
+    background: #fff !important;
+    color: #222 !important;
+} 

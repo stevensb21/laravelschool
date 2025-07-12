@@ -1,0 +1,204 @@
+* {
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    display: flex;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    height: 100vh;
+    background-color: #f4fcfa;
+    font-family: 'Source Serif Pro', serif;
+}
+
+body, .container, .content, .main-bg {
+    background: var(--main-bg) !important;
+}
+
+.content {
+    padding: 20px;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;  /* Два столбца */
+    gap: 10px; 
+}
+
+.photo {
+    border-radius: 50%;
+    width: 200px;
+    height: 200px;
+    margin-left: 100px;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+    
+}
+
+.photo img {
+    border-radius: 50%;
+    width: 100%; /* Ширина изображения */
+     height: auto; /* Высота автоматически */
+     object-fit: cover;
+}
+
+
+.info {
+    width: 399px;
+    height: 70px;
+    margin-left: 50px;
+    margin-top: 5%;
+    flex: 1;
+    line-height: 0.5;
+}
+
+.static{
+    width: 642px;
+    height: 130px;
+}
+
+.reviews-container {
+    width: 438px;
+    height: 268px;
+    border-radius: 30px;
+    margin-top: 10px;
+    padding-left: 10px;
+    overflow-y: auto; 
+    scrollbar-width: none;
+    background-color: white;
+    padding: 15px;
+    border-radius: 30px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.reviews{
+    border-left: 3px solid #3182CE;
+    border-radius: 3px;
+    padding-left: 3px;
+}
+
+.education, .achievements, .items {
+    background-color: white;
+    height: 130;
+    padding: 10px;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.items ul{
+  margin-left: 30px;
+}
+
+.average {
+    display: flex;
+}
+
+.average div{
+    width: 5050px;
+    height: 144px;
+    text-align: center;
+    background-color: white;
+    padding: 10px;
+    border-radius: 30px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.average p{
+    margin: 7px;
+}
+
+.averperf, .averatt{
+    margin-right: 48px;
+}
+
+.numbers{
+    color: #3182CE;
+    text-decoration: none;
+}
+
+@media (max-width: 1024px) {
+
+    body {
+        padding-top: 70px !important;
+    }
+    
+
+  .content {
+    display: block;
+    padding: 10px;
+    width: 100% !important;
+  }
+  .profileReviews, .static, .profile, .reviews-container, .statistics, .education, .achievements, .items, .average {
+    width: 100% !important;
+    max-width: 100vw !important;
+    margin: 0 0 16px 0 !important;
+    box-sizing: border-box;
+  }
+  .profile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .photo {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 10px auto;
+  }
+  .info {
+    width: 100% !important;
+    margin: 0;
+    text-align: center;
+    line-height: 1.2;
+  }
+  .reviews-container {
+    padding: 10px;
+    border-radius: 18px;
+    font-size: 15px;
+    min-height: 80px;
+    margin-bottom: 18px;
+  }
+  .reviews {
+    font-size: 14px;
+    padding-left: 8px;
+  }
+  .education, .achievements, .items {
+    margin-bottom: 12px;
+    padding: 10px;
+    border-radius: 12px;
+    font-size: 15px;
+  }
+  .items ul {
+    margin-left: 18px;
+    font-size: 15px;
+  }
+  .average {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .average div {
+    width: 100% !important;
+    min-width: 0;
+    height: auto;
+    margin: 0 0 10px 0;
+    border-radius: 18px;
+    font-size: 16px;
+  }
+  .averperf, .averatt {
+    margin-right: 0;
+  }
+  .numbers {
+    font-size: 22pt !important;
+  }
+  h3 {
+    font-size: 18px !important;
+    margin-bottom: 8px;
+  }
+  p {
+    font-size: 15px !important;
+  }
+}

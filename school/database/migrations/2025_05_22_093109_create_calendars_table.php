@@ -20,6 +20,8 @@ return new class extends Migration
             $table->time('start_time')->nullable();
             $table->time('end_time')->nullable();
             $table->string('teacher')->nullable();
+            $table->date('updated_at');
+            $table->date('created_at');
         });
     }
 
