@@ -5,16 +5,16 @@
 @vite(['resources/css/appeals.css'])
 <style>
 .appeal-form {
-    background: #f7fafc;
+    background: var(--card-bg);
     padding: 32px 24px 24px 24px;
     border-radius: 14px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    box-shadow: 0 2px 8px var(--card-shadow);
     max-width: 600px;
     margin: 0 auto 32px auto;
 }
 .appeal-form label {
     font-weight: 500;
-    color: #2d3748;
+    color: var(--text-primary);
     margin-bottom: 6px;
     display: block;
 }
@@ -23,22 +23,23 @@
 .appeal-form textarea {
     width: 100%;
     padding: 10px 12px;
-    border: 1.5px solid #cbd5e1;
+    border: 1.5px solid var(--input-border);
     border-radius: 7px;
     font-size: 1rem;
     margin-bottom: 16px;
-    background: #fff;
+    background: var(--input-bg);
+    color: var(--text-primary);
     transition: border 0.2s;
 }
 .appeal-form input[type="text"]:focus,
 .appeal-form select:focus,
 .appeal-form textarea:focus {
-    border-color: #3182ce;
+    border-color: var(--input-focus);
     outline: none;
 }
 .appeal-form button {
-    background: #2563eb;
-    color: #fff;
+    background: var(--btn-primary);
+    color: var(--text-light);
     padding: 10px 28px;
     border: none;
     border-radius: 7px;
@@ -49,7 +50,7 @@
     margin-top: 8px;
 }
 .appeal-form button:hover {
-    background: #174ea6;
+    background: var(--btn-primary-hover);
 }
 
 /* Стили для кнопок действий */
@@ -64,21 +65,21 @@
 }
 
 .view-btn {
-    background-color: #3182CE;
-    color: white;
+    background-color: var(--btn-secondary);
+    color: var(--text-light);
 }
 
 .view-btn:hover {
-    background-color: #2C5282;
+    background-color: var(--btn-secondary-hover);
 }
 
 .rate-btn {
-    background-color: #48BB78;
-    color: white;
+    background-color: var(--success-color);
+    color: var(--text-light);
 }
 
 .rate-btn:hover {
-    background-color: #38A169;
+    background-color: var(--status-active);
 }
 
 /* Стили для звездочек рейтинга */
@@ -94,7 +95,7 @@
 
 .rating-stars label {
     font-size: 24px;
-    color: #ddd;
+    color: var(--accent-dark);
     cursor: pointer;
     transition: color 0.3s;
 }
@@ -115,29 +116,29 @@
     right: 20px;
     padding: 15px 20px;
     border-radius: 5px;
-    color: white;
+    color: var(--text-light);
     font-weight: 500;
     z-index: 10000;
     display: none;
 }
 
 .toast-success {
-    background-color: #48BB78;
+    background-color: var(--toast-success);
 }
 
 .toast-error {
-    background-color: #F56565;
+    background-color: var(--toast-error);
 }
 
 .toast-info {
-    background-color: #3182CE;
+    background-color: var(--toast-info);
 }
 
 /* Стили для вкладок */
 .appeals-tabs {
     display: flex;
     margin-bottom: 20px;
-    border-bottom: 2px solid #e2e8f0;
+    border-bottom: 2px solid var(--border-light);
 }
 
 .tab-btn {
@@ -147,18 +148,18 @@
     cursor: pointer;
     font-size: 14px;
     font-weight: 500;
-    color: #718096;
+    color: var(--text-muted);
     border-bottom: 2px solid transparent;
     transition: all 0.3s;
 }
 
 .tab-btn:hover {
-    color: #2d3748;
+    color: var(--text-primary);
 }
 
 .tab-btn.active {
-    color: #2563eb;
-    border-bottom-color: #2563eb;
+    color: var(--btn-primary);
+    border-bottom-color: var(--btn-primary);
 }
 
 .tab-content {
@@ -171,12 +172,19 @@
 
 /* Стили для кнопки ответа */
 .reply-btn {
-    background-color: #ED8936;
-    color: white;
+    background-color: var(--btn-primary);
+    color: var(--text-light);
 }
 
 .reply-btn:hover {
-    background-color: #DD6B20;
+    background-color: var(--btn-primary-hover);
+    opacity: 0.85;
+}
+
+@media (max-width: 600px) {
+  .students-container {
+    margin: 20px 0 0 0 !important;
+  }
 }
 </style>
 @endsection

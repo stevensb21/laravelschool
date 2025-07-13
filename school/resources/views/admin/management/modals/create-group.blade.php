@@ -1,4 +1,4 @@
-<div id="createGroupModal" class="modal">
+<div id="createGroupModal" class="modal" style="top: 50px;">
     <div class="modal-content">
         <span class="close" onclick="closeModal('createGroupModal')">&times;</span>
         <h3>Создать новую группу</h3>

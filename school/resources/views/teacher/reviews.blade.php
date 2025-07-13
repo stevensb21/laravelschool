@@ -1,7 +1,8 @@
 @extends('admin.layouts.head')
 @section('head')
 @vite(['resources/css/reviews.css'])
-@vite(['resources/css/teacher/dashboard.css'])
+@vite(['resources/css/colors.css'])
+@vite(['resources/css/student/dashboard.css'])
 @endsection
 
 @if(isset($isAdmin) && $isAdmin)
@@ -15,7 +16,7 @@
         <div class="admin-header" style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
             <h2 style="margin: 0; color: #333;">Отзывы преподавателя: {{ $teacher->fio ?? auth()->user()->name }}</h2>
             @if(isset($teacher))
-                <a href="{{ route('admin.teacher.profile', $teacher->users_id) }}" class="action-btn" style="background: #2563eb; color: white; padding: 8px 16px; border-radius: 4px; text-decoration: none; font-size: 14px;">Назад к профилю</a>
+                <a href="{{ route('admin.teacher.profile', $teacher->users_id) }}" class="action-btn" style="background: var(--btn-primary); color: white; padding: 8px 16px; border-radius: 4px; text-decoration: none; font-size: 14px;">Назад к профилю</a>
             @endif
         </div>
     @endif

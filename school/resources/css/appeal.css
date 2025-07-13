@@ -46,12 +46,17 @@
 
 .appeals-filters select {
     padding: 10px;
-    border: 1px solid #E2E8F0;
-    border-radius: 5px;
+    border: 1.5px solid var(--input-border);
+    border-radius: 6px;
     font-size: 14px;
     min-width: 150px;
-    color: #2D3748;
-    background-color: white;
+    color: var(--text-primary);
+    background-color: var(--input-bg);
+    transition: border 0.2s;
+}
+.appeals-filters select:focus {
+    border-color: var(--input-focus);
+    outline: none;
 }
 
 .appeals-list {
@@ -88,18 +93,18 @@
 }
 
 .status.new {
-    background-color: #EBF8FF;
-    color: #2B6CB0;
+    background-color: var(--status-pending);
+    color: var(--text-light);
 }
 
 .status.in-progress {
-    background-color: #FEFCBF;
-    color: #975A16;
+    background-color: var(--status-active);
+    color: var(--text-light);
 }
 
 .status.resolved {
-    background-color: #F0FFF4;
-    color: #2F855A;
+    background-color: var(--status-completed);
+    color: var(--text-light);
 }
 
 .appeal-details {

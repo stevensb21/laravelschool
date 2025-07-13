@@ -60,10 +60,10 @@ class StudentController extends Controller
             // Валидация данных
             $validated = $request->validate([
                 'users_id' => 'required|exists:users,id',
-                'login' => 'required|unique:users,name,' . $validated['users_id'],
+                'login' => 'required|unique:users,name,' . $request->users_id,
                 'fio' => 'required',
                 'numberphone' => 'required',
-                'email' => 'required|email|unique:students,email,' . $validated['users_id'] . ',users_id',
+                'email' => 'required|email|unique:students,email,' . $request->users_id . ',users_id',
                 'femaleparent' => 'required',
                 'numberparent' => 'required',
                 'group' => 'required',
@@ -396,66 +396,38 @@ class StudentController extends Controller
         $attendance = 0;
         
         if ($student) {
-            // Получаем данные из таблицы home_work_students
-            $homeworkGrades = \App\Models\HomeWorkStudent::where('student_id', $student->id)->get();
-            
-            // Статистика оценок и посещаемости
+            $statistics = $student->statistics()->get();
             $allGrades = [];
-            $examGrades = [];
-            $totalLessons = 0;
-            $attendedLessons = 0;
-
-            foreach ($homeworkGrades as $grade) {
-                // Если home_work_id = 0, это урок (не домашнее задание)
-                if ($grade->home_work_id == 0) {
-                    $totalLessons++;
-                    
-                    if ($grade->grade > 0) {
-                        // Был на уроке и получил оценку
-                        $attendedLessons++;
-                        
-                        if ($grade->grade > 2) {
-                            $allGrades[] = $grade->grade;
-                            
-                            // Определяем тип оценки
-                            if ($grade->grade >= 4.5) {
-                                $gradeStats['fives']++;
-                            } elseif ($grade->grade >= 3.5) {
-                                $gradeStats['fours']++;
-                            } elseif ($grade->grade >= 2.5) {
-                                $gradeStats['threes']++;
-                            } else {
-                                $gradeStats['twos']++;
-                            }
-                        }
-                    }
-                    // Если grade = 0, значит не было на занятии
-                } else {
-                    // Это домашнее задание
-                    if ($grade->grade > 0 && $grade->grade > 2) {
-                        $allGrades[] = $grade->grade;
-                        
-                        // Определяем тип оценки
-                        if ($grade->grade >= 4.5) {
-                            $gradeStats['fives']++;
-                        } elseif ($grade->grade >= 3.5) {
-                            $gradeStats['fours']++;
-                        } elseif ($grade->grade >= 2.5) {
-                            $gradeStats['threes']++;
-                        } else {
-                            $gradeStats['twos']++;
-                        }
-                    }
+            $gradeStats = [
+                'fives' => 0,
+                'fours' => 0,
+                'threes' => 0,
+                'twos' => 0
+            ];
+            foreach ($statistics as $stat) {
+                // Оценки за уроки
+                if ($stat->grade_lesson > 0) {
+                    $allGrades[] = $stat->grade_lesson;
+                    if ($stat->grade_lesson >= 4.5) $gradeStats['fives']++;
+                    elseif ($stat->grade_lesson >= 3.5) $gradeStats['fours']++;
+                    elseif ($stat->grade_lesson >= 2.5) $gradeStats['threes']++;
+                    else $gradeStats['twos']++;
+                }
+                // Оценки за домашки
+                if ($stat->homework > 0) {
+                    $allGrades[] = $stat->homework;
+                    if ($stat->homework >= 4.5) $gradeStats['fives']++;
+                    elseif ($stat->homework >= 3.5) $gradeStats['fours']++;
+                    elseif ($stat->homework >= 2.5) $gradeStats['threes']++;
+                    else $gradeStats['twos']++;
                 }
             }
-            
-            // Считаем средние значения
             $average = count($allGrades) > 0 ? round(array_sum($allGrades) / count($allGrades), 2) : 0;
             $average_exam = $average; // Пока считаем экзамен как общий средний балл
+            $totalLessons = $statistics->count();
+            $attendedLessons = $statistics->where('attendance', true)->count();
             $attendance = $totalLessons > 0 ? round($attendedLessons / $totalLessons * 100, 1) : 0;
-            
-            // Получаем оценки для отображения в таблице (из statistics для совместимости)
-            $grades = $student->statistics()->orderByDesc('created_at')->get();
+            $grades = $statistics->sortByDesc('created_at');
         }
         
         return view('student.grades', compact('user', 'grades', 'gradeStats', 'average', 'average_exam', 'attendance'));

@@ -6,7 +6,7 @@
     <main class="content">
         <div class="admin-dashboard">
             <div class="dashboard-header">
-                <h2>Личный кабинет преподавателя: {{ $teacher->fio }}</h2>
+                <h2> {{ $teacher->fio }}</h2>
                 <a href="{{ route('teacher') }}" class="action-btn">Назад к списку преподавателей</a>
             </div>
             
@@ -114,6 +114,8 @@
 </div>
 
 <style>
+@import './colors.css';
+
 .admin-dashboard {
     padding: 20px;
 }
@@ -169,6 +171,7 @@
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 20px;
     margin-bottom: 30px;
+    color: #131936;
 }
 
 .stat-card {
@@ -187,7 +190,7 @@
 .stat-value {
     font-size: 32px;
     font-weight: bold;
-    color: #2563eb;
+
     margin-bottom: 8px;
 }
 
@@ -230,7 +233,7 @@
     background: #f8fafc;
     border-radius: 8px;
     padding: 15px;
-    border-left: 3px solid #2563eb;
+    border-left: 3px solid #131936;
 }
 
 .review-header {
@@ -317,7 +320,7 @@
 }
 
 .action-btn {
-    background: #2563eb;
+    background: var(--btn-primary);
     color: white;
     padding: 10px 20px;
     border-radius: 6px;
@@ -327,7 +330,7 @@
 }
 
 .action-btn:hover {
-    background: #1d4ed8;
+    background: var(--btn-primary-hover);
     color: white;
     text-decoration: none;
 }

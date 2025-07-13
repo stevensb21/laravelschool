@@ -71,6 +71,9 @@ class TeacherController extends Controller
             $education = array_filter(explode("\n", str_replace("\r", "", $validated['education'])));
             $achievements = $validated['achievements'] ? array_filter(explode("\n", str_replace("\r", "", $validated['achievements']))) : [];
 
+            \Log::info('Education from request:', [$validated['education']]);
+            \Log::info('Education parsed:', [$education]);
+
             // Обновляем преподавателя
             $teacher->update([
                 'fio' => $validated['fio'],
@@ -80,6 +83,8 @@ class TeacherController extends Controller
                 'achievements' => $achievements,
                 'email' => $validated['email'],
             ]);
+
+            \Log::info('Teacher after update:', [$teacher->fresh()]);
 
             DB::commit();
             return redirect()->back()->with('success', 'Преподаватель успешно отредактирован');

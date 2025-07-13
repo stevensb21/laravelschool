@@ -33,52 +33,7 @@ body, .container, .content, .main-bg {
     width: 100%;
 }
 
-@media (max-width: 768px) {
 
-    .homework-actions {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        text-align: center; 
-    }
-    body {
-        padding-top: 0px !important;
-    }
-    .select-group {
-      display: flex;
-      flex-direction: column;
-      gap: 10px; /* расстояние между фильтрами */
-      width: 100%;
-    }
-    .select-group select,
-    .select-group button {
-      width: 100%;
-      box-sizing: border-box;
-      margin-bottom: 3px;
-    }
-  }
-
-  @media (max-width: 1024px) {
-    body {
-        padding-top: 0px !important;
-    }
-    .select-group {
-      display: flex;
-      flex-direction: column;
-      gap: 10px; /* расстояние между фильтрами */
-      width: 100%;
-      
-    }
-    .select-group select,
-    .select-group button,
-    .select-group input,
-    .select-group button {
-      width: 100%;
-      box-sizing: border-box;
-      margin-top: 5px;
-    }
-  }
 
 .homework-filters input,
 .homework-filters select {
@@ -156,12 +111,12 @@ body, .container, .content, .main-bg {
 }
 
 .status.active {
-    background-color: var(--text-primary);
+    background-color: var(--status-active);
     color: var(--text-light);
 }
 
 .status.completed {
-    background-color: var(--text-primary);
+    background-color: var(--status-completed);
     color: var(--text-light);
 }
 
@@ -266,16 +221,19 @@ body, .container, .content, .main-bg {
 /* Стили для страницы просмотра работ */
 .back-btn {
     padding: 8px 16px;
-    background-color: #718096;
+    background-color: var(--btn-primary);
     color: white;
     text-decoration: none;
     border-radius: 5px;
     font-size: 14px;
+    margin-left: 10px;
     transition: background-color 0.3s;
+    text-align: center;
+    justify-content: center;
 }
 
 .back-btn:hover {
-    background-color: #4A5568;
+    background-color: var(--btn-primary-hover);
     text-decoration: none;
     color: white;
 }
@@ -293,10 +251,8 @@ body, .container, .content, .main-bg {
 }
 
 .submissions-table {
-    background-color: white;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    overflow-x: auto;
+    width: 100%;
 }
 
 .submissions-table table {
@@ -330,8 +286,8 @@ body, .container, .content, .main-bg {
 }
 
 .status.submitted {
-    background-color: #48BB78;
-    color: white;
+    background-color: var(--status-active);
+    color: var(--text-light);
     padding: 4px 8px;
     border-radius: 4px;
     font-size: 12px;
@@ -339,8 +295,8 @@ body, .container, .content, .main-bg {
 }
 
 .status.not-submitted {
-    background-color: #E53E3E;
-    color: white;
+    background-color: var(--error-color);
+    color: var(--text-light);
     padding: 4px 8px;
     border-radius: 4px;
     font-size: 12px;
@@ -388,7 +344,7 @@ body, .container, .content, .main-bg {
 
 .grade-btn {
     padding: 6px 12px;
-    background-color: #4299E1;
+    background-color: var(--btn-primary);
     color: white;
     border: none;
     border-radius: 4px;
@@ -398,7 +354,7 @@ body, .container, .content, .main-bg {
 }
 
 .grade-btn:hover {
-    background-color: #3182CE;
+    background-color: var(--btn-primary-hover);
 }
 
 .no-action {
@@ -473,7 +429,7 @@ body, .container, .content, .main-bg {
 
 .save-btn {
     padding: 8px 16px;
-    background-color: #48BB78;
+    background-color: var(--table-header);
     color: white;
     border: none;
     border-radius: 4px;
@@ -482,12 +438,12 @@ body, .container, .content, .main-bg {
 }
 
 .save-btn:hover {
-    background-color: #38A169;
+    background-color: var(--nav-hover);
 }
 
 .cancel-btn {
     padding: 8px 16px;
-    background-color: #A0AEC0;
+    background-color: var(--btn-accent);
     color: white;
     border: none;
     border-radius: 4px;
@@ -496,7 +452,7 @@ body, .container, .content, .main-bg {
 }
 
 .cancel-btn:hover {
-    background-color: #718096;
+    background-color: var(--btn-accent-hover);
 }
 
 /* Стили для модального окна удаления */
@@ -542,3 +498,67 @@ table tr, table td, table th {
     background: #fff !important;
     color: #222 !important;
 } 
+
+.select-group select {
+    margin-top: 5px;
+ }
+.select-group button {
+    margin-top: 5px;
+}
+
+
+@media (max-width: 1024px) {
+    body {
+        padding-top: 0px !important;
+    }
+    .select-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px; /* расстояние между фильтрами */
+      width: 100%;
+      
+    }
+
+    .select-group button {
+        margin-top: 5px;
+    }
+
+    .select-group select,
+    .select-group button,
+    .select-group input,
+    .select-group button {
+      width: 100%;
+      box-sizing: border-box;
+
+    }
+  }
+
+  @media (max-width: 768px) {
+
+    .homework-actions {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center; 
+    }
+    body {
+        padding-top: 30px !important;
+    }
+    .select-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px; /* расстояние между фильтрами */
+      width: 100%;
+    }
+    .select-group select,
+    .select-group button {
+      width: 100%;
+      box-sizing: border-box;
+      margin-bottom: 3px;
+    }
+
+    .select-group button {
+        margin-top: 5px;
+    }
+  }

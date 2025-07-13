@@ -20,22 +20,18 @@
                     <input type="text" name="fio" placeholder="Поиск студента..."  value="{{ request('fio') }}">
                     <select name="group">
                         <option value="">Все группы</option>
-                        @foreach ($allGroups as $group):
-                            <option value="{{ $group }}" 
-                            {{ request('group') == $group ? 'selected' : '' }}>
-                                    {{$group}}
+                        @foreach ($allGroups as $group)
+                            <option value="{{ $group }}" {{ request('group') == $group ? 'selected' : '' }}>
+                                {{$group}}
                             </option>
                         @endforeach
                     </select>
-                    <!-- <select name="status">
-                        <option value="">Все статусы</option>
-                            <option value="active">Активный</option>
-                            <option value="inactive">Неактивный</option>
-                        </select> -->
-                    <button type="submit">Применить фильтры</button>
-                    @if(request('fio') || request('group'))
-                        <a href="{{ route('student') }}" class="reset-filters">Сбросить фильтры</a>
-                    @endif
+                    <div class="filters-actions">
+                        <button type="submit">Применить фильтры</button>
+                        @if(request('fio') || request('group'))
+                            <a href="{{ route('student') }}" class="reset-filters">Сбросить фильтры</a>
+                        @endif
+                    </div>
                 </form>
             </div>
             <div class="students-table">

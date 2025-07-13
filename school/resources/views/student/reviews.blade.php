@@ -1,6 +1,7 @@
 @extends('admin.layouts.head')
 @section('head')
 @vite(['resources/css/reviews.css'])
+@vite(['resources/css/colors.css'])
 @vite(['resources/css/student/dashboard.css'])
 @endsection
 

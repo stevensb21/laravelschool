@@ -38,6 +38,17 @@ class Teacher extends Model
         return $this->belongsTo(User::class, 'users_id');
     }
 
+    public function reviews()
+    {
+        return $this->hasMany(\App\Models\Review::class, 'recipient_id')
+            ->where('recipient_type', 'teacher');
+    }
+
+    public function getAverageRatingAttribute()
+    {
+        return round($this->reviews()->avg('rating'), 1);
+    }
+
     /**
      * Вычисляет и обновляет статистику преподавателя на основе оценок студентов из его групп
      */

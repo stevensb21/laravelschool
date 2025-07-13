@@ -34,7 +34,6 @@
     export function openEditModal(teacherData) {
         // Получаем логин пользователя по users_id
        
-                
                 // Заполняем остальные поля формы
                 document.getElementById('edit_users_id').value = teacherData.users_id;
                 document.getElementById('edit_username').value = teacherData.name;
@@ -42,9 +41,9 @@
                 document.getElementById('edit_fio').value = teacherData.fio;
                 document.getElementById('edit_job_title').value = teacherData.job_title;
                 document.getElementById('edit_email').value = teacherData.email;
-                document.getElementById('edit_subjects').value = teacherData.subjects;
-                document.getElementById('edit_education').value = teacherData.education;
-                document.getElementById('edit_achievements').value = teacherData.achievements;
+                document.getElementById('edit_subjects').value = Array.isArray(teacherData.subjects) ? teacherData.subjects.join('\n') : (teacherData.subjects || '');
+                document.getElementById('edit_education').value = Array.isArray(teacherData.education) ? teacherData.education.join('\n') : (teacherData.education || '');
+                document.getElementById('edit_achievements').value = Array.isArray(teacherData.achievements) ? teacherData.achievements.join('\n') : (teacherData.achievements || '');
                 
                 // Показываем модальное окно
                 document.getElementById('editTeacherModal').style.display = 'block';

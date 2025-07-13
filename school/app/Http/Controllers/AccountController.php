@@ -20,8 +20,7 @@ class AccountController extends Controller
             $newAppeals = Appeal::where('status', 'Активно')->count();
             return view('admin/account', compact('user', 'totalStudents', 'totalTeachers', 'activeGroups', 'newAppeals'));
         } elseif ($user->role === 'teacher') {
-            $teacher = Teacher::where('users_id', $user->id)->first();
-            return view('teacher/account', compact('teacher'));
+            return app(\App\Http\Controllers\TeacherController::class)->account(request());
         } else {
             $student = $user->student;
             $group = $student->group;

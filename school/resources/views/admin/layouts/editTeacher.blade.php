@@ -15,7 +15,7 @@
                 
                 <div class="form-group">
                     <label for="edit_username">Логин:</label>
-                    <input type="text" id="edit_username" name="username" required>
+                    <input type="text" id="edit_username" name="name" required>
                 </div>
                 
                 <div class="form-group">

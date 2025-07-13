@@ -1,4 +1,4 @@
-<div id="deleteGroupModal" class="modal">
+<div id="deleteGroupModal" class="modal" style="top: 50px;">
     <div class="modal-content">
         <span class="close" onclick="closeModal('deleteGroupModal')">&times;</span>
         <h3>Удалить группу</h3>

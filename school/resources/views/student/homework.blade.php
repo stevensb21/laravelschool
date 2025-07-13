@@ -1,6 +1,7 @@
 @extends('admin.layouts.head')
 @section('head')
 @vite(['resources/css/homework.css'])
+@vite(['resources/css/colors.css'])
 @endsection
 
 
@@ -65,7 +66,7 @@
                                             <span>Выберите файл</span>
                                             <span class="file-name" style="color:#718096;">Файл не выбран</span>
                                         </label>
-                                        <button type="submit" style="background:#3182ce;color:#fff;padding:8px 18px;border:none;border-radius:6px;font-size:1rem;cursor:pointer;transition:background 0.2s;">Сдать работу</button>
+                                        <button type="submit" style="background:var(--btn-primary);color:#fff;padding:8px 18px;border:none;border-radius:6px;font-size:1rem;cursor:pointer;transition:background 0.2s;">Сдать работу</button>
                                     </form>
                                 @endif
                             </div>

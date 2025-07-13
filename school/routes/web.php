@@ -464,3 +464,90 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/reviews', [App\Http\Controllers\ReviewController::class, 'store'])->name('reviews.store');
     Route::get('/reviews/{recipientType}/{recipientId}', [App\Http\Controllers\ReviewController::class, 'index'])->name('reviews.index');
 });
+
+Route::get('/fix-courses-json', function() {
+    $fixed = 0;
+    $courses = \DB::table('courses')->get();
+    foreach ($courses as $course) {
+        $access = $course->access_;
+        // Если это строка с экранированными кавычками — пробуем декодировать
+        if (is_string($access) && preg_match('/^\s*\\?\"?\{.*\}\"?\s*$/s', $access)) {
+            $decoded = json_decode($access, true);
+            // Если декодировалось в строку — значит, это строка внутри строки
+            if (is_string($decoded)) {
+                $decoded = json_decode($decoded, true);
+            }
+            if (is_array($decoded)) {
+                \DB::table('courses')->where('id', $course->id)->update([
+                    'access_' => json_encode($decoded, JSON_UNESCAPED_UNICODE)
+                ]);
+                $fixed++;
+            }
+        }
+    }
+    return "Исправлено $fixed курсов.";
+});
+
+Route::get('/debug-teacher-structure', function() {
+    $result = [];
+    $teachers = \App\Models\Teacher::with('user')->get();
+    foreach ($teachers as $teacher) {
+        $teacherData = [
+            'users_id' => $teacher->users_id,
+            'fio' => $teacher->fio,
+            'email' => $teacher->email,
+        ];
+        // Курсы, где этот преподаватель есть в access_->teachers
+        $courses = \App\Models\Course::where(function($q) use ($teacher) {
+            $q->whereJsonContains('access_->teachers', (int)$teacher->users_id)
+              ->orWhereJsonContains('access_->teachers', (string)$teacher->users_id);
+        })->get();
+        $teacherData['courses'] = $courses->map(function($c) {
+            return [
+                'id' => $c->id,
+                'name' => $c->name,
+                'access_' => $c->access_,
+            ];
+        });
+        // Группы, где есть хотя бы один из этих курсов
+        $courseIds = $courses->pluck('id')->toArray();
+        $groups = \App\Models\Group::where(function($q) use ($courseIds) {
+            foreach ($courseIds as $cid) {
+                $q->orWhereJsonContains('courses', (int)$cid)
+                  ->orWhereJsonContains('courses', (string)$cid);
+            }
+        })->get();
+        $teacherData['groups'] = $groups->map(function($g) {
+            return [
+                'id' => $g->id,
+                'name' => $g->name,
+                'courses' => $g->courses,
+            ];
+        });
+        // Студенты из этих групп
+        $groupNames = $groups->pluck('name')->toArray();
+        $students = \App\Models\Student::whereIn('group_name', $groupNames)->get();
+        $teacherData['students'] = $students->map(function($s) {
+            return [
+                'id' => $s->id,
+                'fio' => $s->fio,
+                'group_name' => $s->group_name,
+            ];
+        });
+        $result[] = $teacherData;
+    }
+    return response()->json($result);
+});
+
+Route::get('/cleanup-orphan-users', function() {
+    $deleted = \DB::table('users')
+        ->whereNotIn('id', function($q) {
+            $q->select('users_id')->from('teachers');
+        })
+        ->whereNotIn('id', function($q) {
+            $q->select('users_id')->from('students');
+        })
+        ->where('role', '!=', 'admin')
+        ->delete();
+    return 'Удалено пользователей: ' . $deleted;
+});

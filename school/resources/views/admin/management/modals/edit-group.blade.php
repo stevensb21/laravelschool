@@ -1,4 +1,4 @@
-<div id="editGroupModal" class="modal">
+<div id="editGroupModal" class="modal" style="top: 50px;">
     <div class="modal-content" style="max-height:80vh;overflow-y:auto;">
         <span class="close" onclick="closeModal('editGroupModal')">&times;</span>
         <h3>Редактировать группу</h3>

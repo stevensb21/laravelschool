@@ -1,16 +1,29 @@
 /* Импорт цветовых переменных */
 @import './colors.css';
 
-body, .container, .content, .main-bg {
+html, body, .container, .container-method {
+    box-sizing: border-box;
+    max-width: 100vw;
+    overflow-x: hidden;
+}
+
+body, .content, .main-bg {
     background: var(--main-bg) !important;
 }
 
+
+
 .container-method {
-    width: 80%;
-    margin: 2% 2%;
-    box-sizing: border-box;
-    overflow-x: hidden; 
+    background-color: var(--card-bg);
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 4px 6px var(--card-shadow);
+    border: 1px solid var(--card-border);
+    max-width: 100vw;
+    width: 100%;
 }
+   
+
 
 .header {
     display: flex;
@@ -92,7 +105,7 @@ body, .container, .content, .main-bg {
     overflow-y: hidden;
     border-radius: 8px;
     box-shadow: 0 4px 6px var(--card-shadow);
-    margin-top: 20px;
+
     border: 1px solid var(--table-border);
 }
 
@@ -119,8 +132,8 @@ body, .container, .content, .main-bg {
 table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 1200px; /* Минимальная ширина таблицы */
-    margin: 0; /* Убираем margin у таблицы */
+    margin: 0;
+    /* min-width убран */
 }
 
 th, td {
@@ -264,11 +277,11 @@ td a {
 
 .success-message {
     background-color: #e8f5e8;
-    color: #2e7d32;
+    color: var( --table-header);
     padding: 12px;
     margin-bottom: 20px;
     border-radius: 5px;
-    border-left: 4px solid #4caf50;
+    border-left: 4px solid var( --table-header);
 }
 
 /* Стили для формы */
@@ -317,7 +330,7 @@ td a {
 .form-group select:focus,
 .form-group textarea:focus {
     outline: none;
-    border-color: #2196f3;
+    border-color: var( --table-header);
     box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
 }
 
@@ -364,12 +377,12 @@ td a {
 }
 
 .submit-btn {
-    background-color: #2196f3;
+    background-color: var( --table-header);
     color: white;
 }
 
 .submit-btn:hover {
-    background-color: #1976d2;
+    background-color: var( --table-header);
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
 }
@@ -389,7 +402,7 @@ td a {
 @media (max-width: 768px) {
     .modal-content {
         width: 95%;
-        margin: 5% auto;
+        
         padding: 20px;
     }
     
@@ -457,14 +470,14 @@ td a {
     display: block;
     margin-bottom: 8px;
     font-weight: 600;
-    color: #2196f3;
+    color: var( --table-header);
     font-size: 13px;
 }
 
 .file-input {
     width: 100%;
     padding: 8px 12px;
-    border: 2px dashed #2196f3;
+    border: 2px dashed var( --table-header);
     border-radius: 6px;
     background-color: #f8f9ff;
     cursor: pointer;
@@ -473,13 +486,13 @@ td a {
 }
 
 .file-input:hover {
-    border-color: #1976d2;
+    border-color: var( --table-header);
     background-color: #e3f2fd;
 }
 
 .file-input:focus {
     outline: none;
-    border-color: #1976d2;
+    border-color: var( --table-header);
     box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
 }
 
@@ -492,7 +505,7 @@ td a {
 
 /* Стили для выбранных файлов */
 .file-input::file-selector-button {
-    background-color: #2196f3;
+    background-color: var( --border-dark);
     color: white;
     border: none;
     padding: 8px 16px;
@@ -504,7 +517,7 @@ td a {
 }
 
 .file-input::file-selector-button:hover {
-    background-color: #1976d2;
+    background-color:  var( --btn-primary);
 }
 
 /* Адаптивные стили для мобильных устройств */
@@ -522,7 +535,7 @@ td a {
     }
     
     .table-container {
-        margin-top: 10px;
+ 
         border-radius: 4px;
     }
     
@@ -567,7 +580,7 @@ td a {
 }
 
 .edit-button {
-    background: #131936;
+    background: var(--btn-primary);
     color: white;
     border: none;
     padding: 10px 20px;
@@ -582,7 +595,7 @@ td a {
 }
 
 .edit-button:hover {
-    background: #283057;
+    background: var(--btn-primary);
     transform: translateY(-1px);
 }
 
@@ -592,107 +605,170 @@ td a {
 
 /* Стили для состояния "Отменить" */
 .edit-button.cancel-mode {
-    background: #f44336;
+    background: var(--btn-primary);
 }
 
 .edit-button.cancel-mode:hover {
-    background: #d32f2f;
+    background: var(--btn-primary-hover);
 }
-
-@media (max-width: 768px) {
-  .methodology-page .edit-button,
-  .methodology-page .reset-filters,
-  .methodology-page button,
-  .methodology-page input[type="submit"] {
-    display: block;
-    width: 100%;
-    margin: 10px 0 0 0;
-    padding: 12px 0;
-    font-size: 16px;
-    border-radius: 8px;
-    background: #3b5b4b;
-    color: #fff;
-    border: none;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-    transition: background 0.2s;
-    font-weight: 500;
-  }
-  .methodology-page .edit-button:hover,
-  .methodology-page .reset-filters:hover,
-  .methodology-page button:hover,
-  .methodology-page input[type="submit"]:hover {
-    background: #274034;
-  }
-
-  .container-method {
-    width: 100%;
-  }
-
-  .methodology-page select {
-    width: 100%;
-    padding: 10px;
-    font-size: 16px;
-    border-radius: 8px;
-    border: 1px solid #bfc8c2;
-    margin-top: 10px;
-    background: #f8faf9;
-    box-sizing: border-box;
-  }
-
-  .methodology-page table {
-    width: 100%;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-    font-size: 14px;
-    background: #fff;
-    margin-top: 16px;
-  }
-  .methodology-page th, .methodology-page td {
-    padding: 8px 6px;
-    text-align: center;
-    word-break: break-word;
-  }
-  .methodology-page th {
-    background: #3b5b4b;
-    color: #fff;
-    font-weight: 600;
-  }
-  .methodology-page td {
-    background: #f8faf9;
-    color: #222;
-  }
-
-  .methodology-page {
-    background: #f8faf9 !important;
-    padding: 0 8px !important;
-  }
-  .methodology-page h1, 
-  .methodology-page h2, 
-  .methodology-page h3, 
-  .methodology-page h4 {
-    margin-top: 18px;
-    margin-bottom: 10px;
-    font-size: 20px;
-    font-weight: 700;
-  }
-  .methodology-page .filters, .methodology-page .filters-form {
-    margin-bottom: 12px !important;
-  }
-}
-
+/* 
 @media (max-width: 1024px) {
     
   
     .container-method {
-      width: 100%;
-      padding-top: 50px;
+        max-width: 950px;
+        margin: 30px auto;
+        width: 100%;
+        background-color: var(--card-bg);
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 4px 6px var(--card-shadow);
+        border: 1px solid var(--card-border);
     }
-  
+    
+    .appeals-header {
+        justify-content: space-between;
+    }
     
    
    
+  } */
+@media (max-width: 900px) {
+    .container-method {
+        padding: 5px;
+    }
+    .table-container table,
+    .table {
+        font-size: 13px;
+    }
+}
+
+/* 
+@media (max-width: 900px) {
+    
+
+    .filters form {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 10px !important;
+        width: 100% !important;
+        display: flex !important;
+    }
+    .filters form > * {
+        width: 100% !important;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
+        margin: 0 !important;
+    }
+    .filters {
+        padding: 0 0 0 0 !important;
+    }
+} */
+
+
+
+  
+  
+  
+  @media (max-width: 768px) {
+    
+
+
+
+    .methodology-page .edit-button,
+    .methodology-page .reset-filters,
+    .methodology-page button,
+    .methodology-page input[type="submit"] {
+      display: block;
+      width: 100%;
+      margin: 10px 0 0 0;
+      padding: 12px 0;
+      font-size: 16px;
+      border-radius: 8px;
+      background: #3b5b4b;
+      color: #fff;
+      border: none;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      transition: background 0.2s;
+      font-weight: 500;
+    }
+    .methodology-page .edit-button:hover,
+    .methodology-page .reset-filters:hover,
+    .methodology-page button:hover,
+    .methodology-page input[type="submit"]:hover {
+      background: #274034;
+    }
+  
+    
+  
+    .methodology-page select {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #bfc8c2;
+      margin-top: 10px;
+      background: #f8faf9;
+      box-sizing: border-box;
+    }
+  
+    .methodology-page table {
+      width: 100%;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      font-size: 14px;
+      background: #fff;
+      margin-top: 16px;
+    }
+    .methodology-page th, .methodology-page td {
+      padding: 8px 6px;
+      text-align: center;
+      word-break: break-word;
+    }
+    .methodology-page th {
+      background: #3b5b4b;
+      color: #fff;
+      font-weight: 600;
+    }
+    .methodology-page td {
+      background: #f8faf9;
+      color: #222;
+    }
+  
+    .methodology-page {
+      background: #f8faf9 !important;
+      padding: 0 8px !important;
+    }
+    .methodology-page h1, 
+    .methodology-page h2, 
+    .methodology-page h3, 
+    .methodology-page h4 {
+      margin-top: 18px;
+      margin-bottom: 10px;
+      font-size: 20px;
+      font-weight: 700;
+    }
+    .methodology-page .filters, .methodology-page .filters-form {
+      margin-bottom: 12px !important;
+    }
+  
+
+
+      .container, .container-method {
+        max-width: 100% !important;
+        width: 100% !important;
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+        box-sizing: border-box;
+    }
+    .header {
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
+    .edit-button {
+        width: 100% !important;
+        margin-top: 10px;
+        box-sizing: border-box;
+    }
   }
-  
-  
-  
