@@ -210,10 +210,10 @@ class ManagementController extends Controller
 
         Course::create([
             'name' => $request->name,
-            'access_' => json_encode([
+            'access_' => [
                 'groups' => $request->access_groups ?? [],
                 'teachers' => $selectedUsers
-            ])
+            ]
         ]);
 
         return redirect()->back()->with('success', 'Курс успешно создан');
@@ -252,10 +252,10 @@ class ManagementController extends Controller
 
         $course->update([
             'name' => $request->name,
-            'access_' => json_encode([
+            'access_' => [
                 'groups' => $request->access_groups ?? [],
                 'teachers' => $selectedUsers
-            ])
+            ]
         ]);
 
         return redirect()->back()->with('success', "Курс '{$oldName}' успешно обновлен");

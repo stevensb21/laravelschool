@@ -24,7 +24,7 @@
                             $absent = $total - $present;
                             $percentage = $total > 0 ? round(($present / $total) * 100, 1) : 0;
                         @endphp
-                        <div style="display:flex;gap:20px;align-items:center;flex-wrap:wrap;">
+                        <div class="attendance-stats-center">
                             <div style="background:#f7fafc;padding:15px;border-radius:8px;min-width:150px;text-align:center;">
                                 <div style="font-size:24px;font-weight:600;color:#38a169;">{{ $percentage }}%</div>
                                 <div style="font-size:14px;color:#718096;">Общая посещаемость</div>
@@ -39,6 +39,21 @@
                             </div>
                         </div>
                     </div>
+                    <style>
+                        .attendance-stats-center {
+                            display: flex;
+                            justify-content: center;
+                            gap: 20px;
+                            flex-wrap: wrap;
+                        }
+                        @media (max-width: 600px) {
+                            .attendance-stats-center {
+                                flex-direction: column;
+                                align-items: center;
+                                gap: 12px;
+                            }
+                        }
+                    </style>
                     
                     <div class="students-table">
                         <table>

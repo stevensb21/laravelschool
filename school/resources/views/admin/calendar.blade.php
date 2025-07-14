@@ -85,12 +85,12 @@
                     </div>                   
                 </form>
                 @if($isAdmin)
-                    @if(request()->has('edit_mode'))
-                        <form method="GET" action="{{ url()->current() }}" class="edit-form" style="display:inline;">
-                            <button type="submit" class="edit-button" style="background:#b0b0b0;">Выйти из режима редактирования</button>
+                    @if($data['edit_mode'] ?? false)
+                        <form method="GET" action="{{ route('calendar') }}" class="edit-form" style="display:inline;">
+                            <button type="submit" class="edit-button" style="background:#b0b0b0;">Просмотр</button>
                         </form>
                     @else
-                        <form method="GET" action="{{ route('calendar.edit') }}" class="edit-form">
+                        <form method="GET" action="{{ route('calendar') }}" class="edit-form">
                             <input type="hidden" name="edit_mode" value="1">
                             <button type="submit" class="edit-button">Изменить</button>
                         </form>
@@ -167,7 +167,7 @@
             echo("<script>console.log('endHour: ".json_encode($endHour)."');</script>");
             echo("<script>console.log('endMinute: ".json_encode($endMinute)."');</script>");
             
-            $style = "grid-column: " . ($day + 1) . "; grid-row: " . ($hour - 6) . "; border-radius: 10px; color: var(--btn-primary:);";
+            $style = "grid-column: " . ($day + 1) . "; grid-row: " . ($hour - 6) . "; border-radius: 10px; color: var(--btn-primary);";
             
             if ($lesson) {
                 $start_minute = (int)date('i', strtotime($lesson['start_time']));
@@ -179,15 +179,15 @@
                 $isLastHour = ($hour == (int)date('G', strtotime($lesson['end_time'])));
                 
                 // Базовый стиль для ячейки
-                $style .= "background-color: var(--bg-secondary); color: var(--btn-primary:);";
+                $style .= "background-color: var(--bg-secondary); color: var(--btn-primary);";
                 
                 // Сбрасываем класс ячейки для каждой новой итерации
                 $cellClass = 'cell has-lesson';
                 
                 // Если урок начинается в половине часа
                 if ($isFirstHour && $start_minute == 30) {
-                    $style = "grid-column: " . ($day + 1) . "; grid-row: " . ($hour - 6) . "; border-radius: 10px; color: var(--btn-primary:);";
-                    $style .= "background: linear-gradient(to bottom, transparent 50%, var(--bg-secondary) 50%); color: var(--btn-primary:);";
+                    $style = "grid-column: " . ($day + 1) . "; grid-row: " . ($hour - 6) . "; border-radius: 10px; color: var(--btn-primary);";
+                    $style .= "background: linear-gradient(to bottom, transparent 50%, var(--bg-secondary) 50%); color: var(--btn-primary);";
                     
                     // Проверяем, есть ли предыдущий урок
                     $hasPrevLesson = false;
@@ -201,16 +201,16 @@
                     }
                     
                     if ($hasPrevLesson) {
-                        $style = "grid-column: " . ($day + 1) . "; grid-row: " . ($hour - 6) . "; border-radius: 10px; color: var(--btn-primary:);";
-                        $style .= "background: linear-gradient(to bottom, var(--bg-secondary) 50%, var(--bg-secondary) 50%); color: var(--btn-primary:);";
+                        $style = "grid-column: " . ($day + 1) . "; grid-row: " . ($hour - 6) . "; border-radius: 10px; color: var(--btn-primary);";
+                        $style .= "background: linear-gradient(to bottom, var(--bg-secondary) 50%, var(--bg-secondary) 50%); color: var(--btn-primary);";
                         $cellClass = 'cell has-lesson has-split';
                     }
                 }
                 
                 // Если урок заканчивается в половине часа
                 if ($isLastHour && $end_minute == 30) {
-                    $style = "grid-column: " . ($day + 1) . "; grid-row: " . ($hour - 6) . "; border-radius: 10px; color: var(--btn-primary:);";
-                    $style .= "background: linear-gradient(to bottom, var(--bg-secondary) 50%, transparent 50%);color: var(--btn-primary:);";
+                    $style = "grid-column: " . ($day + 1) . "; grid-row: " . ($hour - 6) . "; border-radius: 10px; color: var(--btn-primary);";
+                    $style .= "background: linear-gradient(to bottom, var(--bg-secondary) 50%, transparent 50%);color: var(--btn-primary);";
                     
                     // Проверяем, есть ли следующий урок
                     $hasNextLesson = false;
@@ -224,21 +224,21 @@
                     }
                     
                     if ($hasNextLesson) {
-                        $style = "grid-column: " . ($day + 1) . "; grid-row: " . ($hour - 6) . "; border-radius: 10px; color: var(--btn-primary:);";
-                        $style .= "background: linear-gradient(to bottom, var(--bg-secondary) 50%, var(--bg-secondary) 50%); color: var(--btn-primary:);";
+                        $style = "grid-column: " . ($day + 1) . "; grid-row: " . ($hour - 6) . "; border-radius: 10px; color: var(--btn-primary);";
+                        $style .= "background: linear-gradient(to bottom, var(--bg-secondary) 50%, var(--bg-secondary) 50%); color: var(--btn-primary);";
                         $cellClass = 'cell has-lesson has-split';
                     }
                 }
                 
                 // Добавляем скругления для начала и конца урока
                 if ($isFirstHour && $start_minute == 0) {
-                    $style .= "border-radius: 10px 10px 0 0; color: var(--btn-primary:);";
+                    $style .= "border-radius: 10px 10px 0 0; color: var(--btn-primary);";
                 }
                 if ($isLastHour && $end_minute == 0) {
-                    $style .= "border-radius: 0 0 10px 10px; color: var(--btn-primary:);";
+                    $style .= "border-radius: 0 0 10px 10px; color: var(--btn-primary);";
                 }
                 if ($isFirstHour && $isLastHour && $start_minute == 0 && $end_minute == 0) {
-                    $style .= "border-radius: 10px; color: var(--btn-primary:);";
+                    $style .= "border-radius: 10px; color: var(--btn-primary);";
                 }
                 
                 $style .= "position: relative;";
@@ -252,13 +252,13 @@
                 // Отображение текста урока
                 if ($isFirstHour && $start_minute == 30) {
                     // Текст для урока, начинающегося в половине часа
-                    echo '<div class="half-hour-text" style="top: 50%; height: 50%; background-color: transparent; color: var(--btn-primary:);">';
+                    echo '<div class="half-hour-text" style="top: 50%; height: 50%; background-color: transparent; color: var(--btn-primary);">';
                     echo '<p>' . htmlspecialchars($lesson['subject']) . ' - ' . 
                             (isset($lesson['name_group']) ? htmlspecialchars($lesson['name_group']) : '') . '</p>';
                     echo '</div>';
                 } elseif ($isLastHour && $end_minute == 30) {
                     // Текст для урока, заканчивающегося в половине часа
-                    echo '<div class="half-hour-text" style="top: 0; height: 50%; background-color: transparent; color: var(--btn-primary:);">';
+                    echo '<div class="half-hour-text" style="top: 0; height: 50%; background-color: transparent; color: var(--btn-primary);">';
                     echo '<p>' . htmlspecialchars($lesson['subject']) . ' - ' . 
                             (isset($lesson['name_group']) ? htmlspecialchars($lesson['name_group']) : '') . '</p>';
                     echo '</div>';
@@ -271,14 +271,14 @@
                 }
                 
                 // Кнопка удаления для режима редактирования
-                if (isset($_GET['edit_mode'])) {
+                if ($data['edit_mode'] ?? false) {
                     echo '<form method="POST" action="' . route('calendar.delete-lesson') . '" class="delete-lesson-form" style="position: absolute; top: 2px; right: 2px; z-index: 20;">';
                     echo csrf_field();
                     echo '<input type="hidden" name="lesson_id" value="' . $lesson['id'] . '">';
                     echo '<button type="submit" name="delete_lesson" class="delete-btn" style="background: none; border: none; color: #ff4444; cursor: pointer; font-size: 16px; padding: 2px 6px;">&times;</button>';
                     echo '</form>';
                 }
-            } else if (isset($_GET['edit_mode'])) {
+            } else if ($data['edit_mode'] ?? false) {
                 echo '<button type="button" class="add-btn" onclick="showModal(\'' . date('Y-m-d', strtotime(session('monday') . ' +' . ($day-1) . ' days')) . '\', \'' . sprintf('%02d:00', $hour) . '\')">+</button>';
             }
             
@@ -296,6 +296,9 @@
         <form method="POST" action="{{ route('calendar.add-lesson') }}">
             @csrf
             <input type="hidden" name="date" id="modalDate">
+            @if($data['edit_mode'] ?? false)
+                <input type="hidden" name="edit_mode" value="1">
+            @endif
             
             <div class="form-group">
                 <label>Время начала:</label>
@@ -404,6 +407,8 @@ window.onclick = function(event) {
 
 <!-- Мобильная версия календаря -->
 <div class="calendar-mobile">
+   
+    
     <select id="weekday-select" onchange="showScheduleForDay(this.value)">
         @php
             $weekdays = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье'];
@@ -431,21 +436,46 @@ window.onclick = function(event) {
                             $lesson = $schedule[$i+1][$hour] ?? null;
                         @endphp
                         @if ($lesson)
-                            <li>
-                                <span class="lesson-time">{{ $hour }}:00</span>
-                                <span class="lesson-title">{{ $lesson['subject'] ?? $lesson['name_group'] ?? '' }}</span>
-                                @if(isset($lesson['teacher']))
-                                    <span class="lesson-teacher">{{ $lesson['teacher'] }}</span>
-                                @endif
-                                @if(isset($lesson['name_group']))
-                                    <span class="lesson-group">{{ $lesson['name_group'] }}</span>
-                                @endif
+                            <li class="mobile-lesson-item">
+                                <div class="lesson-info">
+                                    <span class="lesson-time">{{ $hour }}:00</span>
+                                    <span class="lesson-title">{{ $lesson['subject'] ?? $lesson['name_group'] ?? '' }}</span>
+                                    @if(isset($lesson['teacher']))
+                                        <span class="lesson-teacher">{{ $lesson['teacher'] }}</span>
+                                    @endif
+                                    @if(isset($lesson['name_group']))
+                                        <span class="lesson-group">{{ $lesson['name_group'] }}</span>
+                                    @endif
+                                </div>
+                                <!-- Debug info -->
+                                <div style="font-size: 10px; color: #999;">
+                                    <!-- isAdmin: {{ $isAdmin ? 'true' : 'false' }}
+                                    edit_mode: {{ ($data['edit_mode'] ?? false) ? 'true' : 'false' }} -->
+                                </div>
+                                
+                                    @if(true)
+                                    
+                                        <div class="mobile-lesson-actions">
+                                            <div>
+                                                <button class="mobile-delete-btn" onclick="deleteLesson('{{ $lesson['id'] }}')">Удалить</button>
+                                            </div>
+                                        </div>
+                                    @endif
+                                
                             </li>
                         @endif
                     @endfor
                 </ul>
             @else
                 <div class="no-lessons">Уроков сегодня нет</div>
+            @endif
+            
+            @if($isAdmin && ($data['edit_mode'] ?? false))
+                <div class="mobile-add-lesson">
+                    <button type="button" class="mobile-add-btn" onclick="showMobileAddModal('{{ date('Y-m-d', strtotime(session('monday') . ' +' . ($i) . ' days')) }}')">
+                        + Добавить урок
+                    </button>
+                </div>
             @endif
         </div>
     @endforeach
@@ -454,12 +484,35 @@ window.onclick = function(event) {
 <!-- Стили для мобильной версии -->
 <style>
 .calendar-mobile {
+    display: none;
     background: #f8f9fa;
     border-radius: 12px;
     padding: 16px;
     margin: 16px 0;
     box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
+
+.mobile-edit-controls {
+    margin-bottom: 16px;
+    text-align: center;
+}
+
+.mobile-edit-btn {
+    background: var(--btn-primary);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    width: 100%;
+    max-width: 200px;
+}
+
+.mobile-edit-btn:hover {
+    background: var(--btn-primary-hover);
+}
+
 #weekday-select {
     width: 100%;
     padding: 8px;
@@ -468,48 +521,217 @@ window.onclick = function(event) {
     border: 1px solid #d1d5db;
     font-size: 16px;
 }
+
 .mobile-day-schedule h4 {
     margin: 0 0 10px 0;
     font-size: 20px;
     font-weight: 600;
     color: #22223b;
 }
+
 .mobile-lesson-list {
     list-style: none;
     padding: 0;
     margin: 0;
 }
-.mobile-lesson-list li {
+
+.mobile-lesson-item {
     background: #fff;
     border-radius: 8px;
     margin-bottom: 10px;
     padding: 10px 12px;
     box-shadow: 0 1px 4px rgba(0,0,0,0.03);
     display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.lesson-info {
+    display: flex;
     flex-direction: column;
     gap: 2px;
+    flex: 1;
 }
+
+.mobile-lesson-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.mobile-delete-btn {
+    background: var(--btn-primary);
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.mobile-delete-btn:hover {
+    background: var(--btn-primary-hover);
+}
+
+.mobile-add-lesson {
+    margin-top: 16px;
+    text-align: center;
+}
+
+.mobile-add-btn {
+    background: var(--btn-primary);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    width: 100%;
+    max-width: 200px;
+}
+
+.mobile-add-btn:hover {
+    background: var(--btn-primary-hover);
+}
+
 .lesson-time {
     font-weight: bold;
     color: #384034;
 }
+
 .lesson-title {
     font-size: 16px;
     color: #22223b;
 }
+
 .lesson-teacher, .lesson-group {
     font-size: 14px;
     color: #6c757d;
 }
+
 .no-lessons {
     text-align: center;
     color: #b0b0b0;
     font-size: 16px;
     margin: 24px 0;
 }
+
+
+
+/* Мобильная версия: только на телефонах (до 600px) */
 @media (max-width: 600px) {
   .calendar-desktop, .grid-container-calendar { display: none !important; }
   .calendar-mobile { display: block; }
+}
+
+
+/* Стили для модального окна */
+.lesson-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 90%;
+    max-height: 90%;
+    overflow-y: auto;
+    width: 400px;
+}
+
+.modal-content h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+}
+
+.form-group select,
+.form-group input,
+.schedule-filter select {
+    width: 100%;
+    padding: 8px;
+    border: 1.5px solid var(--input-border);
+    border-radius: 6px;
+    font-size: 16px;
+    background: var(--input-bg);
+    color: var(--text-primary);
+    transition: border 0.2s;
+}
+.form-group select:focus,
+.schedule-filter select:focus {
+    border-color: var(--input-focus);
+    outline: none;
+}
+
+.form-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.form-buttons button {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.form-buttons button[type="submit"] {
+    background: var(--btn-primary);
+    color: white;
+}
+
+.form-buttons button[type="submit"]:hover {
+    background: var(--btn-primary-hover);
+}
+
+.cancel-btn {
+    background: var(--btn-secondary);
+    color: white;
+}
+
+.cancel-btn:hover {
+    background: var(--btn-secondary-hover);
+}
+
+@media (max-width: 600px) {
+    .modal-content {
+        width: 95%;
+        margin: 10px;
+        padding: 15px;
+    }
+    
+    .form-buttons {
+        flex-direction: column;
+    }
+    
+    .form-buttons button {
+        margin-bottom: 10px;
+    }
 }
 </style>
 
@@ -529,6 +751,39 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// Функция для показа модального окна добавления урока в мобильной версии
+function showMobileAddModal(date) {
+    const modal = document.getElementById('addLessonModal');
+    const dateInput = document.getElementById('modalDate');
+    const startTimeSelect = document.getElementById('modalStartTime');
+    const endTimeSelect = document.getElementById('modalEndTime');
+    
+    // Устанавливаем дату
+    dateInput.value = date;
+    
+    // Очищаем и заполняем select времени начала
+    startTimeSelect.innerHTML = '';
+    for (let hour = 8; hour <= 21; hour++) {
+        const currentHour = `${String(hour).padStart(2, '0')}:00`;
+        startTimeSelect.add(new Option(currentHour, currentHour));
+        
+        const currentHalfHour = `${String(hour).padStart(2, '0')}:30`;
+        startTimeSelect.add(new Option(currentHalfHour, currentHalfHour));
+    }
+    
+    // Очищаем и заполняем select времени окончания
+    endTimeSelect.innerHTML = '';
+    for (let hour = 8; hour <= 22; hour++) {
+        const currentHour = `${String(hour).padStart(2, '0')}:00`;
+        endTimeSelect.add(new Option(currentHour, currentHour));
+        
+        const currentHalfHour = `${String(hour).padStart(2, '0')}:30`;
+        endTimeSelect.add(new Option(currentHalfHour, currentHalfHour));
+    }
+    
+    modal.style.display = 'flex';
+}
 </script>
 
 @endsection

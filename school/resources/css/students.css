@@ -2,7 +2,7 @@
 @import './colors.css';
 
 .students-container {
-    max-width: 950px;
+    max-width: 100%;
     margin: 30px auto;
     background-color: var(--card-bg);
     border-radius: 15px;
@@ -13,10 +13,10 @@
 }
 
 .students-header {
+    margin-top: 10px;
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
+    
 }
 
 .students-header h2 {
@@ -34,16 +34,26 @@
     cursor: pointer;
     font-size: 14px;
     transition: background-color 0.3s;
+    
 }
 
 .add-student-btn:hover {
     background-color: var(--btn-primary-hover);
 }
 
+.students-filters button, a {
+    margin-left: 10px;
+}
+
 .students-filters {
+    margin-top: 20px;
+
     display: flex;
+    flex-direction: row;
     gap: 15px;
+    align-items: center;
     margin-bottom: 20px;
+   
     padding: 15px;
     background-color: var(--bg-secondary);
     border-radius: 10px;
@@ -57,6 +67,7 @@
     border-radius: 5px;
     font-size: 14px;
     min-width: 200px;
+
     background-color: var(--input-bg);
     color: var(--text-primary);
 }
@@ -66,6 +77,20 @@
     outline: none;
     border-color: var(--input-focus);
     box-shadow: 0 0 0 3px rgba(110, 1, 4, 0.1);
+}
+
+
+.filters-form {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0;
+    margin: 0;
+    padding: 0;
+}
+
+.filters-actions button:first-child {
+    margin-left: 10px;
 }
 
 .filters-form button[type="submit"] {
@@ -78,8 +103,14 @@
     transition: background-color 0.3s;
 }
 
-.filters-form button[type="submit"]:hover {
-    background-color: var(--btn-secondary-hover);
+.filters-form button[type="submit"] {
+    padding: 8px 16px;
+    background-color: var(--btn-secondary);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
 }
 
 .students-table {
@@ -141,17 +172,14 @@
     background-color: var(--status-active);
     color: var(--text-light);
 }
-
 .status.inactive {
     background-color: var(--status-inactive);
     color: var(--text-primary);
 }
-
 .status.warning {
     background-color: var(--status-pending);
     color: var(--text-light);
 }
-
 .status.info {
     background-color: var(--info-color);
     color: var(--text-light);
@@ -243,13 +271,7 @@
     transform: translateY(-2px) scale(1.05);
 }
 
-@media (max-width: 768px) {
-    .students-filters input,
-    .students-filters select,
-    .students-filters button {
-        margin-bottom: 10px;
-    }
-}
+
 
 
 .pagination {
@@ -495,19 +517,23 @@
 }
 
 .reset-filters {
-    background-color: var(--btn-accent);
-    color: var(--text-primary);
-    border: none;
+    
+    background-color: #E2E8F0;
+    text-align: center;
+    justify-content: center;
+    color: #4A5568;
     padding: 8px 16px;
+    border: none;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s;
+    text-decoration: none;
 }
+
 
 .reset-filters:hover {
-    background-color: var(--btn-accent-hover);
+    background-color: #CBD5E0;
 }
-
 .modal-content h2 {
     color: var(--text-primary);
     margin-bottom: 20px;
@@ -528,4 +554,150 @@
 .form-group select.error {
     border-color: var(--error-color);
     box-shadow: 0 0 0 2px rgba(110, 1, 4, 0.2);
+}
+
+.filters-actions {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+    margin: 0;
+}
+.filters-actions button,
+.filters-actions .reset-filters {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    white-space: normal;
+    min-width: 120px;
+    height: auto;
+    min-height: 40px;
+    padding: 8px 16px;
+    line-height: 1.2;
+    word-break: break-word;
+}
+.filters-actions button {
+    background-color: var(--btn-secondary);
+    color: white;
+    transition: background-color 0.3s;
+}
+.filters-actions button:hover {
+    background-color: var(--btn-primary-hover);
+}
+.filters-actions .reset-filters {
+    background-color: #E2E8F0;
+    color: #4A5568;
+    transition: background-color 0.3s;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.filters-actions .reset-filters:hover {
+    background-color: #CBD5E0;
+}
+
+
+@media (max-width: 768px) {
+
+    .students-filters {
+        flex-direction: column;
+    }
+
+    .students-filter {
+        display: flex;
+        flex-direction: column;
+        
+    }
+
+    .students-filters button, a {
+        margin-left: 0px;
+    }
+
+    .students-filters a {
+        margin-top: 10px;
+    }
+
+    .students-filters select,
+    .students-filter input {
+        margin-bottom: 10px;
+        max-width: 100%;
+        width: 100%;
+        margin-top: 10px;
+        box-sizing: border-box;
+    }
+
+
+
+  
+
+    .teachers-header{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    
+    
+    .reset-filters {
+        display: block;
+        padding: 3px;
+        margin-top: 10px;
+        flex: 1 1 0;
+        width: auto;
+        min-width: 0;
+        margin: 0;
+        display: block;
+    }
+
+    .add-student-btn {
+        margin-top: 10px;
+    }
+}
+
+@media (max-width: 600px) {
+
+    .students-header {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+  .students-filters {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .students-filters > * {
+    width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box;
+  }
+  .filters-form {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+  .filters-actions {
+  
+    flex-direction: row;
+    gap: 10px;
+    width: 100%;
+    justify-content: stretch;
+    flex-wrap: wrap;
+  }
+  .filters-actions button,
+  .filters-actions .reset-filters {
+
+    flex: 1 1 0;
+    width: auto;
+    min-width: 0;
+    margin: 0;
+    display: block;
+  }
 }

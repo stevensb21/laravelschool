@@ -1,4 +1,4 @@
-<div id="editCourseModal" class="modal">
+<div id="editCourseModal" class="modal" style="top: 50px;">
     <div class="modal-content" style="max-height:80vh;overflow-y:auto;">
         <span class="close" onclick="closeModal('editCourseModal')">&times;</span>
         <h3>Редактировать курс</h3>

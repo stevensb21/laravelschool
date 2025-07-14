@@ -1,4 +1,4 @@
-<div id="deleteCourseModal" class="modal">
+<div id="deleteCourseModal" class="modal" style="top: 50px;">
     <div class="modal-content">
         <span class="close" onclick="closeModal('deleteCourseModal')">&times;</span>
         <h3>Удалить курс</h3>

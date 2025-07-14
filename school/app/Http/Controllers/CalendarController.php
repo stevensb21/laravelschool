@@ -25,6 +25,7 @@ class CalendarController extends Controller
             $data['isAdmin'] = true;
             $data['isTeacher'] = false;
             $data['isStudent'] = false;
+            $data['edit_mode'] = request()->has('edit_mode');
             return view('admin.calendar', compact('data'));
         } elseif ($role === 'teacher') {
             $teacher = $user->teacher;
@@ -135,38 +136,31 @@ class CalendarController extends Controller
     private function buildShedule($lessons) {
         $schedule = array_fill(1, 7, array_fill(8, 22, null));
         foreach ($lessons as $lesson) {
-            $day = date('w', strtotime($lesson['date_'])); // даты из баззы данных
+            $lessonArr = is_array($lesson) ? $lesson : $lesson->toArray();
+            $day = date('w', strtotime($lessonArr['date_']));
             if($day == 0) {
                 $day = 7;
             }
-            
-            // Получаем время начала и окончания в формате timestamp
-            $start_timestamp = strtotime($lesson['start_time']);
-            $end_timestamp = strtotime($lesson['end_time']);
-            
-            // Получаем часы и минуты
+            $start_timestamp = strtotime($lessonArr['start_time']);
+            $end_timestamp = strtotime($lessonArr['end_time']);
             $start_hour = (int)date('G', $start_timestamp);
             $start_minute = (int)date('i', $start_timestamp);
             $end_hour = (int)date('G', $end_timestamp);
             $end_minute = (int)date('i', $end_timestamp);
-            
-            // Добавляем информацию о частичных часах в данные урока
-            $lesson['partial_start'] = $start_minute > 0;
-            $lesson['partial_end'] = $end_minute > 0;
-            
-            // Заполняем массив расписания
+            $lessonArr['partial_start'] = $start_minute > 0;
+            $lessonArr['partial_end'] = $end_minute > 0;
             for ($hour = $start_hour; $hour <= $end_hour; $hour++) {
                 if ($hour == $start_hour) {
-                    $schedule[$day][$hour] = $lesson;
+                    $schedule[$day][$hour] = $lessonArr;
                 } 
                 elseif ($hour == $end_hour) {
                     if ($end_minute == 0 && $hour > $start_hour) {
                         continue;
                     }
-                    $schedule[$day][$hour] = $lesson;
+                    $schedule[$day][$hour] = $lessonArr;
                 } 
                 else {
-                    $schedule[$day][$hour] = $lesson;
+                    $schedule[$day][$hour] = $lessonArr;
                 }
             }
         }
@@ -224,12 +218,21 @@ class CalendarController extends Controller
         $lesson = new Calendar();
         $lesson->createItem($lessonData);
 
+        // Возвращаемся в режим редактирования, если пользователь был в нем
+        if (request()->has('edit_mode')) {
+            return redirect()->route('calendar', ['edit_mode' => 1]);
+        }
+        
         return redirect('calendar');
     }
 
     public function editMode(Request $request)
     {
         $data = $this->buildCompact();
+        $data['isAdmin'] = true;
+        $data['isTeacher'] = false;
+        $data['isStudent'] = false;
+        $data['edit_mode'] = true;
         return view('admin/calendar', compact('data'));
     }
 
@@ -241,6 +244,11 @@ class CalendarController extends Controller
         
         if ($lesson) {
             $lesson->delete();
+        }
+        
+        // Возвращаемся в режим редактирования, если пользователь был в нем
+        if (request()->has('edit_mode')) {
+            return redirect()->route('calendar', ['edit_mode' => 1]);
         }
         
         return redirect('calendar');

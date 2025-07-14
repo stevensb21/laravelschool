@@ -144,7 +144,7 @@
                     </div>
                 </div>
 
-                <div class="management-card">
+                <!-- <div class="management-card">
                     <h3>Настройки системы</h3>
                     <div class="card-content">
                         <button class="action-btn" onclick="openGeneralSettingsModal()">Общие настройки</button>
@@ -157,7 +157,7 @@
                             <p>Статус: {{ $systemInfo['status'] }}</p>
                         </div>
                     </div>
-                </div>
+                </div> -->
 
                 <div class="management-card">
                     <h3>Резервное копирование</h3>

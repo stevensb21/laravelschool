@@ -88,6 +88,8 @@ class StatisticController extends Controller
         $total_students_in_groups = $all_groups->sum(function($group) {
             return $group->students->count();
         });
+        $total_homeworks = \App\Models\HomeWork::count();
+        $expected_submissions = $total_homeworks * max($total_students_in_groups, 1);
         
         // Фильтруем сдачи домашних заданий по периоду
         $homework_submissions_query = \App\Models\HomeWorkStudent::query();
@@ -102,28 +104,18 @@ class StatisticController extends Controller
         // Сдано с опозданием (есть файл, но нет оценки)
         $overdue_submissions = $homework_submissions->whereNotNull('file_path')->whereNull('grade')->count();
         
-        // Не сдано (общее количество студентов минус те, кто сдал)
+        // Не сдано (ожидаемых сдач минус те, кто сдал)
         $total_submitted = $completed_submissions + $overdue_submissions;
-        $not_submitted = max(0, $total_students_in_groups - $total_submitted);
+        $not_submitted = max(0, $expected_submissions - $total_submitted);
         
-        // Если нет студентов в группах, используем данные из таблицы statistics
-        if ($total_students_in_groups == 0) {
-            $homework_stats = $all->where('homework', '>', 0);
-            $total_homework_records = $homework_stats->count();
-            
-            if ($total_homework_records > 0) {
-                $completed_percent = 60; // Примерно 60% сдают вовремя
-                $overdue_percent = 25;   // 25% с опозданием
-                $pending_percent = 15;   // 15% не сдают
-            } else {
-                $completed_percent = 0;
-                $overdue_percent = 0;
-                $pending_percent = 100;
-            }
+        if ($expected_submissions == 0) {
+            $completed_percent = 0;
+            $overdue_percent = 0;
+            $pending_percent = 0;
         } else {
-            $completed_percent = $total_students_in_groups > 0 ? round($completed_submissions / $total_students_in_groups * 100) : 0;
-            $overdue_percent = $total_students_in_groups > 0 ? round($overdue_submissions / $total_students_in_groups * 100) : 0;
-            $pending_percent = $total_students_in_groups > 0 ? round($not_submitted / $total_students_in_groups * 100) : 0;
+            $completed_percent = round($completed_submissions / $expected_submissions * 100, 1);
+            $overdue_percent = round($overdue_submissions / $expected_submissions * 100, 1);
+            $pending_percent = round($not_submitted / $expected_submissions * 100, 1);
         }
 
         // Статистика по группам

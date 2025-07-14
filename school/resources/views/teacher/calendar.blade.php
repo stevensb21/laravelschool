@@ -105,11 +105,11 @@
                                 @endphp
                                 @if ($isFirstHour && !in_array($lessonId, $rendered))
                                     <div class="cell has-lesson"
-                                         style="grid-column: {{ $day + 1 }}; grid-row: {{ $hour - 6 }} / span {{ $duration }};
-                                                background-color: #131936; color: var(--btn-primary:); border-radius: 10px; position:relative;">
+                                         style="grid-column: {{ $day + 1 }}; grid-row: {{ $hour - 6 }} / span {{ $duration }}; background-color: var(--bg-secondary); color: var(--btn-primary); border-radius: 10px; position:relative;">
                                         <div style="padding:6px 8px;">
                                             <div style="font-weight:600;">{{ $lesson['subject'] }}</div>
-                                            <div style="font-size:13px;color:#374151;">{{ $lesson['name_group'] }}</div>                                        </div>
+                                            <div style="font-size:13px;color:var(--text-secondary);">{{ $lesson['teacher'] ?? $lesson['name_group'] }}</div>
+                                        </div>
                                     </div>
                                     @php $rendered[] = $lessonId; @endphp
                                 @endif
@@ -227,7 +227,13 @@
             font-size: 16px;
             margin: 24px 0;
         }
-        @media (max-width: 600px) {
+
+        .calendar-mobile { 
+            display: none; 
+        }
+
+
+        @media (max-width: 768px) {
           .calendar-desktop, .grid-container-calendar { display: none !important; }
           .calendar-mobile { display: block; }
         }

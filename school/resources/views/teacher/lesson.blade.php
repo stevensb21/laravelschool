@@ -34,9 +34,9 @@
                                     <div style="color:#4a5568;font-size:0.98rem;">Группа: {{ $lesson->name_group ?? '—' }}</div>
                                 </div>
                                 <div style="text-align:right;">
-                                    <div style="font-size:1rem;color:#2563eb;">{{ $lesson->start_time }} - {{ $lesson->end_time }}</div>
+                                    <div style="font-size:1rem;color:#131936;">{{ $lesson->start_time }} - {{ $lesson->end_time }}</div>
                                     <a href="{{ route('teacher.lesson.students', ['lesson_id' => $lesson->id]) }}"
-                                       style="margin-top:8px;display:inline-block;padding:7px 18px;background:#38a169;color:white;border:none;border-radius:7px;font-size:0.98rem;font-weight:500;text-decoration:none;">
+                                       style="margin-top:8px;display:inline-block;padding:7px 18px;background:var(--btn-primary);color:white;border:none;border-radius:7px;font-size:0.98rem;font-weight:500;text-decoration:none;">
                                         Начать урок
                                     </a>
                                 </div>

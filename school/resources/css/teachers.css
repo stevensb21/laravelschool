@@ -38,43 +38,21 @@
 
 .teachers-filters {
     display: flex;
+    flex-direction: row;
     gap: 15px;
+    align-items: center;
     margin-bottom: 20px;
+   
     padding: 15px;
     background-color: var(--bg-secondary);
     border-radius: 10px;
     box-shadow: 0 2px 4px var(--card-shadow);
 }
 
-@media (max-width: 768px) {
-    .select-group {
-        flex-direction: column;
-        
-    }
-
-    .select-group select,
-    .select-group input {
-        margin-bottom: 10px;
-        
-    }
-
-  
-
-    .teachers-header{
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-    }
-
-
-
-    .reset-filters {
-        display: block;
-        padding: 3px;
-        margin-top: 10px;
-    }
+.filters-actions button:first-child {
+    margin-left: 10px;
 }
+
 
 .teachers-filters input,
 .teachers-filters select {
@@ -288,7 +266,7 @@
 }
 
 .education-tag {
-    background: linear-gradient(135deg, #131936 0%, #36417c 100%);
+    background: var(--nav-bg);
     color: white;
     padding: 6px 12px;
     border-radius: 20px;
@@ -305,8 +283,11 @@
 
 .filters-form {
     display: flex;
-    gap: 15px;
+    flex-direction: row;
     align-items: center;
+    gap: 0;
+    margin: 0;
+    padding: 0;
 }
 
 .filters-form input[type="text"],
@@ -329,17 +310,23 @@
 }
 
 .filters-form button[type="submit"]:hover {
-    background-color: #333d71;
+    background-color:  var(--btn-primary-hover);
 }
 
 .reset-filters {
-    padding: 8px 16px;
+    
     background-color: #E2E8F0;
+    text-align: center;
+    justify-content: center;
     color: #4A5568;
-    text-decoration: none;
+    padding: 8px 16px;
+    border: none;
     border-radius: 5px;
+    cursor: pointer;
     transition: background-color 0.3s;
+    text-decoration: none;
 }
+
 
 .reset-filters:hover {
     background-color: #CBD5E0;
@@ -497,3 +484,135 @@
     border-radius: 5px;
     margin-bottom: 20px;
 } 
+
+.filters-actions {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+    margin: 0;
+}
+
+.filters-actions button,
+.filters-actions .reset-filters {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    white-space: normal;
+    min-width: 120px;
+    height: auto;
+    min-height: 40px;
+    padding: 8px 16px;
+    line-height: 1.2;
+    word-break: break-word;
+}
+
+.filters-actions button {
+    background-color: var(--btn-secondary);
+    color: white;
+    transition: background-color 0.3s;
+}
+
+.filters-actions button:hover {
+    background-color: var(--btn-primary-hover);
+}
+
+.filters-actions .reset-filters {
+    background-color: #E2E8F0;
+    color: #4A5568;
+    transition: background-color 0.3s;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.filters-actions .reset-filters:hover {
+    background-color: #CBD5E0;
+}
+
+@media (max-width: 768px) {
+
+    .teachers-filters {
+        flex-direction: column;
+    }
+
+    .select-group {
+        display: flex;
+        flex-direction: column;
+        
+    }
+
+    .select-group select,
+    .select-group input {
+        margin-bottom: 10px;
+        max-width: 100%;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+
+
+  
+
+    .teachers-header{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    
+    
+    .reset-filters {
+        display: block;
+        padding: 3px;
+        margin-top: 10px;
+        flex: 1 1 0;
+        width: auto;
+        min-width: 0;
+        margin: 0;
+        display: block;
+    }
+
+    .add-teacher-btn {
+        margin-top: 10px;
+    }
+}
+
+@media (max-width: 600px) {
+  .teachers-filters {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .teachers-filters > * {
+    width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box;
+  }
+  .filters-form {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+  .filters-actions {
+    flex-direction: row;
+    gap: 10px;
+    width: 100%;
+   
+    justify-content: stretch;
+    flex-wrap: wrap;
+  }
+  .filters-actions button,
+  .filters-actions .reset-filters {
+    flex: 1 1 0;
+    width: auto;
+    min-width: 0;
+    margin: 0;
+    display: block;
+  }
+}

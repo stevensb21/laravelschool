@@ -28,8 +28,8 @@
                                         @endforeach
                                 </select>  
                         </div>
-                        <div class="select-group">
-                            <button type="submit">Применить фильтры</button> 
+                        <div class="filters-actions">
+                            <button type="submit">Применить фильтры</button>
                             @if(request('fio') || request('subject'))
                                 <a href="{{ route('teacher') }}" class="reset-filters">Сбросить фильтры</a>
                             @endif  
@@ -56,7 +56,7 @@
                                        echo htmlspecialchars(implode(', ', $subjects));
                                         ?>
                                     </p>
-                                    <p class="rating">Рейтинг: <?= number_format($teacher['average_performance'], 1) ?></p>
+                                    <p class="rating">Рейтинг: {{ $teacher->average_rating !== null ? number_format($teacher->average_rating, 1) : '0.0' }}</p>
                                     <div class="teacher-stats">
                                         <div class="stat">
                                             <div class="stat-value"><?= number_format($teacher['average_attendance'], 1) ?>%</div>

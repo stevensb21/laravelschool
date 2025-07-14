@@ -1,4 +1,4 @@
-<div id="createCourseModal" class="modal">
+<div id="createCourseModal" class="modal" style="top: 50px;">
     <div class="modal-content">
         <span class="close" onclick="closeModal('createCourseModal')">&times;</span>
         <h3>Создать новый курс</h3>

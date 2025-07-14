@@ -2,10 +2,13 @@
 @import './colors.css';
 
 .appeals-container {
+    max-width: 100%;
+    margin: 30px auto;
     background-color: var(--card-bg);
     border-radius: 15px;
-    padding: 20px;
+    padding: 30px;
     box-shadow: 0 4px 6px var(--card-shadow);
+    width: 100%;
     border: 1px solid var(--card-border);
 }
 
@@ -23,6 +26,8 @@
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    text-align: center;
+    justify-content: center;
     font-size: 14px;
     transition: background-color 0.3s;
 }
@@ -90,11 +95,14 @@
     overflow: hidden;
     box-shadow: 0 2px 4px var(--card-shadow);
     border: 1px solid var(--table-border);
+    overflow-x: auto;
+    width: 100%;
 }
 
 .appeals-table table {
     width: 100%;
     border-collapse: collapse;
+    min-width: 600px;
 }
 
 .appeals-table th,
@@ -211,12 +219,21 @@
 }
 
 .reply-btn {
-    background-color: var(--btn-primary);
+    background-color: var(--warning-color);
     color: var(--text-light);
+    border: none;
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 5px;
 }
 
 .reply-btn:hover {
-    background-color: var(--btn-primary-hover);
+    background-color: var(--warning-color);
+    opacity: 0.85;
+    color: var(--text-light);
 }
 
 .delete-btn {
@@ -226,6 +243,23 @@
 
 .delete-btn:hover {
     background-color: var(--primary-dark);
+}
+
+.rate-btn {
+    background-color: var(--success-color);
+    color: var(--text-light);
+    border: none;
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 5px;
+}
+
+.rate-btn:hover {
+    background-color: var(--status-active);
+    color: var(--text-light);
 }
 
 /* Модальные окна */
@@ -430,6 +464,125 @@
     }
 }
 
+@media (max-width: 1024px) {
+   
+    .appeals-filters {
+      display: flex;
+      flex-direction: column;
+      gap: 10px; 
+      width: 100%;
+      
+    }
+
+    .appeals-header {
+        justify-content: space-between;
+    }
+
+
+    
+
+    .appeals-filters button {
+        margin-top: 5px;
+    }
+
+    .appeals-filters select,
+    .appeals-filters button,
+    .appeals-filters input,
+    .appeals-filters button {
+      width: 100%;
+      box-sizing: border-box;
+
+    }
+  }
+
+  @media (max-width: 800px) {   
+
+    .appeals-filters,
+    .appeals-filters form {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 10px !important;
+        width: 100% !important;
+        display: flex !important;
+    }
+    .appeals-filters form > * {
+        width: 100% !important;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
+        margin: 0 0 8px 0 !important;
+    }
+    body {
+        padding-top: 30px !important;
+    }
+    .appeals-filters {
+      display: flex;
+      flex-direction: column;
+      gap: 10px; 
+      width: 100%;
+    }
+    .appeals-filters select,
+    .appeals-filters button {
+      width: 100%;
+      box-sizing: border-box;
+      margin-bottom: 3px;
+    }
+
+    .appeals-filters button {
+        margin-top: 5px;
+    }
+    .container, .appeals-container {
+        max-width: 100% !important;
+        width: 100% !important;
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+        box-sizing: border-box;
+    }
+    .appeals-header {
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
+    .add-appeal-btn {
+        width: 100% !important;
+        margin-top: 10px;
+        box-sizing: border-box;
+    }
+}
+
+@media (max-width: 900px) {
+    .appeals-filters form {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 10px !important;
+        width: 100% !important;
+        display: flex !important;
+    }
+    .appeals-filters form > * {
+        width: 100% !important;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
+        margin: 0 !important;
+    }
+    .appeals-filters {
+        padding: 0 0 0 0 !important;
+    }
+}
+
+
 #toast.toast-success { background: var(--toast-success); }
 #toast.toast-error { background: var(--toast-error); }
 #toast.toast-info { background: var(--toast-info); } 
+
+.modal-content .form-group select {
+    width: 100%;
+    padding: 8px;
+    border: 1.5px solid var(--input-border);
+    border-radius: 6px;
+    font-size: 16px;
+    background: var(--input-bg);
+    color: var(--text-primary);
+    transition: border 0.2s;
+}
+.modal-content .form-group select:focus {
+    border-color: var(--input-focus);
+    outline: none;
+} 

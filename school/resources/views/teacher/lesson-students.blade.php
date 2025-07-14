@@ -1,6 +1,7 @@
 @extends('admin.layouts.head')
 @section('head')
 @vite(['resources/css/admin/homework.css'])
+@vite(['resources/css/homework.css'])
 @endsection
 
 @include('teacher.nav')
