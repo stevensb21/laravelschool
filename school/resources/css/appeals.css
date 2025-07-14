@@ -464,7 +464,7 @@
     }
 }
 
-/* @media (max-width: 1024px) {
+@media (max-width: 1024px) {
    
     .appeals-filters {
       display: flex;
@@ -493,9 +493,9 @@
       box-sizing: border-box;
 
     }
-  } */
+  }
 
-  /* @media (max-width: 800px) {   
+  @media (max-width: 800px) {   
 
     .appeals-filters,
     .appeals-filters form {
@@ -546,9 +546,9 @@
         margin-top: 10px;
         box-sizing: border-box;
     }
-} */
+}
 
-/* @media (max-width: 900px) {
+@media (max-width: 900px) {
     .appeals-filters form {
         flex-direction: column !important;
         align-items: stretch !important;
@@ -565,7 +565,7 @@
     .appeals-filters {
         padding: 0 0 0 0 !important;
     }
-} */
+}
 
 
 #toast.toast-success { background: var(--toast-success); }
