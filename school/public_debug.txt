@@ -1,0 +1,1 @@
+Public index loaded: C:\Users\SystemX\Desktop\laravelschool\school\public\index.php
