@@ -19,6 +19,23 @@
     $isStudent = $data['isStudent'] ?? false;
 ?>
 
+<?php
+$colorVars = [
+    '--primary-color',
+    '--secondary-color',
+    '--primary-light',
+    '--secondary-light',
+    '--accent-light',
+    '--success-color',
+    '--info-color',
+    '--status-active',
+    '--status-pending',
+    '--status-completed',
+    '--progress-fill',
+    '--link-color',
+    '--link-hover',
+];
+?>
  
 
 <div class="container">
@@ -111,177 +128,94 @@
         </div>
     <?php endforeach; ?>
     
-    <!-- Временные отметки -->
+    <!-- Временные отметки (30-минутная сетка) -->
     <?php 
-    $times = ['8:00', '9:00', '10:00', '11:00', '12:00', '13:00', '14:00', 
-                '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00'];
-    foreach ($times as $i => $time): ?>
-        <div class="time" style="grid-column: 1; grid-row: <?= $i+2 ?>;">
+    $times = [];
+    for ($h = 8; $h <= 22; $h++) {
+        $times[] = sprintf('%02d:00', $h);
+        if ($h < 22) $times[] = sprintf('%02d:30', $h);
+    }
+    foreach ($times as $i => $time): 
+    $isHalf = strpos($time, ':30') !== false;
+?>
+    <div class="time<?= $isHalf ? ' half-hour' : '' ?>" style="grid-column: 1; grid-row: <?= $i+2 ?>;">
             <p><?= $time ?></p>
         </div>
     <?php endforeach; ?>
     
     <!-- Ячейки календаря -->
     <?php
-    for ($hour = 8; $hour <= 22; $hour++) {
+    // 1. Сетка и кнопки +
+    for ($slot = 0; $slot < count($times); $slot++) {
         for ($day = 1; $day <= 7; $day++) {
-            $lesson = $schedule[$day][$hour];
-            echo("<script>console.log('php_array: ".json_encode($schedule[$day][$hour])."');</script>");
-            
-            // Инициализируем переменные значениями по умолчанию
-            $isFirstHour = false;
-            $endHour = 0;
-            $endMinute = 0;
-            $startMinute = 0;
-            $isLastHour = false;
-            $isEndHour = false;
-            
-            // Проверяем, существует ли урок, прежде чем обращаться к его данным
-            if ($lesson) {
-                $isFirstHour = ($hour == (int)date('G', strtotime($lesson['start_time'])));
-                $endHour = (int)date('G', strtotime($lesson['end_time']));
-                $endMinute = (int)date('i', strtotime($lesson['end_time']));
-                $startMinute = (int)date('i', strtotime($lesson['start_time']));
-                $isLastHour = ($hour == $endHour || ($hour == $endHour - 1 && $endMinute == 0));
-                
-                // Проверяем, является ли текущий час последним часом урока
-                $isEndHour = ($hour == $endHour);
-                
-                // Проверяем, начинается ли следующий урок в этом же часе
-                $nextLessonInSameHour = false;
-                if (isset($schedule[$day][$hour+1])) {
-                    $nextLesson = $schedule[$day][$hour+1];
-                    $nextStartHour = (int)date('G', strtotime($nextLesson['start_time']));
-                    $nextStartMinute = (int)date('i', strtotime($nextLesson['start_time']));
-                    
-                    if ($nextStartHour == $hour && $nextStartMinute == 30) {
-                        $nextLessonInSameHour = true;
+            $cellDate = date('Y-m-d', strtotime(session('monday') . ' +' . ($day-1) . ' days'));
+            $style = "grid-column: " . ($day + 1) . "; grid-row: " . ($slot + 2) . "; position:relative; z-index:1;";
+            echo '<div class="cell" style="' . $style . '">';
+            if ($data['edit_mode'] ?? false) {
+                echo '<button type="button" class="add-btn" style="position:absolute;bottom:4px;right:4px;z-index:10;" onclick="showModal(\'' . $cellDate . '\', \'' . $times[$slot] . '\')">+</button>';
+            }
+            echo '</div>';
+        }
+    }
+    // 2. Уроки с точным позиционированием
+    for ($day = 1; $day <= 7; $day++) {
+        $lessonsArray = is_array($data['lessons']) ? $data['lessons'] : (method_exists($data['lessons'], 'all') ? $data['lessons']->all() : []);
+        $dayLessons = array_filter($lessonsArray, function($lesson) use ($day) {
+            return (date('N', strtotime($lesson->date_)) == $day);
+        });
+        usort($dayLessons, function($a, $b) {
+            return strcmp($a->start_time, $b->start_time);
+        });
+        $columns = [];
+        foreach ($dayLessons as $i => $lesson) {
+            $startA = strtotime($lesson->start_time);
+            $endA = strtotime($lesson->end_time);
+            $col = 0;
+            $used = [];
+            foreach ($columns as $j => $colLessons) {
+                foreach ($colLessons as $other) {
+                    $startB = strtotime($other->start_time);
+                    $endB = strtotime($other->end_time);
+                    if ($startA < $endB && $endA > $startB) {
+                        $used[$j] = true;
                     }
                 }
             }
-            
-            echo("<script>console.log('hour: ".json_encode($hour)."');</script>");
-            echo("<script>console.log('day: ".json_encode($day)."');</script>");
-            echo("<script>console.log('isFirstHour: ".json_encode($isFirstHour)."');</script>");
-            echo("<script>console.log('isLastHour: ".json_encode($isLastHour)."');</script>");
-            echo("<script>console.log('endHour: ".json_encode($endHour)."');</script>");
-            echo("<script>console.log('endMinute: ".json_encode($endMinute)."');</script>");
-            
-            $style = "grid-column: " . ($day + 1) . "; grid-row: " . ($hour - 6) . "; border-radius: 10px; color: var(--btn-primary);";
-            
-            if ($lesson) {
-                $start_minute = (int)date('i', strtotime($lesson['start_time']));
-                $end_minute = (int)date('i', strtotime($lesson['end_time']));
-                $current_hour = (int)date('G', strtotime($lesson['start_time']));
-                
-                // Определяем, является ли текущий час первым или последним для урока
-                $isFirstHour = ($hour == $current_hour);
-                $isLastHour = ($hour == (int)date('G', strtotime($lesson['end_time'])));
-                
-                // Базовый стиль для ячейки
-                $style .= "background-color: var(--bg-secondary); color: var(--btn-primary);";
-                
-                // Сбрасываем класс ячейки для каждой новой итерации
-                $cellClass = 'cell has-lesson';
-                
-                // Если урок начинается в половине часа
-                if ($isFirstHour && $start_minute == 30) {
-                    $style = "grid-column: " . ($day + 1) . "; grid-row: " . ($hour - 6) . "; border-radius: 10px; color: var(--btn-primary);";
-                    $style .= "background: linear-gradient(to bottom, transparent 50%, var(--bg-secondary) 50%); color: var(--btn-primary);";
-                    
-                    // Проверяем, есть ли предыдущий урок
-                    $hasPrevLesson = false;
-                    foreach ($lessons as $prevLesson) {
-                        if ($prevLesson['date_'] === $lesson['date_'] &&
-                            (int)date('G', strtotime($prevLesson['end_time'])) === $hour &&
-                            (int)date('i', strtotime($prevLesson['end_time'])) === 30) {
-                            $hasPrevLesson = true;
-                            break;
-                        }
-                    }
-                    
-                    if ($hasPrevLesson) {
-                        $style = "grid-column: " . ($day + 1) . "; grid-row: " . ($hour - 6) . "; border-radius: 10px; color: var(--btn-primary);";
-                        $style .= "background: linear-gradient(to bottom, var(--bg-secondary) 50%, var(--bg-secondary) 50%); color: var(--btn-primary);";
-                        $cellClass = 'cell has-lesson has-split';
-                    }
-                }
-                
-                // Если урок заканчивается в половине часа
-                if ($isLastHour && $end_minute == 30) {
-                    $style = "grid-column: " . ($day + 1) . "; grid-row: " . ($hour - 6) . "; border-radius: 10px; color: var(--btn-primary);";
-                    $style .= "background: linear-gradient(to bottom, var(--bg-secondary) 50%, transparent 50%);color: var(--btn-primary);";
-                    
-                    // Проверяем, есть ли следующий урок
-                    $hasNextLesson = false;
-                    foreach ($lessons as $nextLesson) {
-                        if ($nextLesson['date_'] === $lesson['date_'] &&
-                            (int)date('G', strtotime($nextLesson['start_time'])) === $hour &&
-                            (int)date('i', strtotime($nextLesson['start_time'])) === 30) {
-                            $hasNextLesson = true;
-                            break;
-                        }
-                    }
-                    
-                    if ($hasNextLesson) {
-                        $style = "grid-column: " . ($day + 1) . "; grid-row: " . ($hour - 6) . "; border-radius: 10px; color: var(--btn-primary);";
-                        $style .= "background: linear-gradient(to bottom, var(--bg-secondary) 50%, var(--bg-secondary) 50%); color: var(--btn-primary);";
-                        $cellClass = 'cell has-lesson has-split';
-                    }
-                }
-                
-                // Добавляем скругления для начала и конца урока
-                if ($isFirstHour && $start_minute == 0) {
-                    $style .= "border-radius: 10px 10px 0 0; color: var(--btn-primary);";
-                }
-                if ($isLastHour && $end_minute == 0) {
-                    $style .= "border-radius: 0 0 10px 10px; color: var(--btn-primary);";
-                }
-                if ($isFirstHour && $isLastHour && $start_minute == 0 && $end_minute == 0) {
-                    $style .= "border-radius: 10px; color: var(--btn-primary);";
-                }
-                
-                $style .= "position: relative;";
-            } else {
-                $cellClass = 'cell';
+            while (isset($used[$col])) $col++;
+            $columns[$col][] = $lesson;
+            $lesson->_col = $col;
+        }
+        $maxCols = count($columns);
+        foreach ($dayLessons as $idx => $lesson) {
+            $startParts = explode(':', $lesson->start_time);
+            $endParts = explode(':', $lesson->end_time);
+            $startHour = (int)$startParts[0];
+            $startMin = (int)$startParts[1];
+            $endHour = (int)$endParts[0];
+            $endMin = (int)$endParts[1];
+            $rowStart = ($startHour - 8) * 2 + 2 + ($startMin >= 30 ? 1 : 0);
+            $rowEnd = ($endHour - 8) * 2 + 2 + ($endMin >= 30 ? 1 : 0);
+            $rowSpan = max(1, $rowEnd - $rowStart);
+            $colorVar = $colorVars[$idx % count($colorVars)];
+            $width = 100 / $maxCols;
+            $left = $lesson->_col * $width;
+            $lessonStyle = "grid-column: " . ($day + 1) . "; grid-row: $rowStart / span $rowSpan; background-color: var($colorVar); color: var(--text-light); border-radius: 10px; z-index:5; margin:2px 0; box-sizing:border-box; display:flex; flex-direction:column; align-items:flex-start; justify-content:flex-start; padding:4px 8px; min-width:80px; pointer-events:auto; border-top:2px solid #fff; box-shadow:0 2px 6px rgba(0,0,0,0.04); position:relative; width:calc($width% - 4px); left:calc($left%);";
+            echo '<div class="has-lesson" style="' . $lessonStyle . '">';
+            echo '<p style="margin:0;font-weight:600;">' . htmlspecialchars($lesson->subject) . '</p>';
+            if (isset($lesson->name_group)) {
+                echo '<p style="margin:0;font-size:11px;font-weight:700;color:var(--text-light);text-shadow:0 1px 2px rgba(0,0,0,0.25);background:rgba(0,0,0,0.10);border-radius:4px;padding:0 2px;">' . htmlspecialchars($lesson->name_group) . '</p>';
             }
-            
-            echo '<div class="' . $cellClass . '" style="' . $style . '">';
-            
-            if ($lesson) {
-                // Отображение текста урока
-                if ($isFirstHour && $start_minute == 30) {
-                    // Текст для урока, начинающегося в половине часа
-                    echo '<div class="half-hour-text" style="top: 50%; height: 50%; background-color: transparent; color: var(--btn-primary);">';
-                    echo '<p>' . htmlspecialchars($lesson['subject']) . ' - ' . 
-                            (isset($lesson['name_group']) ? htmlspecialchars($lesson['name_group']) : '') . '</p>';
-                    echo '</div>';
-                } elseif ($isLastHour && $end_minute == 30) {
-                    // Текст для урока, заканчивающегося в половине часа
-                    echo '<div class="half-hour-text" style="top: 0; height: 50%; background-color: transparent; color: var(--btn-primary);">';
-                    echo '<p>' . htmlspecialchars($lesson['subject']) . ' - ' . 
-                            (isset($lesson['name_group']) ? htmlspecialchars($lesson['name_group']) : '') . '</p>';
-                    echo '</div>';
-                } else {
-                    // Обычный текст для полного часа
-                    echo '<p>' . htmlspecialchars($lesson['subject']) . '</p>';
-                    if (isset($lesson['name_group'])) {
-                        echo '<p>' . htmlspecialchars($lesson['name_group']) . '</p>';
-                    }
-                }
-                
-                // Кнопка удаления для режима редактирования
-                if ($data['edit_mode'] ?? false) {
-                    echo '<form method="POST" action="' . route('calendar.delete-lesson') . '" class="delete-lesson-form" style="position: absolute; top: 2px; right: 2px; z-index: 20;">';
-                    echo csrf_field();
-                    echo '<input type="hidden" name="lesson_id" value="' . $lesson['id'] . '">';
-                    echo '<button type="submit" name="delete_lesson" class="delete-btn" style="background: none; border: none; color: #ff4444; cursor: pointer; font-size: 16px; padding: 2px 6px;">&times;</button>';
-                    echo '</form>';
-                }
-            } else if ($data['edit_mode'] ?? false) {
-                echo '<button type="button" class="add-btn" onclick="showModal(\'' . date('Y-m-d', strtotime(session('monday') . ' +' . ($day-1) . ' days')) . '\', \'' . sprintf('%02d:00', $hour) . '\')">+</button>';
+            if ($data['edit_mode'] ?? false) {
+                echo '<form method="POST" action="' . route('calendar.delete-lesson') . '" class="delete-lesson-form" style="position: absolute; left: 0; bottom: 0; z-index: 20;">';
+                echo csrf_field();
+                echo '<input type="hidden" name="lesson_id" value="' . $lesson->id . '">';
+                echo '<button type="submit" name="delete_lesson" class="delete-btn">&times;</button>';
+                echo '</form>';
+                // Кнопка добавления параллельного урока (справа снизу)
+                $lessonDate = date('Y-m-d', strtotime($lesson->date_));
+                $startTime = $lesson->start_time;
+                echo '<button type="button" class="add-btn lesson-add-btn" style="position:absolute;right:6px;bottom:6px;z-index:21;" onclick="showModal(\'' . $lessonDate . '\', \'' . $startTime . '\')">+</button>';
             }
-            
             echo '</div>';
         }
     }
@@ -359,36 +293,26 @@ function showModal(date, startTime) {
     const dateInput = document.getElementById('modalDate');
     const startTimeSelect = document.getElementById('modalStartTime');
     const endTimeSelect = document.getElementById('modalEndTime');
-    
     // Устанавливаем дату
     dateInput.value = date;
-    
     // Очищаем и заполняем select времени начала
     startTimeSelect.innerHTML = '';
-    const hour = parseInt(startTime.split(':')[0]);
-    
-    if (hour > 8) {
-        const prevHalfHour = `${String(hour-1).padStart(2, '0')}:30`;
-        startTimeSelect.add(new Option(prevHalfHour, prevHalfHour));
+    let startHour = 8, endHour = 22;
+    for (let h = startHour; h <= endHour; h++) {
+        let hourStr = String(h).padStart(2, '0');
+        startTimeSelect.add(new Option(hourStr + ':00', hourStr + ':00'));
+        if (h < endHour) startTimeSelect.add(new Option(hourStr + ':30', hourStr + ':30'));
     }
-    
-    const currentHour = `${String(hour).padStart(2, '0')}:00`;
-    startTimeSelect.add(new Option(currentHour, currentHour, true, true));
-    
-    const currentHalfHour = `${String(hour).padStart(2, '0')}:30`;
-    startTimeSelect.add(new Option(currentHalfHour, currentHalfHour));
-    
+    // Выделяем нужное время
+    if (startTime) startTimeSelect.value = startTime;
     // Очищаем и заполняем select времени окончания
     endTimeSelect.innerHTML = '';
-    let currentTime = new Date(`2000-01-01T${startTime}`);
-    const endTime = new Date('2000-01-01T22:00:00');
-    
-    while (currentTime <= endTime) {
-        const timeStr = currentTime.toTimeString().slice(0, 5);
-        endTimeSelect.add(new Option(timeStr, timeStr));
-        currentTime.setMinutes(currentTime.getMinutes() + 30);
+    for (let h = startHour; h <= endHour; h++) {
+        let hourStr = String(h).padStart(2, '0');
+        endTimeSelect.add(new Option(hourStr + ':00', hourStr + ':00'));
+        if (h < endHour) endTimeSelect.add(new Option(hourStr + ':30', hourStr + ':30'));
     }
-    
+    endTimeSelect.value = '';
     modal.style.display = 'flex';
 }
 
@@ -419,57 +343,49 @@ window.onclick = function(event) {
     </select>
     @foreach($weekdays as $i => $day)
         @php
-            $hasLessons = false;
-            for ($hour = 8; $hour <= 22; $hour++) {
-                if (!empty($schedule[$i+1][$hour])) {
-                    $hasLessons = true;
-                    break;
+            // Собираем все уникальные уроки на этот день
+            $uniqueLessons = [];
+            foreach ($data['lessons'] as $lesson) {
+                if (date('N', strtotime($lesson->date_)) == $i+1) {
+                    $uniqueLessons[] = $lesson;
                 }
             }
+            // Сортируем по времени начала
+            usort($uniqueLessons, function($a, $b) {
+                return strcmp($a->start_time, $b->start_time);
+            });
+            $hasLessons = count($uniqueLessons) > 0;
         @endphp
         <div class="mobile-day-schedule" data-day="{{ $i+1 }}" style="display: none;">
             <h4>{{ $day }}</h4>
             @if($hasLessons)
                 <ul class="mobile-lesson-list">
-                    @for ($hour = 8; $hour <= 22; $hour++)
-                        @php
-                            $lesson = $schedule[$i+1][$hour] ?? null;
-                        @endphp
-                        @if ($lesson)
-                            <li class="mobile-lesson-item">
-                                <div class="lesson-info">
-                                    <span class="lesson-time">{{ $hour }}:00</span>
-                                    <span class="lesson-title">{{ $lesson['subject'] ?? $lesson['name_group'] ?? '' }}</span>
-                                    @if(isset($lesson['teacher']))
-                                        <span class="lesson-teacher">{{ $lesson['teacher'] }}</span>
-                                    @endif
-                                    @if(isset($lesson['name_group']))
-                                        <span class="lesson-group">{{ $lesson['name_group'] }}</span>
-                                    @endif
+                    @foreach ($uniqueLessons as $lesson)
+                        <li class="mobile-lesson-item">
+                            <div class="lesson-info">
+                                <span class="lesson-time">{{ substr($lesson->start_time,0,5) }}-{{ substr($lesson->end_time,0,5) }}</span>
+                                <span class="lesson-title">{{ $lesson->subject ?? $lesson->name_group ?? '' }}</span>
+                                @if(isset($lesson->teacher))
+                                    <span class="lesson-teacher">{{ $lesson->teacher }}</span>
+                                @endif
+                                @if(isset($lesson->name_group))
+                                    <span class="lesson-group">{{ $lesson->name_group }}</span>
+                                @endif
+                            </div>
+                            <div style="font-size: 10px; color: #999;"></div>
+                            @if(true)
+                                <div class="mobile-lesson-actions">
+                                    <div>
+                                        <button class="mobile-delete-btn" onclick="deleteLesson('{{ $lesson->id }}')">Удалить</button>
+                                    </div>
                                 </div>
-                                <!-- Debug info -->
-                                <div style="font-size: 10px; color: #999;">
-                                    <!-- isAdmin: {{ $isAdmin ? 'true' : 'false' }}
-                                    edit_mode: {{ ($data['edit_mode'] ?? false) ? 'true' : 'false' }} -->
-                                </div>
-                                
-                                    @if(true)
-                                    
-                                        <div class="mobile-lesson-actions">
-                                            <div>
-                                                <button class="mobile-delete-btn" onclick="deleteLesson('{{ $lesson['id'] }}')">Удалить</button>
-                                            </div>
-                                        </div>
-                                    @endif
-                                
-                            </li>
-                        @endif
-                    @endfor
+                            @endif
+                        </li>
+                    @endforeach
                 </ul>
             @else
                 <div class="no-lessons">Уроков сегодня нет</div>
             @endif
-            
             @if($isAdmin && ($data['edit_mode'] ?? false))
                 <div class="mobile-add-lesson">
                     <button type="button" class="mobile-add-btn" onclick="showMobileAddModal('{{ date('Y-m-d', strtotime(session('monday') . ' +' . ($i) . ' days')) }}')">

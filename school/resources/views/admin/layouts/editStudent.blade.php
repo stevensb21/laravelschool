@@ -67,7 +67,7 @@
                 
                 <div class="form-group">
                     <label for="edit_datebirthday">Дата рождения:</label>
-                    <input type="date" id="edit_datebirthday" name="datebirthday" required>
+                    <input type="date" id="edit_datebirthday" name="datebirthday" required max="{{ \Carbon\Carbon::now()->subYear()->format('Y-m-d') }}">
                 </div>
                 
                 <div class="form-group">

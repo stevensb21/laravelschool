@@ -170,7 +170,7 @@ class StudentController extends Controller
                 'femaleparent' => 'required',
                 'numberparent' => 'required',
                 'group' => 'required',
-                'datebirthday' => 'required',
+                'datebirthday' => ['required', 'date', 'before_or_equal:' . \Carbon\Carbon::now()->subYear()->format('Y-m-d')],
                 'achievements' => '',
             ], [
                 'name.required' => 'Логин обязателен для заполнения',
@@ -185,6 +185,7 @@ class StudentController extends Controller
                 'numberparent.required' => 'Номер телефона родителя обязателен для заполнения',
                 'group.required' => 'Выберите группу',
                 'datebirthday.required' => 'Дата рождения обязательна для заполнения',
+                'datebirthday.before_or_equal' => 'Студенту должно быть минимум 1 год!',
             ]);
 
             \Log::info('Данные прошли валидацию', ['validated_data' => $validated]);

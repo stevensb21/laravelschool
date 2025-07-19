@@ -88,7 +88,7 @@
                 
                 <div class="form-group">
                     <label for="datebirthday">Дата рождения:</label>
-                    <input type="date" id="datebirthday" name="datebirthday" value="{{ old('datebirthday') }}" required>
+                    <input type="date" id="datebirthday" name="datebirthday" value="{{ old('datebirthday') }}" required max="{{ \Carbon\Carbon::now()->subYear()->format('Y-m-d') }}">
                     @error('datebirthday')
                         <span class="error-text">{{ $message }}</span>
                     @enderror

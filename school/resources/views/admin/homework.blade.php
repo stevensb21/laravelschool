@@ -207,29 +207,47 @@
             alert('Ошибка: ID задания не найден');
             return;
         }
+        fetch(`/homework/${homeworkToDelete}`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                closeDeleteModal();
+                showCustomToast(data.message || 'Домашнее задание успешно удалено');
+                setTimeout(() => location.reload(), 3000);
+            } else {
+                alert('Ошибка при удалении задания: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Произошла ошибка при удалении задания');
+        });
+    }
 
-        if (confirm('Вы уверены, что хотите удалить это задание? Это действие нельзя отменить!')) {
-            fetch(`/homework/${homeworkToDelete}`, {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    closeDeleteModal();
-                    alert(data.message);
-                    location.reload(); // Перезагружаем страницу для обновления данных
-                } else {
-                    alert('Ошибка при удалении задания: ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Произошла ошибка при удалении задания');
-            });
-        }
+    function showCustomToast(message) {
+        let toast = document.createElement('div');
+        toast.textContent = message;
+        toast.style.position = 'fixed';
+        toast.style.top = '30px';
+        toast.style.left = '30px';
+        toast.style.zIndex = '9999';
+        toast.style.background = 'var(--toast-success)';
+        toast.style.color = 'var(--text-light)';
+        toast.style.padding = '16px 32px';
+        toast.style.borderRadius = '8px';
+        toast.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)';
+        toast.style.fontSize = '16px';
+        toast.style.opacity = '0.95';
+        toast.style.animation = 'fadeIn 0.5s';
+        document.body.appendChild(toast);
+        setTimeout(() => {
+            toast.remove();
+        }, 3000);
     }
 
     // Обновляем обработчик клика вне модального окна

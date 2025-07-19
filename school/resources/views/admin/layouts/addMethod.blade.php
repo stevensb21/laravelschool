@@ -40,7 +40,7 @@
                 <div class="file-upload-section">
                     <label for="homework_files" class="file-upload-label">Или загрузите файлы:</label>
                     <input type="file" id="homework_files" name="homework_files[]" multiple accept=".pdf,.doc,.docx,.txt,.zip,.rar" class="file-input">
-                    <div class="file-info">Поддерживаемые форматы: PDF, DOC, DOCX, TXT, ZIP, RAR</div>
+                
                     <div class="file-hint">💡 Для выбора нескольких файлов: удерживайте Ctrl и кликайте на файлы, или перетащите несколько файлов</div>
                 </div>
                 @error('homework')
@@ -62,7 +62,7 @@
                 <div class="file-upload-section">
                     <label for="lesson_files" class="file-upload-label">Или загрузите файлы:</label>
                     <input type="file" id="lesson_files" name="lesson_files[]" multiple accept=".pdf,.doc,.docx,.txt,.zip,.rar" class="file-input">
-                    <div class="file-info">Поддерживаемые форматы: PDF, DOC, DOCX, TXT, ZIP, RAR</div>
+                   
                     <div class="file-hint">💡 Для выбора нескольких файлов: удерживайте Ctrl и кликайте на файлы, или перетащите несколько файлов</div>
                 </div>
                 @error('lesson')
@@ -84,7 +84,7 @@
                 <div class="file-upload-section">
                     <label for="exercise_files" class="file-upload-label">Или загрузите файлы:</label>
                     <input type="file" id="exercise_files" name="exercise_files[]" multiple accept=".pdf,.doc,.docx,.txt,.zip,.rar" class="file-input">
-                    <div class="file-info">Поддерживаемые форматы: PDF, DOC, DOCX, TXT, ZIP, RAR</div>
+                 
                     <div class="file-hint">💡 Для выбора нескольких файлов: удерживайте Ctrl и кликайте на файлы, или перетащите несколько файлов</div>
                 </div>
                 @error('exercise')
@@ -106,7 +106,6 @@
                 <div class="file-upload-section">
                     <label for="book_files" class="file-upload-label">Или загрузите файлы:</label>
                     <input type="file" id="book_files" name="book_files[]" multiple accept=".pdf,.doc,.docx,.txt,.zip,.rar" class="file-input">
-                    <div class="file-info">Поддерживаемые форматы: PDF, DOC, DOCX, TXT, ZIP, RAR</div>
                     <div class="file-hint">💡 Для выбора нескольких файлов: удерживайте Ctrl и кликайте на файлы, или перетащите несколько файлов</div>
                 </div>
                 @error('book')
@@ -144,7 +143,7 @@
                 <div class="file-upload-section">
                     <label for="presentation_files" class="file-upload-label">Или загрузите файлы:</label>
                     <input type="file" id="presentation_files" name="presentation_files[]" multiple accept=".pdf,.ppt,.pptx,.zip,.rar" class="file-input">
-                    <div class="file-info">Поддерживаемые форматы: PDF, PPT, PPTX, ZIP, RAR</div>
+                   
                     <div class="file-hint">💡 Для выбора нескольких файлов: удерживайте Ctrl и кликайте на файлы, или перетащите несколько файлов</div>
                 </div>
                 @error('presentation')
@@ -166,7 +165,7 @@
                 <div class="file-upload-section">
                     <label for="test_files" class="file-upload-label">Или загрузите файлы:</label>
                     <input type="file" id="test_files" name="test_files[]" multiple accept=".pdf,.doc,.docx,.txt,.zip,.rar" class="file-input">
-                    <div class="file-info">Поддерживаемые форматы: PDF, DOC, DOCX, TXT, ZIP, RAR</div>
+                 
                     <div class="file-hint">💡 Для выбора нескольких файлов: удерживайте Ctrl и кликайте на файлы, или перетащите несколько файлов</div>
                 </div>
                 @error('test')
@@ -188,7 +187,7 @@
                 <div class="file-upload-section">
                     <label for="article_files" class="file-upload-label">Или загрузите файлы:</label>
                     <input type="file" id="article_files" name="article_files[]" multiple accept=".pdf,.doc,.docx,.txt,.zip,.rar" class="file-input">
-                    <div class="file-info">Поддерживаемые форматы: PDF, DOC, DOCX, TXT, ZIP, RAR</div>
+                 
                     <div class="file-hint">💡 Для выбора нескольких файлов: удерживайте Ctrl и кликайте на файлы, или перетащите несколько файлов</div>
                 </div>
                 @error('article')

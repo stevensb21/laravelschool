@@ -241,8 +241,6 @@
                     <div class="file-upload-section">
                         <label for="edit_lesson_files" class="file-upload-label">Или загрузите файлы:</label>
                         <input type="file" id="edit_lesson_files" name="lesson_files[]" multiple accept=".pdf,.doc,.docx,.txt,.zip,.rar" class="file-input">
-                        <div class="file-info">Поддерживаемые форматы: PDF, DOC, DOCX, TXT, ZIP, RAR</div>
-                        <div class="file-hint">💡 Для выбора нескольких файлов: удерживайте Ctrl и кликайте на файлы, или перетащите несколько файлов</div>
                     </div>
                     @error('lesson')
                         <span class="error-text">{{ $message }}</span>
@@ -263,8 +261,6 @@
                     <div class="file-upload-section">
                         <label for="edit_exercise_files" class="file-upload-label">Или загрузите файлы:</label>
                         <input type="file" id="edit_exercise_files" name="exercise_files[]" multiple accept=".pdf,.doc,.docx,.txt,.zip,.rar" class="file-input">
-                        <div class="file-info">Поддерживаемые форматы: PDF, DOC, DOCX, TXT, ZIP, RAR</div>
-                        <div class="file-hint">💡 Для выбора нескольких файлов: удерживайте Ctrl и кликайте на файлы, или перетащите несколько файлов</div>
                     </div>
                     @error('exercise')
                         <span class="error-text">{{ $message }}</span>
@@ -285,8 +281,6 @@
                     <div class="file-upload-section">
                         <label for="edit_book_files" class="file-upload-label">Или загрузите файлы:</label>
                         <input type="file" id="edit_book_files" name="book_files[]" multiple accept=".pdf,.doc,.docx,.txt,.zip,.rar" class="file-input">
-                        <div class="file-info">Поддерживаемые форматы: PDF, DOC, DOCX, TXT, ZIP, RAR</div>
-                        <div class="file-hint">💡 Для выбора нескольких файлов: удерживайте Ctrl и кликайте на файлы, или перетащите несколько файлов</div>
                     </div>
                     @error('book')
                         <span class="error-text">{{ $message }}</span>
@@ -319,8 +313,6 @@
                     <div class="file-upload-section">
                         <label for="edit_presentation_files" class="file-upload-label">Или загрузите файлы:</label>
                         <input type="file" id="edit_presentation_files" name="presentation_files[]" multiple accept=".pdf,.doc,.docx,.txt,.zip,.rar" class="file-input">
-                        <div class="file-info">Поддерживаемые форматы: PDF, DOC, DOCX, TXT, ZIP, RAR</div>
-                        <div class="file-hint">💡 Для выбора нескольких файлов: удерживайте Ctrl и кликайте на файлы, или перетащите несколько файлов</div>
                     </div>
                     @error('presentation')
                         <span class="error-text">{{ $message }}</span>
@@ -339,8 +331,6 @@
                     <div class="file-upload-section">
                         <label for="edit_test_files" class="file-upload-label">Или загрузите файлы:</label>
                         <input type="file" id="edit_test_files" name="test_files[]" multiple accept=".pdf,.doc,.docx,.txt,.zip,.rar" class="file-input">
-                        <div class="file-info">Поддерживаемые форматы: PDF, DOC, DOCX, TXT, ZIP, RAR</div>
-                        <div class="file-hint">💡 Для выбора нескольких файлов: удерживайте Ctrl и кликайте на файлы, или перетащите несколько файлов</div>
                     </div>
                     @error('test')
                         <span class="error-text">{{ $message }}</span>
@@ -356,6 +346,10 @@
                 <div class="form-group">
                     <label for="edit_article">Ссылки на статьи (каждое с новой строки):</label>
                     <textarea id="edit_article" name="article" rows="3" placeholder="methodfile/article/file1.pdf&#10;https://article2.com"></textarea>
+                    <div class="file-upload-section">
+                        <label for="edit_article_files" class="file-upload-label">Или загрузите файлы:</label>
+                        <input type="file" id="edit_article_files" name="article_files[]" multiple accept=".pdf,.doc,.docx,.txt,.zip,.rar" class="file-input">
+                    </div>
                     @error('article')
                         <span class="error-text">{{ $message }}</span>
                     @enderror
