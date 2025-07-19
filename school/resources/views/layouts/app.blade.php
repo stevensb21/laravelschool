@@ -14,7 +14,6 @@
     <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
     @vite(['resources/css/auth.css'])
 
-
 </head>
 <body>
      @yield('content')   
