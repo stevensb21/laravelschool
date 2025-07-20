@@ -38,7 +38,7 @@
                             <strong>{{ $review->sender_name }}</strong>
                             <div class="rating-stars" style="display: flex; gap: 2px;">
                                 @for($i = 1; $i <= 5; $i++)
-                                    <span style="color: {{ $i <= $review->rating ? '#ffd700' : '#ddd' }};">★</span>
+                                    <span class="star" style="color: {{ $i <= $review->rating ? 'var(--status-pending)' : 'var(--border-light)' }};">★</span>
                                 @endfor
                             </div>
                         </div>
@@ -79,16 +79,16 @@
             
             <div class="average">
                 <div class="averperf">
-                    <p style="font-size: 14pt;">Средняя успеваемость:</p>
+                    <p style="font-size: 14pt;">Средняя успеваемость за работу на уроке:</p>
                     <p class="numbers" style="font-size: 30pt;">{{ $statistics['average_performance'] ?? 0 }}</p>
                 </div>
                 <div class="averatt">
-                    <p style="font-size: 14pt;">Средняя посещаемость:</p>
+                    <p style="font-size: 14pt;">Средняя посещаемость уроков:</p>
                     <p class="numbers" style="font-size: 30pt;">{{ $statistics['average_attendance'] ?? 0 }}%</p>
                 </div>
                 <div class="averexam">
-                    <p style="font-size: 14pt;">Средняя за экзамены:</p>
-                    <p class="numbers" style="font-size: 30pt;">{{ $statistics['average_exam_score'] ?? 0 }}</p>
+                    <p style="font-size: 14pt;">Средняя за домашнюю работу:</p>
+                    <p class="numbers" style="font-size: 30pt;">{{ $statistics['average_homework'] ?? 0 }}</p>
                 </div>
             </div>
         </div>

@@ -355,7 +355,55 @@ class StudentController extends Controller
                 $review->sender_name = $sender ? $sender->fio : 'Студент';
             }
         });
-        return view('student.account', compact('student', 'reviews'));
+        // === Новая статистика как на странице grades ===
+        $average = 0;
+        $average_exam = 0;
+        $attendance = 0;
+        $gradeStats = [
+            'fives' => 0,
+            'fours' => 0,
+            'threes' => 0,
+            'twos' => 0
+        ];
+        $statistics = $student->statistics()->get();
+        $allGrades = [];
+        foreach ($statistics as $stat) {
+            // Оценки за уроки
+            if ($stat->grade_lesson > 0) {
+                $allGrades[] = $stat->grade_lesson;
+                if ($stat->grade_lesson >= 4.5) $gradeStats['fives']++;
+                elseif ($stat->grade_lesson >= 3.5) $gradeStats['fours']++;
+                elseif ($stat->grade_lesson >= 2.5) $gradeStats['threes']++;
+                else $gradeStats['twos']++;
+            }
+            // Оценки за домашки
+            if ($stat->homework > 0) {
+                $allGrades[] = $stat->homework;
+                if ($stat->homework >= 4.5) $gradeStats['fives']++;
+                elseif ($stat->homework >= 3.5) $gradeStats['fours']++;
+                elseif ($stat->homework >= 2.5) $gradeStats['threes']++;
+                else $gradeStats['twos']++;
+            }
+        }
+        $average = count($allGrades) > 0 ? round(array_sum($allGrades) / count($allGrades), 2) : 0;
+        $average_exam = $average;
+        // Надёжная фильтрация по notes
+        $lessonStats = $statistics->filter(function($stat) {
+            return strpos(trim(strtolower($stat->notes)), 'lesson:') === 0;
+        });
+        $totalLessons = $lessonStats->count();
+        $attendedLessons = $lessonStats->where('attendance', true)->count();
+        $attendance = $totalLessons > 0 ? round($attendedLessons / $totalLessons * 100, 1) : 0;
+        // Временный лог для отладки
+        \Log::info('STATISTICS', [
+            'all' => $statistics->toArray(),
+            'lessonStats' => $lessonStats->toArray(),
+            'attendedLessons' => $attendedLessons,
+            'totalLessons' => $totalLessons,
+            'attendance' => $attendance,
+            'average' => $average,
+        ]);
+        return view('student.account', compact('student', 'reviews', 'average', 'average_exam', 'attendance'));
     }
     public function calendar() {
         $user = auth()->user();
@@ -425,10 +473,45 @@ class StudentController extends Controller
             }
             $average = count($allGrades) > 0 ? round(array_sum($allGrades) / count($allGrades), 2) : 0;
             $average_exam = $average; // Пока считаем экзамен как общий средний балл
-            $totalLessons = $statistics->count();
-            $attendedLessons = $statistics->where('attendance', true)->count();
+            // Считаем посещаемость только по урокам (notes начинается с lesson:)
+            $lessonStats = $statistics->filter(function($stat) {
+                return strpos($stat->notes, 'lesson:') === 0;
+            });
+            $totalLessons = $lessonStats->count();
+            $attendedLessons = $lessonStats->where('attendance', true)->count();
             $attendance = $totalLessons > 0 ? round($attendedLessons / $totalLessons * 100, 1) : 0;
-            $grades = $statistics->sortByDesc('created_at');
+            $grades = $statistics->sortByDesc('created_at')->map(function($stat) use ($student) {
+                $subject = null;
+                $gradeType = null;
+                if (preg_match('/lesson:(\d+)/', $stat->notes, $m)) {
+                    $lessonId = $m[1];
+                    $calendar = \App\Models\Calendar::find($lessonId);
+                    $subject = $calendar ? $calendar->subject : null;
+                    $gradeType = $stat->grade_lesson > 0 ? 'Урок' : ($stat->homework > 0 ? 'Домашнее задание' : '—');
+                } elseif (preg_match('/homework:(\d+)/', $stat->notes, $m)) {
+                    $homeworkId = $m[1];
+                    $homework = \App\Models\HomeWork::find($homeworkId);
+                    $subject = $homework && $homework->course ? $homework->course->name : null;
+                    $gradeType = 'Домашнее задание';
+                } elseif (strpos($stat->notes, 'Оценка за домашнее задание') !== false) {
+                    $gradeType = 'Домашнее задание';
+                    // Пытаемся найти предмет по дате и группе (старый способ)
+                    $date = $stat->created_at->toDateString();
+                    $group = $student->group;
+                    if ($group) {
+                        $homework = \App\Models\HomeWork::where('groups_id', $group->id)
+                            ->whereDate('created_at', $date)
+                            ->orderByDesc('created_at')
+                            ->first();
+                        if ($homework && $homework->course) {
+                            $subject = $homework->course->name;
+                        }
+                    }
+                }
+                $stat->subject = $subject;
+                $stat->grade_type = $gradeType;
+                return $stat;
+            });
         }
         
         return view('student.grades', compact('user', 'grades', 'gradeStats', 'average', 'average_exam', 'attendance'));
@@ -444,7 +527,21 @@ class StudentController extends Controller
             $attendance = $student->statistics()
                 ->whereNotNull('attendance')
                 ->orderByDesc('created_at')
-                ->get();
+                ->get()
+                ->filter(function($record) {
+                    // Только уроки, исключаем домашки
+                    return strpos($record->notes, 'lesson:') === 0;
+                })
+                ->map(function($record) {
+                    $subject = null;
+                    if (preg_match('/lesson:(\\d+)/', $record->notes, $m)) {
+                        $lessonId = $m[1];
+                        $calendar = \App\Models\Calendar::find($lessonId);
+                        $subject = $calendar ? $calendar->subject : null;
+                    }
+                    $record->subject = $subject;
+                    return $record;
+                });
         }
         return view('student.attendance', compact('user', 'attendance'));
     }

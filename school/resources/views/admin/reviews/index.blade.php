@@ -125,6 +125,11 @@
                                         @endif
                                     </span>
                                 @endif
+                                <form method="POST" action="{{ route('admin.reviews.destroy', $review->id) }}" class="delete-review-form" data-review-id="{{ $review->id }}" style="display:inline; margin-left:10px;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="button" class="delete-btn" onclick="showDeleteReviewModal({{ $review->id }})">Удалить</button>
+                                </form>
                             </div>
                         </div>
                     @endforeach
@@ -143,13 +148,26 @@
             @csrf
             <div class="form-group">
                 <label for="moderation_comment">Причина отклонения:</label>
-                <textarea name="moderation_comment" id="moderation_comment" required placeholder="Укажите причину отклонения отзыва..."></textarea>
+                <textarea name="moderation_comment" id="moderation_comment" required placeholder="Укажите причину отклонения отзыва..." rows="4" cols="40" class="model-reject-textarea"></textarea>
             </div>
             <div class="form-actions">
-                <button type="submit" class="submit-btn">Отклонить</button>
-                <button type="button" class="cancel-btn" onclick="closeRejectModal()">Отмена</button>
+                <button type="submit" class="model-reject-btn">Отклонить</button>
+                <button type="button" class="model-cancel-btn" onclick="closeRejectModal()">Отмена</button>
             </div>
         </form>
+    </div>
+</div>
+
+<!-- Модальное окно подтверждения удаления -->
+<div id="deleteModal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <span class="close" onclick="hideDeleteReviewModal()">&times;</span>
+        <h3>Подтвердите удаление</h3>
+        <p>Вы действительно хотите удалить этот отзыв?</p>
+        <div class="form-actions">
+            <button id="confirmDeleteBtn" class="delete-btn model-delete-btn">Удалить</button>
+            <button type="button" class="cancel-btn" onclick="hideDeleteReviewModal()">Отмена</button>
+        </div>
     </div>
 </div>
 
@@ -190,11 +208,30 @@ function closeRejectModal() {
     document.getElementById('moderation_comment').value = '';
 }
 
-// Закрытие модального окна при клике вне его
+let deleteReviewModalId = null;
+function showDeleteReviewModal(reviewId) {
+    deleteReviewModalId = reviewId;
+    document.getElementById('deleteModal').classList.add('show');
+}
+function hideDeleteReviewModal() {
+    deleteReviewModalId = null;
+    document.getElementById('deleteModal').classList.remove('show');
+}
+document.getElementById('confirmDeleteBtn').onclick = function() {
+    if (deleteReviewModalId) {
+        const form = document.querySelector('.delete-review-form[data-review-id="' + deleteReviewModalId + '"]');
+        if (form) form.submit();
+        hideDeleteReviewModal();
+    }
+};
 window.onclick = function(event) {
-    const modal = document.getElementById('rejectModal');
-    if (event.target == modal) {
+    const rejectModal = document.getElementById('rejectModal');
+    if (rejectModal && event.target == rejectModal) {
         closeRejectModal();
+    }
+    const deleteModal = document.getElementById('deleteModal');
+    if (deleteModal && event.target == deleteModal) {
+        hideDeleteReviewModal();
     }
 }
 </script>

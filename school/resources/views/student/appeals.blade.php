@@ -85,8 +85,9 @@
 /* Стили для звездочек рейтинга */
 .rating-stars {
     display: flex;
-    gap: 5px;
+    gap: 8px;
     margin-top: 10px;
+    flex-direction: row;
 }
 
 .rating-stars input[type="radio"] {
@@ -94,19 +95,17 @@
 }
 
 .rating-stars label {
-    font-size: 24px;
-    color: var(--accent-dark);
+    font-size: 2.2rem;
+    color: var(--accent-color); /* невыбранные — оранжевые */
+    text-shadow: 0 1px 2px var(--border-dark), 0 0 1px #fff;
     cursor: pointer;
-    transition: color 0.3s;
+    transition: color 0.2s, text-shadow 0.2s;
+    user-select: none;
 }
-
-.rating-stars input[type="radio"]:checked ~ label {
-    color: #ffd700;
-}
-
-.rating-stars label:hover,
-.rating-stars label:hover ~ label {
-    color: #ffd700;
+.rating-stars label.selected,
+.rating-stars label.hovered {
+    color: var(--status-pending); /* выбранные — жёлтые */
+    text-shadow: 0 2px 6px var(--secondary-color), 0 0 2px #fff;
 }
 
 /* Стили для toast уведомлений */
@@ -393,17 +392,13 @@
             <input type="hidden" id="rateAppealId" name="appeal_id">
             <div class="form-group">
                 <label>Оценка ответа:</label>
-                <div class="rating-stars">
-                    <input type="radio" name="like_feedback" value="1" id="star1">
-                    <label for="star1">★</label>
-                    <input type="radio" name="like_feedback" value="2" id="star2">
-                    <label for="star2">★</label>
-                    <input type="radio" name="like_feedback" value="3" id="star3">
-                    <label for="star3">★</label>
-                    <input type="radio" name="like_feedback" value="4" id="star4">
-                    <label for="star4">★</label>
-                    <input type="radio" name="like_feedback" value="5" id="star5">
-                    <label for="star5">★</label>
+                <div class="rating-stars" id="starRating">
+                    <label data-value="1">★</label>
+                    <label data-value="2">★</label>
+                    <label data-value="3">★</label>
+                    <label data-value="4">★</label>
+                    <label data-value="5">★</label>
+                    <input type="hidden" name="like_feedback" id="starRatingValue" value="0">
                 </div>
             </div>
             <div class="form-actions">
@@ -571,5 +566,21 @@ function showTab(tabName) {
     // Активируем нужную кнопку
     event.target.classList.add('active');
 }
+
+// Звёздный рейтинг: выбор слева направо
+const starLabels = document.querySelectorAll('#starRating label');
+const starInput = document.getElementById('starRatingValue');
+starLabels.forEach((label, idx) => {
+    label.addEventListener('mouseenter', () => {
+        starLabels.forEach((l, i) => l.classList.toggle('hovered', i <= idx));
+    });
+    label.addEventListener('mouseleave', () => {
+        starLabels.forEach(l => l.classList.remove('hovered'));
+    });
+    label.addEventListener('click', () => {
+        starInput.value = idx + 1;
+        starLabels.forEach((l, i) => l.classList.toggle('selected', i <= idx));
+    });
+});
 </script>
 

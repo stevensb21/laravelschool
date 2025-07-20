@@ -120,6 +120,13 @@ body, .container, .content, .main-bg {
 .numbers{
     color: #2D3748;
     text-decoration: none;
+    align-self: flex-end ;
+}
+
+.statistics .numbers {
+    align-self: flex-end;
+    margin-top: auto;
+    margin-bottom: 0;
 }
 
 @media (max-width: 1024px) {
@@ -135,7 +142,7 @@ body, .container, .content, .main-bg {
     width: 100% !important;
   }
   .profileReviews, .static, .profile, .reviews-container, .statistics, .education, .achievements, .items, .average {
-    width: 100% !important;
+    width: 110% !important;
     max-width: 100vw !important;
     margin: 0 0 16px 0 !important;
     box-sizing: border-box;
@@ -159,7 +166,7 @@ body, .container, .content, .main-bg {
     line-height: 1.2;
   }
   .reviews-container {
-    width: 100% !important;
+    width: 90% !important;
     max-width: 100vw !important;
     min-width: 0 !important;
     margin: 0 0 16px 0 !important;

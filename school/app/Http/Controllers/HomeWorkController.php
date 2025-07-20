@@ -126,7 +126,7 @@ class HomeWorkController extends Controller
                 'grade_lesson' => 0, // Оценка за урок (не ставится при проверке ДЗ)
                 'homework' => $request->grade, // Оценка за домашнее задание
                 'attendance' => true, // Считаем, что студент присутствовал, раз сдал работу
-                'notes' => 'Оценка за домашнее задание: ' . ($request->feedback ?: 'Без комментариев')
+                'notes' => 'homework:' . $submission->home_work_id . ';feedback:' . ($request->feedback ?: 'Без комментариев')
             ]);
 
             return response()->json([
@@ -157,6 +157,18 @@ class HomeWorkController extends Controller
             $homework->update([
                 'deadline' => $request->new_deadline
             ]);
+
+            // Пересчёт статуса после продления срока
+            $homework->refresh();
+            $allGraded = $homework->homeWorkStudents->whereNotNull('grade')->count() == $homework->group->students->count();
+            if ($allGraded) {
+                $homework->status = 'Завершено';
+            } elseif ($homework->deadline < now()) {
+                $homework->status = 'Просрочено';
+            } else {
+                $homework->status = 'Активно';
+            }
+            $homework->save();
 
             return response()->json([
                 'success' => true,

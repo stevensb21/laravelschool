@@ -24,15 +24,15 @@
             <div class="profile-stats">
                 <div class="stat-card">
                     <h4>Средний балл</h4>
-                    <p>{{ $student->average_performance }}</p>
+                    <p>{{ $average ?? 0 }}</p>
                 </div>
                 <div class="stat-card">
                     <h4>Средняя за экзамен</h4>
-                    <p>{{ $student->average_exam_score }}</p>
+                    <p>{{ $average_exam ?? 0 }}</p>
                 </div>
                 <div class="stat-card">
                     <h4>Посещаемость</h4>
-                    <p>{{ $student->average_attendance }}%</p>
+                    <p>{{ $attendance ?? 0 }}%</p>
                 </div>
             </div>
         </div>

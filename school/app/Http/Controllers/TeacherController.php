@@ -391,6 +391,38 @@ class TeacherController extends Controller
         }
         $students = $studentsQuery->get();
 
+        // === Новый расчёт статистики для каждого студента ===
+        foreach ($students as $student) {
+            // 1. Собираем все lesson statistics для этого студента, где lesson ведёт этот преподаватель
+            $lessonStats = collect();
+            $lessonIds = [];
+            foreach ($student->statistics as $stat) {
+                if (preg_match('/lesson:(\d+)/', $stat->notes, $m)) {
+                    $lessonId = $m[1];
+                    $calendar = \App\Models\Calendar::find($lessonId);
+                    if ($calendar && str_replace(' ', '', mb_strtolower($calendar->teacher)) == str_replace(' ', '', mb_strtolower($teacher->fio))) {
+                        $lessonStats->push($stat);
+                        $lessonIds[] = $lessonId;
+                    }
+                }
+            }
+            // Средний балл за уроки
+            $student->average_performance = $lessonStats->where('grade_lesson', '>', 0)->avg('grade_lesson') ? round($lessonStats->where('grade_lesson', '>', 0)->avg('grade_lesson'), 1) : 0;
+            // Посещаемость
+            $totalLessons = $lessonStats->count();
+            $attendedLessons = $lessonStats->where('attendance', true)->count();
+            $student->average_attendance = $totalLessons > 0 ? round($attendedLessons / $totalLessons * 100, 1) : 0;
+            // Средний балл за домашки, которые задал этот преподаватель
+            $homeworkStats = \App\Models\HomeWorkStudent::where('student_id', $student->id)
+                ->where('grade', '>', 0)
+                ->get()
+                ->filter(function($hws) use ($teacher) {
+                    return $hws->homework && $hws->homework->teacher && $hws->homework->teacher->users_id == $teacher->users_id;
+                });
+            $student->average_homework = $homeworkStats->count() > 0 ? round($homeworkStats->avg('grade'), 1) : 0;
+        }
+        // === Конец нового расчёта ===
+
         $isAdmin = auth()->user()->role === 'admin';
         return view('teacher.students', compact('students', 'teacher', 'allGroups', 'isAdmin'));
     }
@@ -628,27 +660,35 @@ class TeacherController extends Controller
             ]);
         }
         
-        // Получаем уроки для этого преподавателя
-        $query = \App\Models\Calendar::whereBetween('date_', [session('monday'), session('sunday')])
+        // Получаем id курсов, которые ведёт преподаватель
+        $courseIds = \App\Models\Course::where(function($q) use ($teacher) {
+            $q->whereJsonContains('access_->teachers', (int)$teacher->users_id)
+              ->orWhereJsonContains('access_->teachers', (string)$teacher->users_id);
+        })->pluck('id')->toArray();
+        // Для фильтров: только "свои" группы и предметы
+        $groups = \App\Models\Group::where(function($q) use ($courseIds) {
+            foreach ($courseIds as $cid) {
+                $q->orWhereJsonContains('courses', (int)$cid)
+                  ->orWhereJsonContains('courses', (string)$cid);
+            }
+        })->get();
+        $subjects = \App\Models\Course::whereIn('id', $courseIds)->pluck('name')->toArray();
+        // Для отображения: ВСЕ уроки этого преподавателя за неделю
+        $allLessonsQuery = \App\Models\Calendar::whereBetween('date_', [session('monday'), session('sunday')])
             ->where('teacher', $teacher->fio);
-            
-        // Применяем фильтры
+        $lessons = $allLessonsQuery->get();
+        // Применяем фильтры только если выбраны
         if (request('group')) {
-            $query->where('name_group', request('group'));
+            $lessons = $lessons->where('name_group', request('group'));
+        } else {
+            // не фильтруем по группам, показываем все свои уроки
         }
         if (request('subject')) {
-            $query->where('subject', request('subject'));
+            $lessons = $lessons->where('subject', request('subject'));
+        } else {
+            // не фильтруем по предметам, показываем все свои уроки
         }
-        
-        $lessons = $query->get();
-        
-        // Получаем группы и предметы для фильтров
-        $groups = \App\Models\Group::all();
-        $subjects = \App\Models\Course::all();
-        
-        // Строим расписание
         $schedule = $this->buildSchedule($lessons);
-        
         $data = [
             'lessons' => $lessons,
             'groups' => $groups,
@@ -663,7 +703,6 @@ class TeacherController extends Controller
             'isTeacher' => true,
             'isStudent' => false,
         ];
-        
         return view('teacher.calendar', compact('data'));
     }
     
@@ -780,14 +819,25 @@ class TeacherController extends Controller
                 }
             }
         }
-        // Текущее домашнее задание для этой группы, даты и предмета
+        // Текущее домашнее задание для этой группы, предмета и учителя
         if ($students->count() && $course) {
             $currentHomework = \App\Models\HomeWork::where('groups_id', $students->first()->group->id ?? null)
                 ->where('course_id', $course->id)
-                ->whereDate('deadline', $lesson->date_)
+                ->where('teachers_id', $teacher->id)
+                ->orderByDesc('created_at')
                 ->first();
         }
-        return view('teacher.lesson-students', compact('teacher', 'lesson', 'students', 'homeworkTitles', 'homeworkFiles', 'currentHomework'));
+        $studentGrades = [];
+        $studentAttendance = [];
+        foreach ($students as $student) {
+            $stat = $student->statistics()
+                ->where('notes', 'like', 'lesson:' . $lesson->id . ';%')
+                ->orderByDesc('created_at')
+                ->first();
+            $studentGrades[$student->id] = $stat ? $stat->grade_lesson : '';
+            $studentAttendance[$student->id] = $stat ? $stat->attendance : false;
+        }
+        return view('teacher.lesson-students', compact('teacher', 'lesson', 'students', 'homeworkTitles', 'homeworkFiles', 'currentHomework', 'studentGrades', 'studentAttendance'));
     }
 
     public function saveLessonAttendance($lesson_id, \Illuminate\Http\Request $request) {
@@ -808,16 +858,31 @@ class TeacherController extends Controller
 
         // --- Сохраняем посещаемость и оценки ---
         foreach ($students as $student) {
-            $wasPresent = isset($attendance[$student->id]);
-            $grade = isset($grades[$student->id]) ? floatval($grades[$student->id]) : null;
-
-            \App\Models\Statistic::create([
+            $wasPresent = isset($attendance[$student->id]) && $attendance[$student->id] == 1;
+            $gradeRaw = $grades[$student->id] ?? null;
+            $grade = isset($grades[$student->id]) && $grades[$student->id] !== '' ? floatval($grades[$student->id]) : null;
+            
+            \Log::info('grade debug', [
                 'student_id' => $student->id,
-                'grade_lesson' => $wasPresent && $grade ? $grade : 0,
-                'homework' => 0,
-                'attendance' => $wasPresent,
-                'notes' => 'Оценка за урок: ' . ($grade ?? '—'),
+                'grade_raw' => $gradeRaw,
+                'grade_final' => $grade,
+                'all_grades' => $grades,
+                'wasPresent' => $wasPresent,
+                'notes_key' => 'lesson:' . $lesson->id . ';date:' . $lesson->date_ . ';group:' . $lesson->name_group,
             ]);
+
+            \App\Models\Statistic::updateOrCreate(
+                [
+                    'student_id' => $student->id,
+                    'notes' => 'lesson:' . $lesson->id . ';date:' . $lesson->date_ . ';group:' . $lesson->name_group,
+                ],
+                [
+                    'grade_lesson' => $grade,
+                    'homework' => 0,
+                    'attendance' => $wasPresent,
+                    'notes' => 'lesson:' . $lesson->id . ';date:' . $lesson->date_ . ';group:' . $lesson->name_group,
+                ]
+            );
         }
 
         // --- Сохраняем домашнее задание ---
@@ -826,6 +891,14 @@ class TeacherController extends Controller
         $homeworkFilePath = null;
         $courseId = null;
         $description = null;
+
+        // Логирование для диагностики загрузки файла
+        \Log::info('Файл для домашки', [
+            'exists' => $request->hasFile('homework_file'),
+            'valid' => $homeworkFile ? $homeworkFile->isValid() : null,
+            'size' => $homeworkFile ? $homeworkFile->getSize() : null,
+            'original_name' => $homeworkFile ? $homeworkFile->getClientOriginalName() : null,
+        ]);
 
         // Определяем course_id и method_id
         $method = null;
@@ -841,12 +914,13 @@ class TeacherController extends Controller
             }
         }
 
-        if ($homeworkFile) {
+        // Проверяем, что файл действительно загружен и не пустой
+        if ($homeworkFile && $homeworkFile->isValid() && $homeworkFile->getSize() > 0) {
             // Загружаем файл
             $homeworkFilePath = $homeworkFile->store('homework_teacher', 'public');
             $description = 'Загружено преподавателем';
             $methodId = 0; // всегда 0 для файла
-        } elseif ($homeworkFromMethod && $methodId) {
+        } elseif ($homeworkFromMethod && !empty($homeworkFromMethod) && $methodId) {
             // Удаляем storage/ или /storage/ из начала пути, если есть
             if (strpos($homeworkFromMethod, '/storage/') === 0) {
                 $homeworkFilePath = substr($homeworkFromMethod, 9);
@@ -857,7 +931,7 @@ class TeacherController extends Controller
             }
             $description = 'Из методпакета';
             // methodId уже определён выше
-        } elseif ($homeworkFromMethod && !$methodId) {
+        } elseif ($homeworkFromMethod && !empty($homeworkFromMethod) && !$methodId) {
             if (strpos($homeworkFromMethod, '/storage/') === 0) {
                 $homeworkFilePath = substr($homeworkFromMethod, 9);
             } elseif (strpos($homeworkFromMethod, 'storage/') === 0) {
@@ -880,7 +954,7 @@ class TeacherController extends Controller
                 'course_id' => $courseId,
                 'method_id' => 1, // всегда определён
                 'teachers_id' => $teacher->id,
-                'deadline' => $lesson->date_,
+                'deadline' => now()->addDays(7)->toDateString(),
                 'file_path' => $homeworkFilePath,
                 'description' => $description,
                 'status' => 'Активно',

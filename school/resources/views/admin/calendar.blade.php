@@ -23,9 +23,6 @@
 $colorVars = [
     '--primary-color',
     '--secondary-color',
-    '--primary-light',
-    '--secondary-light',
-    '--accent-light',
     '--success-color',
     '--info-color',
     '--status-active',
@@ -204,13 +201,13 @@ $colorVars = [
             echo '<p style="margin:0;font-weight:600;">' . htmlspecialchars($lesson->subject) . '</p>';
             if (isset($lesson->name_group)) {
                 echo '<p style="margin:0;font-size:11px;font-weight:700;color:var(--text-light);text-shadow:0 1px 2px rgba(0,0,0,0.25);background:rgba(0,0,0,0.10);border-radius:4px;padding:0 2px;">' . htmlspecialchars($lesson->name_group) . '</p>';
-            }
-            if ($data['edit_mode'] ?? false) {
+                    }
+                if ($data['edit_mode'] ?? false) {
                 echo '<form method="POST" action="' . route('calendar.delete-lesson') . '" class="delete-lesson-form" style="position: absolute; left: 0; bottom: 0; z-index: 20;">';
-                echo csrf_field();
+                    echo csrf_field();
                 echo '<input type="hidden" name="lesson_id" value="' . $lesson->id . '">';
                 echo '<button type="submit" name="delete_lesson" class="delete-btn">&times;</button>';
-                echo '</form>';
+                    echo '</form>';
                 // Кнопка добавления параллельного урока (справа снизу)
                 $lessonDate = date('Y-m-d', strtotime($lesson->date_));
                 $startTime = $lesson->start_time;
@@ -293,6 +290,10 @@ function showModal(date, startTime) {
     const dateInput = document.getElementById('modalDate');
     const startTimeSelect = document.getElementById('modalStartTime');
     const endTimeSelect = document.getElementById('modalEndTime');
+    
+    // Отладочная информация
+    console.log('showModal called with:', { date, startTime });
+    
     // Устанавливаем дату
     dateInput.value = date;
     // Очищаем и заполняем select времени начала
@@ -304,14 +305,12 @@ function showModal(date, startTime) {
         if (h < endHour) startTimeSelect.add(new Option(hourStr + ':30', hourStr + ':30'));
     }
     // Выделяем нужное время
-    if (startTime) startTimeSelect.value = startTime;
-    // Очищаем и заполняем select времени окончания
-    endTimeSelect.innerHTML = '';
-    for (let h = startHour; h <= endHour; h++) {
-        let hourStr = String(h).padStart(2, '0');
-        endTimeSelect.add(new Option(hourStr + ':00', hourStr + ':00'));
-        if (h < endHour) endTimeSelect.add(new Option(hourStr + ':30', hourStr + ':30'));
+    if (startTime) {
+        startTimeSelect.value = startTime;
     }
+    // Сразу обновляем значения конца урока
+    updateEndOptions();
+    // Сброс значения конца урока
     endTimeSelect.value = '';
     modal.style.display = 'flex';
 }
@@ -327,6 +326,46 @@ window.onclick = function(event) {
         closeModal();
     }
 }
+
+function generateTimes(from = '08:00', to = '22:00') {
+    const times = [];
+    let [h, m] = from.split(':').map(Number);
+    const [endH, endM] = to.split(':').map(Number);
+    while (h < endH || (h === endH && m <= endM)) {
+        times.push((h < 10 ? '0' : '') + h + ':' + (m === 0 ? '00' : '30'));
+        m += 30;
+        if (m === 60) { h++; m = 0; }
+    }
+    return times;
+}
+
+function updateEndOptions() {
+    const startTimeSelect = document.getElementById('modalStartTime');
+    const endTimeSelect = document.getElementById('modalEndTime');
+    const allTimes = generateTimes();
+    const startValue = startTimeSelect.value;
+    endTimeSelect.innerHTML = '';
+    let add = false;
+    allTimes.forEach(time => {
+        if (time === startValue) add = true;
+        if (add) {
+            const opt = document.createElement('option');
+            opt.value = time;
+            opt.textContent = time;
+            endTimeSelect.appendChild(opt);
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const startTimeSelect = document.getElementById('modalStartTime');
+    const endTimeSelect = document.getElementById('modalEndTime');
+    if (startTimeSelect && endTimeSelect) {
+        startTimeSelect.addEventListener('change', updateEndOptions);
+        // Инициализация при открытии модалки
+        updateEndOptions();
+    }
+});
 </script>
 
 <!-- Мобильная версия календаря -->
@@ -361,26 +400,26 @@ window.onclick = function(event) {
             @if($hasLessons)
                 <ul class="mobile-lesson-list">
                     @foreach ($uniqueLessons as $lesson)
-                        <li class="mobile-lesson-item">
-                            <div class="lesson-info">
+                            <li class="mobile-lesson-item">
+                                <div class="lesson-info">
                                 <span class="lesson-time">{{ substr($lesson->start_time,0,5) }}-{{ substr($lesson->end_time,0,5) }}</span>
                                 <span class="lesson-title">{{ $lesson->subject ?? $lesson->name_group ?? '' }}</span>
                                 @if(isset($lesson->teacher))
                                     <span class="lesson-teacher">{{ $lesson->teacher }}</span>
-                                @endif
+                                    @endif
                                 @if(isset($lesson->name_group))
                                     <span class="lesson-group">{{ $lesson->name_group }}</span>
-                                @endif
-                            </div>
-                            <div style="font-size: 10px; color: #999;"></div>
-                            @if(true)
-                                <div class="mobile-lesson-actions">
-                                    <div>
-                                        <button class="mobile-delete-btn" onclick="deleteLesson('{{ $lesson->id }}')">Удалить</button>
-                                    </div>
+                                    @endif
                                 </div>
-                            @endif
-                        </li>
+                            <div style="font-size: 10px; color: #999;"></div>
+                                    @if(true)
+                                        <div class="mobile-lesson-actions">
+                                            <div>
+                                        <button class="mobile-delete-btn" onclick="deleteLesson('{{ $lesson->id }}')">Удалить</button>
+                                            </div>
+                                        </div>
+                                    @endif
+                            </li>
                     @endforeach
                 </ul>
             @else

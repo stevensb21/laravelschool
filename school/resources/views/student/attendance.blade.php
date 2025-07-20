@@ -59,23 +59,23 @@
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Дата</th>
-                                    <th>Статус</th>
-                                    <th>Комментарий</th>
+                                    <th style="text-align:center;">Дата</th>
+                                    <th style="text-align:center;">Статус</th>
+                                    <th style="text-align:center;">Комментарий</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach($attendance as $record)
                                     <tr>
-                                        <td>{{ $record->created_at->format('d.m.Y') }}</td>
-                                        <td>
+                                        <td style="text-align:center;">{{ $record->created_at->format('d.m.Y') }}</td>
+                                        <td style="text-align:center;">
                                             @if($record->attendance)
                                                 <span class="status active">Присутствовал</span>
                                             @else
                                                 <span class="status inactive">Отсутствовал</span>
                                             @endif
                                         </td>
-                                        <td>{{ $record->notes ?? '—' }}</td>
+                                        <td style="text-align:center;">{{ $record->subject ?? ($record->notes ?? '—') }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>

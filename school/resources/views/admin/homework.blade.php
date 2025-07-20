@@ -131,7 +131,45 @@
         </div>
     </div>
 
+    <!-- Toast уведомление -->
+    <div id="toast" class="toast"></div>
+
+    <style>
+    .toast {
+        position: fixed;
+        top: 24px;
+        left: 24px;
+        min-width: 220px;
+        max-width: 350px;
+        background: #22223b;
+        color: #fff;
+        padding: 16px 24px;
+        border-radius: 8px;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        font-size: 1rem;
+        opacity: 0;
+        z-index: 9999;
+        pointer-events: none;
+        transition: opacity 0.3s, transform 0.3s;
+        transform: translateY(-30px);
+    }
+    .toast.show {
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateY(0);
+    }
+    </style>
+
     <script>
+    function showToast(message) {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.classList.add('show');
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 2000);
+    }
+
     function openExtendModal(homeworkId, currentDeadline) {
         document.getElementById('homeworkId').value = homeworkId;
         document.getElementById('currentDeadline').value = currentDeadline;
@@ -176,15 +214,15 @@
         .then(data => {
             if (data.success) {
                 closeExtendModal();
-                alert(data.message);
-                location.reload(); // Перезагружаем страницу для обновления данных
+                showToast(data.message); // Показываем toast
+                setTimeout(() => location.reload(), 2000); // Перезагрузка через 2 сек
             } else {
-                alert('Ошибка при продлении срока: ' + data.message);
+                showToast('Ошибка при продлении срока: ' + data.message);
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Произошла ошибка при продлении срока');
+            showToast('Произошла ошибка при продлении срока');
         });
     };
 

@@ -29,9 +29,26 @@ class CalendarController extends Controller
             return view('admin.calendar', compact('data'));
         } elseif ($role === 'teacher') {
             $teacher = $user->teacher;
-            // Получаем только группы, которые ведёт преподаватель (если есть связь)
-            $groups = Group::whereJsonContains('courses', $teacher->subjects)->get(); // или используйте вашу связь
-            $courses = $teacher->subjects ?? [];
+            // Получаем id курсов, которые ведёт преподаватель
+            $courseIds = \App\Models\Course::where(function($q) use ($teacher) {
+                $q->whereJsonContains('access_->teachers', (int)$teacher->users_id)
+                  ->orWhereJsonContains('access_->teachers', (string)$teacher->users_id);
+            })->pluck('id')->toArray();
+            // Получаем только группы, которые проходят хотя бы один из этих курсов
+            $groups = \App\Models\Group::where(function($q) use ($courseIds) {
+                foreach ($courseIds as $cid) {
+                    $q->orWhereJsonContains('courses', (int)$cid)
+                      ->orWhereJsonContains('courses', (string)$cid);
+                }
+            })->get();
+            // Получаем только названия предметов, которые ведёт преподаватель
+            $subjects = \App\Models\Course::whereIn('id', $courseIds)->pluck('name')->toArray();
+            // ВРЕМЕННО: dd для отладки
+            dd([
+                'courseIds' => $courseIds,
+                'subjects' => $subjects,
+                'groups' => $groups->pluck('name')->toArray(),
+            ]);
             $query = \App\Models\Calendar::whereBetween('date_', [session('monday'), session('sunday')]);
             if (request('group')) {
                 $query->where('name_group', request('group'));
@@ -40,14 +57,14 @@ class CalendarController extends Controller
             }
             if (request('subject')) {
                 $query->where('subject', request('subject'));
-            } else if (!empty($courses)) {
-                $query->whereIn('subject', $courses);
+            } else if (!empty($subjects)) {
+                $query->whereIn('subject', $subjects);
             }
             $lessons = $query->get();
             $data = [
                 'lessons' => $lessons,
                 'groups' => $groups,
-                'subjects' => $courses,
+                'subjects' => $subjects,
                 'teachers' => [$teacher],
                 'user' => $user,
                 'schedule' => $this->buildShedule($lessons),
@@ -58,7 +75,7 @@ class CalendarController extends Controller
                 'isTeacher' => true,
                 'isStudent' => false,
             ];
-            return view('admin.calendar', compact('data'));
+            return view('teacher.calendar', compact('data'));
         } else { // student
             $student = $user->student;
             $group = $student->group_name;
@@ -194,7 +211,8 @@ class CalendarController extends Controller
 
     public function addLesson(Request $request)
     {
-        // Валидация данных
+        $user = auth()->user();
+        $role = $user->role;
         $validated = $request->validate([
             'date' => 'required|date',
             'start_time' => 'required|date_format:H:i',
@@ -204,7 +222,18 @@ class CalendarController extends Controller
             'teacher' => 'required|string'
         ]);
 
-        // Подготовка данных для сохранения
+        // --- Проверка для преподавателя ---
+        if ($role === 'teacher') {
+            $teacher = $user->teacher;
+            // Получаем только свои группы и предметы
+            $groups = \App\Models\Group::whereJsonContains('courses', $teacher->subjects)->pluck('name')->toArray();
+            $subjects = $teacher->subjects ?? [];
+            if (!in_array($validated['name_group'], $groups) || !in_array($validated['subject'], $subjects) || $validated['teacher'] !== $teacher->fio) {
+                return redirect()->back()->with('error', 'Вы можете добавлять уроки только для своих групп и предметов.');
+            }
+        }
+        // --- Конец проверки ---
+
         $lessonData = [
             'date_' => $validated['date'],
             'start_time' => $validated['start_time'],
@@ -214,15 +243,12 @@ class CalendarController extends Controller
             'teacher' => $validated['teacher']
         ];
 
-        // Создание нового урока
         $lesson = new Calendar();
         $lesson->createItem($lessonData);
 
-        // Возвращаемся в режим редактирования, если пользователь был в нем
         if (request()->has('edit_mode')) {
             return redirect()->route('calendar', ['edit_mode' => 1]);
         }
-        
         return redirect('calendar');
     }
 

@@ -1,9 +1,6 @@
 /* Импорт цветовых переменных */
 @import './colors.css';
 
-body, .container, .content, .main-bg {
-    background: var(--main-bg) !important;
-}
 
 .homework-container {
     background-color: var(--card-bg);
@@ -31,6 +28,10 @@ body, .container, .content, .main-bg {
     gap: 15px;
     align-items: center;
     width: 100%;
+}
+
+a.file-name, .file-name, .file-link, .student-file-name, .homework-link {
+    color: var(--link-color);
 }
 
 

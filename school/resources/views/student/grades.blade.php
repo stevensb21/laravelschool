@@ -78,29 +78,19 @@
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Дата</th>
-                                    <th>Тип</th>
-                                    <th>Оценка</th>
-                                    <th>Комментарий</th>
+                                    <th title="Дата выставления оценки" style="color:#2d3748;">Дата</th>
+                                    <th title="Название предмета" style="color:#2d3748;">Предмет</th>
+                                    <th title="Тип оценки: урок или домашнее задание" style="color:#2d3748;">Тип</th>
+                                    <th title="Оценка по 5-балльной шкале" style="color:#2d3748;">Оценка</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach($grades as $grade)
-                                    @php
-                                        $type = $grade->grade_lesson > 0 ? 'Урок' : ($grade->homework > 0 ? 'Домашнее задание' : '—');
-                                        $value = $grade->grade_lesson > 0 ? $grade->grade_lesson : ($grade->homework > 0 ? $grade->homework : '—');
-                                    @endphp
                                     <tr>
                                         <td>{{ $grade->created_at->format('d.m.Y') }}</td>
-                                        <td>{{ $type }}</td>
-                                        <td>
-                                            @if($value !== '—')
-                                                <span class="status {{ $value >= 4.5 ? 'active' : ($value >= 3.5 ? 'warning' : 'inactive') }}">{{ $value }}</span>
-                                            @else
-                                                <span style="color:#a0aec0;">—</span>
-                                            @endif
-                                        </td>
-                                        <td>{{ $grade->notes ?? '—' }}</td>
+                                        <td>{{ $grade->subject ?? '—' }}</td>
+                                        <td>{{ $grade->grade_type ?? '—' }}</td>
+                                        <td style="font-size:1rem;">{{ $grade->grade_lesson > 0 ? $grade->grade_lesson : ($grade->homework > 0 ? $grade->homework : '—') }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>

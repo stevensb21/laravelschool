@@ -169,17 +169,32 @@
     gap: 2px;
 }
 
-.star {
-    color: var(--warning-color);
-    font-size: 16px;
+.rating-stars .star {
+    font-size: 22px;
+    color: var(--accent-color);
+    text-shadow: 0 1px 2px var(--border-dark), 0 0 1px #fff;
+    transition: color 0.2s, text-shadow 0.2s;
 }
-
-.star.filled {
-    color: var(--warning-color);
+.rating-stars .star.filled,
+.rating-stars .star.selected {
+    color: var(--status-pending);
+    text-shadow: 0 2px 6px var(--secondary-color), 0 0 2px #fff;
 }
-
-.star.empty {
-    color: var(--border-light);
+.rating-stars .star {
+    opacity: 1;
+}
+.rating-input label {
+    font-size: 22px;
+    color: var(--accent-color);
+    text-shadow: 0 1px 2px var(--border-dark), 0 0 1px #fff;
+    cursor: pointer;
+    transition: color 0.2s, text-shadow 0.2s;
+}
+.rating-input input[type="radio"]:checked ~ label,
+.rating-input label:hover,
+.rating-input label:hover ~ label {
+    color: var(--status-pending);
+    text-shadow: 0 2px 6px var(--secondary-color), 0 0 2px #fff;
 }
 
 .rating-value {
@@ -364,15 +379,17 @@
 
 .rating-input label {
     font-size: 22px;
-    color: var(--border-light);
+    color: var(--accent-color);
+    text-shadow: 0 1px 2px var(--border-dark), 0 0 1px #fff;
     cursor: pointer;
-    transition: color 0.2s;
+    transition: color 0.2s, text-shadow 0.2s;
 }
 
 .rating-input input[type="radio"]:checked ~ label,
 .rating-input label:hover,
 .rating-input label:hover ~ label {
-    color: var(--warning-color);
+    color: var(--status-pending);
+    text-shadow: 0 2px 6px var(--secondary-color), 0 0 2px #fff;
 }
 
 .submit-review-btn {
@@ -445,4 +462,151 @@
     padding: 10px 15px;
     border-radius: 5px;
     margin-bottom: 20px;
+} 
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: auto;
+    background: rgba(0,0,0,0.45);
+    justify-content: center;
+    align-items: center;
+}
+.modal.show {
+    display: flex !important;
+}
+.modal .modal-content {
+    background: var(--card-bg);
+    margin: auto;
+    padding: 32px 28px 24px 28px;
+    border-radius: 12px;
+    max-width: 350px;
+    width: 100%;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    text-align: center;
+    position: relative;
+}
+.modal .close {
+    position: absolute;
+    top: 12px;
+    right: 18px;
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    cursor: pointer;
+}
+.modal .form-actions {
+    margin-top: 24px;
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+} 
+
+.modal .form-actions .delete-btn, .modal .form-actions .cancel-btn {
+    min-width: 130px;
+    height: 44px;
+    padding: 0 28px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 7px;
+    box-sizing: border-box;
+    display: inline-block;
+}
+.modal .form-actions .delete-btn {
+    background: var(--primary-color);
+    color: #fff;
+    border: none;
+    transition: background 0.2s, box-shadow 0.2s;
+}
+.modal .form-actions .delete-btn:hover {
+    background: var(--primary-hover);
+}
+.modal .form-actions .cancel-btn {
+    background: transparent;
+    color: var(--primary-color);
+    border: 2px solid var(--primary-color);
+    transition: background 0.2s, color 0.2s, border 0.2s;
+}
+.modal .form-actions .cancel-btn:hover {
+    background: var(--primary-color);
+    color: #fff;
+    border-color: var(--primary-color);
+} 
+
+.model-delete-btn {
+    min-width: 130px;
+    height: 44px;
+    padding: 0 28px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 7px;
+    background: var(--primary-color);
+    color: #fff;
+    border: none;
+    box-shadow: 0 2px 6px var(--card-shadow);
+    transition: background 0.2s, box-shadow 0.2s;
+    display: inline-block;
+}
+.model-delete-btn:hover {
+    background: var(--primary-hover);
+    box-shadow: 0 4px 12px var(--card-shadow);
+} 
+
+.model-reject-btn, .model-cancel-btn {
+    min-width: 130px;
+    height: 44px;
+    padding: 0 28px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 7px;
+    box-sizing: border-box;
+    display: inline-block;
+}
+.model-reject-btn {
+    background: var(--primary-color);
+    color: #fff;
+    border: none;
+    box-shadow: 0 2px 6px var(--card-shadow);
+    transition: background 0.2s, box-shadow 0.2s;
+}
+.model-reject-btn:hover {
+    background: var(--primary-hover);
+    box-shadow: 0 4px 12px var(--card-shadow);
+}
+.model-cancel-btn {
+    background: transparent;
+    color: var(--primary-color);
+    border: 2px solid var(--primary-color);
+    transition: background 0.2s, color 0.2s, border 0.2s;
+}
+.model-cancel-btn:hover {
+    background: var(--primary-color);
+    color: #fff;
+    border-color: var(--primary-color);
+} 
+
+.model-reject-textarea {
+    width: 100%;
+    min-width: 220px;
+    max-width: 340px;
+    min-height: 80px;
+    padding: 10px 12px;
+    border: 1.5px solid var(--primary-color);
+    border-radius: 7px;
+    font-size: 15px;
+    background: var(--input-bg);
+    color: var(--text-primary);
+    transition: border 0.2s, box-shadow 0.2s;
+    resize: vertical;
+    box-sizing: border-box;
+    margin-top: 6px;
+}
+.model-reject-textarea:focus {
+    border-color: var(--primary-hover);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(110,1,4,0.08);
 } 
