@@ -2,7 +2,7 @@
 
 <div id="addStudentModal" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="closeModal('addStudentModal')">&times;</span>
+            <span class="close" onclick="closeModal('addStudentModal')" style="color:var(--error-color);font-size:22px;position:absolute;right:18px;top:12px;cursor:pointer;">&times;</span>
             <h2>Добавить студента</h2>
             
             <?php if (isset($error)): ?>

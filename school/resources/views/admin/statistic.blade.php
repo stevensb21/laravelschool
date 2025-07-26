@@ -53,10 +53,10 @@
                         </div>
                         <div class="stat-details">
                             <p><span>Средняя посещаемость:</span> <strong>{{ $attendance }}%</strong></p>
-                            <p><span>Отличная:</span> <strong>{{ $excellent_attendance }}</strong></p>
-                            <p><span>Хорошая:</span> <strong>{{ $good_attendance }}</strong></p>
-                            <p><span>Удовлетворительная:</span> <strong>{{ $satisfactory_attendance }}</strong></p>
-                            <p><span>Неудовлетворительная:</span> <strong>{{ $unsatisfactory_attendance }}</strong></p>
+                            <p><span>Студентов с посещаемостью ≥ 90%:</span> <strong>{{ $excellent_attendance }}</strong></p>
+                            <p><span>Студентов с посещаемостью ≥ 80%:</span> <strong>{{ $good_attendance }}</strong></p>
+                            <p><span>Студентов с посещаемостью ≥ 70%:</span> <strong>{{ $satisfactory_attendance }}</strong></p>
+                            <p><span>Студентов с посещаемостью &lt; 70%:</span> <strong>{{ $unsatisfactory_attendance }}</strong></p>
                         </div>
                     </div>
                     <div class="stat-card">
@@ -158,7 +158,7 @@
                         <input type="hidden" name="period" value="{{ $period ?? 'all' }}">
                         <select name="format" id="exportFormat">
                             <option value="xlsx">Excel</option>
-                            <option value="csv">CSV</option>
+                            <!-- <option value="csv">CSV</option> -->
                             <option value="pdf">PDF</option>
                         </select>
                         <button type="submit" class="export-btn">

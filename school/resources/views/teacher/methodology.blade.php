@@ -21,7 +21,8 @@
     </div>
 @endif
 
-
+<div class="container">
+    <div class="content">
     <div class="container-method">
         @if(isset($isAdmin) && $isAdmin)
             <div class="admin-header" style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
@@ -170,7 +171,8 @@
             </table>
         </div>
     </div>
-
+    </div>
+    </div>
 
     <style>
     .toast-success {

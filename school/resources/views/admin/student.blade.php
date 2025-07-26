@@ -63,10 +63,13 @@
                             <div class="reviews">
                                 <div class="review-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                                     <strong>{{ $review->sender_name }}</strong>
-                                    <div class="rating-stars" style="display: flex; gap: 2px;">
-                                        @for($i = 1; $i <= 5; $i++)
-                                            <span style="color: {{ $i <= $review->rating ? '#ffd700' : '#ddd' }};">★</span>
-                                        @endfor
+                                    <div class="review-rating">
+                                        <div class="rating-stars" style="display: flex; gap: 2px;">
+                                            @for($i = 1; $i <= 5; $i++)
+                                            <span class="star {{ $i <= $review->rating ? 'filled' : 'empty' }}">★</span>
+                                            @endfor
+                                        </div>
+                                        <span class="rating-value">{{ $review->rating }}/5</span>
                                     </div>
                                 </div>
                                 <p>{{ $review->review_text }}</p>

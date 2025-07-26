@@ -21,7 +21,7 @@
         </div>
     @endif
 
-    <div class="reviews-container">
+    <div class="reviews-container" style="background:var(--card-bg);border-radius:12px;box-shadow:0 2px 8px var(--card-shadow);padding:24px;">
         <div class="reviews-header">
             <h2>Отзывы</h2>
             <button class="action-btn" onclick="showReviewForm()" style="background: var(--primary-color); color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
@@ -137,7 +137,7 @@
                     </div>
                 @endforeach
             @else
-                <div class="no-reviews">
+                <div class="no-reviews" style="text-align:center;padding:40px;color:var(--text-color);">
                     <p>Отзывов пока нет</p>
                 </div>
             @endif

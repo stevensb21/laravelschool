@@ -7,13 +7,13 @@
     @include('student.nav')
     <div class="container" style="flex:1;min-width:0;">
         <main class="content">
-            <div class="students-container">
+            <div class="students-container" style="background:var(--card-bg);border-radius:12px;box-shadow:0 2px 8px var(--card-shadow);padding:24px;">
                 <div class="students-header">
                     <h2>Посещаемость</h2>
                 </div>
                 
                 @if($attendance->isEmpty())
-                    <div style="text-align:center;padding:40px;color:#718096;">
+                    <div style="text-align:center;padding:40px;color:var(--text-color);">
                         <p>Данные о посещаемости пока не загружены.</p>
                     </div>
                 @else

@@ -30,7 +30,7 @@
 
 <div class="container">
     <main class="content">
-        <div class="calendar-container">
+        <div class="calendar-container" style="background:var(--card-bg);border-radius:12px;box-shadow:0 2px 8px var(--card-shadow);padding:24px;">
             <div class="calendar-header">
                 <h2>Управление расписанием</h2>
                 <div class="calendar-controls">
@@ -231,6 +231,7 @@
                 <button type="button" class="cancel-btn" onclick="closeModal()">Отмена</button>
             </div>
         </form>
+        <span class="close" onclick="closeModal()" style="color:var(--error-color);font-size:22px;position:absolute;right:18px;top:12px;cursor:pointer;">&times;</span>
     </div>
 </div>
 

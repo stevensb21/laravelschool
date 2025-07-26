@@ -1,6 +1,6 @@
-<div id="deleteGroupModal" class="modal" style="top: 50px;">
+<div id="deleteGroupModal" class="modal">
     <div class="modal-content">
-        <span class="close" onclick="closeModal('deleteGroupModal')">&times;</span>
+        <span class="close" onclick="closeModal('deleteGroupModal')" style="color:var(--error-color);font-size:22px;position:absolute;right:18px;top:12px;cursor:pointer;">&times;</span>
         <h3>Удалить группу</h3>
         <form action="{{ route('management.deleteGroup') }}" method="POST">
             @csrf

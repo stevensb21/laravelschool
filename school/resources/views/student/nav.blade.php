@@ -1,4 +1,4 @@
-<nav class="sidebar" id="studentSidebar">
+<nav class="sidebar" id="studentSidebar" style="background:var(--nav-bg);color:var(--nav-text);">
     <div class="mobile-nav-header">
         <span class="mobile-logo">okapi-board</span>
         <button class="mobile-nav-toggle" id="studentNavToggle" aria-label="Открыть меню">
@@ -12,6 +12,7 @@
         <a href="{{ route('student.homework') }}">Домашние задания</a>
         <a href="{{ route('student.grades') }}">Оценки</a>
         <a href="{{ route('student.attendance') }}">Посещаемость</a>
+        <a href="{{ route('chats.index') }}">Чаты</a>
         <a href="{{ route('student.appeals') }}">Обращения</a>
         <a href="{{ route('student.reviews') }}">Отзывы</a>
         <form action="{{ route('logout') }}" method="POST" style="display: inline;">

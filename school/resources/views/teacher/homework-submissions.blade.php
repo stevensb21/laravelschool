@@ -3,6 +3,25 @@
 
 <meta name="csrf-token" content="{{ csrf_token() }}">
 @vite(['resources/css/homework.css'])
+<style>
+.table-scroll-container {
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-color) transparent;
+    max-width: none !important;
+    width: auto !important;
+    min-width: 0 !important;
+}
+.table-scroll-container::-webkit-scrollbar { height: 8px; }
+.table-scroll-container::-webkit-scrollbar-track { background: transparent; }
+.table-scroll-container::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+.table-scroll-container::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
+.submissions-table .table-scroll-container table th,
+.submissions-table .table-scroll-container table td {
+    text-align: left !important;
+}
+</style>
 @include('teacher.nav')
 
 <div class="container">
@@ -20,71 +39,73 @@
                 <p><strong>Описание:</strong> {{ $homework->description ?? 'Описание отсутствует' }}</p>
             </div>
 
-            <div class="submissions-table">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>№</th>
-                            <th>Студент</th>
-                            <th>Статус</th>
-                            <th>Файл</th>
-                            <th>Оценка</th>
-                            <th>Комментарий</th>
-                            <th>Действия</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($studentsList as $index => $item)
-                            <tr class="{{ $item['hasSubmitted'] ? 'submitted' : 'not-submitted' }}">
-                                <td>{{ $index + 1 }}</td>
-                                <td>{{ $item['student']->fio }}</td>
-                                <td>
-                                    @if($item['hasSubmitted'])
-                                        <span class="status submitted">Сдано</span>
-                                    @else
-                                        <span class="status not-submitted">Не сдано</span>
-                                    @endif
-                                </td>
-                                <td>
-                                    @if($item['hasSubmitted'] && $item['filePath'])
-                                        <a href="{{ $item['filePath'] }}" target="_blank" class="file-link" download>
-                                            📄 Скачать файл
-                                        </a>
-                                    @else
-                                        <span class="no-file">Файл не загружен</span>
-                                    @endif
-                                </td>
-                                <td>
-                                    @if($item['hasSubmitted'])
-                                        <span class="grade {{ $item['grade'] ? 'has-grade' : 'no-grade' }}">
-                                            {{ $item['grade'] ?? 'Не оценено' }}
-                                        </span>
-                                    @else
-                                        <span class="no-grade">-</span>
-                                    @endif
-                                </td>
-                                <td>
-                                    @if($item['hasSubmitted'])
-                                        <span class="feedback">
-                                            {{ $item['feedback'] ?? 'Нет комментария' }}
-                                        </span>
-                                    @else
-                                        <span class="no-feedback">-</span>
-                                    @endif
-                                </td>
-                                <td>
-                                    @if($item['hasSubmitted'])
-                                        <button class="grade-btn" onclick="openGradeModal({{ $item['submission']->id }}, '{{ $item['student']->fio }}', {{ $item['grade'] ?? 'null' }}, '{{ $item['feedback'] ?? '' }}')">
-                                            Оценить
-                                        </button>
-                                    @else
-                                        <span class="no-action">-</span>
-                                    @endif
-                                </td>
+            <div class="table-scroll-container">
+                <div class="submissions-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>№</th>
+                                <th>Студент</th>
+                                <th>Статус</th>
+                                <th>Файл</th>
+                                <th>Оценка</th>
+                                <th>Комментарий</th>
+                                <th>Действия</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach($studentsList as $index => $item)
+                                <tr class="{{ $item['hasSubmitted'] ? 'submitted' : 'not-submitted' }}">
+                                    <td>{{ $index + 1 }}</td>
+                                    <td>{{ $item['student']->fio }}</td>
+                                    <td>
+                                        @if($item['hasSubmitted'])
+                                            <span class="status submitted">Сдано</span>
+                                        @else
+                                            <span class="status not-submitted">Не сдано</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($item['hasSubmitted'] && $item['filePath'])
+                                            <a href="{{ $item['filePath'] }}" target="_blank" class="file-link" download>
+                                                📄 Скачать файл
+                                            </a>
+                                        @else
+                                            <span class="no-file">Файл не загружен</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($item['hasSubmitted'])
+                                            <span class="grade {{ $item['grade'] ? 'has-grade' : 'no-grade' }}">
+                                                {{ $item['grade'] ?? 'Не оценено' }}
+                                            </span>
+                                        @else
+                                            <span class="no-grade">-</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($item['hasSubmitted'])
+                                            <span class="feedback">
+                                                {{ $item['feedback'] ?? 'Нет комментария' }}
+                                            </span>
+                                        @else
+                                            <span class="no-feedback">-</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($item['hasSubmitted'])
+                                            <button class="grade-btn" onclick="openGradeModal({{ $item['submission']->id }}, '{{ $item['student']->fio }}', {{ $item['grade'] ?? 'null' }}, '{{ $item['feedback'] ?? '' }}')">
+                                                Оценить
+                                            </button>
+                                        @else
+                                            <span class="no-action">-</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </main>
@@ -93,7 +114,7 @@
 <!-- Модальное окно для оценки -->
 <div id="gradeModal" class="modal">
     <div class="modal-content">
-        <span class="close">&times;</span>
+        <span class="close" onclick="closeModal('gradeModal')" style="color:var(--error-color);font-size:22px;position:absolute;right:18px;top:12px;cursor:pointer;">&times;</span>
         <h3>Оценка работы</h3>
         <form id="gradeForm">
             <input type="hidden" id="submissionId" name="submission_id">
@@ -129,7 +150,7 @@ function openGradeModal(submissionId, studentName, currentGrade, currentFeedback
     document.getElementById('studentName').value = studentName;
     document.getElementById('grade').value = currentGrade || '';
     document.getElementById('feedback').value = currentFeedback || '';
-    document.getElementById('gradeModal').style.display = 'block';
+    document.getElementById('gradeModal').style.display = 'flex';
 }
 
 function closeGradeModal() {
@@ -176,6 +197,21 @@ if(document.getElementById('gradeForm'))
             alert('Произошла ошибка при сохранении оценки');
         });
     };
+
+// Горизонтальная прокрутка таблиц с колесиком мыши
+document.addEventListener('wheel', (event) => {
+    const target = event.target;
+    const tableScrollContainer = target.closest('.table-scroll-container');
+    if (tableScrollContainer) {
+        event.preventDefault();
+        const scrollAmount = 300;
+        if (event.deltaY > 0) {
+            tableScrollContainer.scrollLeft += scrollAmount;
+        } else {
+            tableScrollContainer.scrollLeft -= scrollAmount;
+        }
+    }
+}, { passive: false });
 </script>
 
 @endsection 

@@ -1,6 +1,6 @@
-<div id="createGroupModal" class="modal" style="top: 50px;">
+<div id="createGroupModal" class="modal">
     <div class="modal-content">
-        <span class="close" onclick="closeModal('createGroupModal')">&times;</span>
+        <span class="close" onclick="closeModal('createGroupModal')" style="color:var(--error-color);font-size:22px;position:absolute;right:18px;top:12px;cursor:pointer;">&times;</span>
         <h3>Создать новую группу</h3>
         <form action="{{ route('management.createGroup') }}" method="POST">
             @csrf
@@ -9,8 +9,13 @@
                 <input type="text" id="group_name" name="name" required>
             </div>
             <div class="form-group">
-                <label for="group_size">Размер группы:</label>
-                <input type="number" id="group_size" name="size" min="0" value="0" required>
+                <label for="group_teacher">Преподаватель:</label>
+                <select id="group_teacher" name="teacher_id" required>
+                    <option value="">Выберите преподавателя...</option>
+                    @foreach($teachers as $teacher)
+                        <option value="{{ $teacher->id }}">{{ $teacher->fio }}</option>
+                    @endforeach
+                </select>
             </div>
             <div class="form-group">
                 <label for="group_courses">Курсы группы:</label>

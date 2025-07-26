@@ -2,6 +2,56 @@
 @section('head')
 
 @vite(['resources/css/method.css'])
+
+<style>
+/* Стили для горизонтальной прокрутки таблиц */
+.table-scroll-container {
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-color) transparent;
+    max-width: none !important;
+    width: auto !important;
+    min-width: 0 !important;
+}
+
+/* Убираем ограничения ширины у родительского контейнера */
+.container-method {
+    max-width: none !important;
+    overflow: visible !important;
+    width: auto !important;
+}
+
+/* Убираем ограничения у table-container */
+.table-container {
+    max-width: none !important;
+    width: auto !important;
+    overflow: visible !important;
+}
+
+.table-scroll-container::-webkit-scrollbar {
+    height: 8px;
+}
+
+.table-scroll-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.table-scroll-container::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+}
+
+.table-scroll-container::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
+}
+
+/* Выравнивание ячеек */
+.container-method .table-scroll-container .table-container table th,
+.container-method .table-scroll-container .table-container table td {
+    text-align: left !important;
+}
+</style>
 @include('admin.layouts.adminNav')
 
 @if (session('delete_success'))
@@ -51,152 +101,154 @@
                     <button type="submit" class="filter-btn">Применить фильтр</button>
                 </form>
             </div>
-            <div class="table-responsive">
-                <div class="table-container">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                @if (isset($_GET['edit_mode']) && $_GET['edit_mode'] == 1) 
-                                    <th></th>
-                                @endif
-                                <th>№</th>
-                                <th>Описание</th>
-                                <th>Домашние задания</th>
-                                <th>Уроки</th>
-                                <th>Практические задания</th>
-                                <th>Книги</th>
-                                <th>Видео</th>
-                                <th>Презентации</th>
-                                <th>Тесты</th>
-                                <th>Статьи</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php $i = 0; ?>
-                            @foreach ($methods as $method)
-                            <?php $i += 1; ?>
+            <div class="table-scroll-container">
+                <div class="table-responsive">
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
                                 <tr>
-                                    @if (isset($_GET['edit_mode']) && $_GET['edit_mode'] == 1)
-                                        <td style="position: relative; width: 50px;">
-                                            <div style="display: flex; gap: 5px;">
-                                                <button type="button" class="edit-method-btn" 
-                                                        style="background: none; border: none; color: #2196f3; cursor: pointer; font-size: 16px; padding: 2px 6px;"
-                                                        onclick="openEditMethodModal({{ $method->id }}, '{{ addslashes($method->title) }}', '{{ addslashes(json_encode($method->title_homework ?? [])) }}', '{{ addslashes(json_encode($method->homework ?? [])) }}', '{{ addslashes(json_encode($method->title_lesson ?? [])) }}', '{{ addslashes(json_encode($method->lesson ?? [])) }}', '{{ addslashes(json_encode($method->title_exercise ?? [])) }}', '{{ addslashes(json_encode($method->exercise ?? [])) }}', '{{ addslashes(json_encode($method->title_book ?? [])) }}', '{{ addslashes(json_encode($method->book ?? [])) }}', '{{ addslashes(json_encode($method->title_video ?? [])) }}', '{{ addslashes(json_encode($method->video ?? [])) }}', '{{ addslashes(json_encode($method->title_presentation ?? [])) }}', '{{ addslashes(json_encode($method->presentation ?? [])) }}', '{{ addslashes(json_encode($method->title_test ?? [])) }}', '{{ addslashes(json_encode($method->test ?? [])) }}', '{{ addslashes(json_encode($method->title_article ?? [])) }}', '{{ addslashes(json_encode($method->article ?? [])) }}')">
-                                                    ✎
-                                                </button>
-                                                <form method="POST" action="{{ route('method.delete') }}" class="delete-method-form" style="display:inline;">
-                                                    @csrf
-                                                    <input type="hidden" name="method_id" value="{{ $method->id }}">
-                                                    <button type="submit" class="delete-btn" onclick="return confirm('Вы уверены, что хотите удалить этот метод?')">✕</button>
-                                                </form>
-                                            </div>
-                                        </td>
+                                    @if (isset($_GET['edit_mode']) && $_GET['edit_mode'] == 1) 
+                                        <th></th>
                                     @endif
-                                    <td>{{ $i }}</td>
-                                    <td>{{ $method->title }}</td>
-                                    <td>
-                                        @if($method->title_homework && is_array($method->title_homework) && $method->homework && is_array($method->homework))
-                                            @for($i = 0; $i < min(count($method->title_homework), count($method->homework)); $i++)
-                                                <a href="{{ asset(ltrim($method->homework[$i], '/')) }}" class="btn btn-primary" target="_blank">
-                                                    {{ $method->title_homework[$i] }}
-                                                </a>
-                                            @endfor
-                                        @else
-                                            Нет данных
-                                        @endif
-                                    </td>
-                                    <td>
-                                        @if($method->title_lesson && is_array($method->title_lesson) && $method->lesson && is_array($method->lesson))
-                                            @for($i = 0; $i < min(count($method->title_lesson), count($method->lesson)); $i++)
-                                                <a href="{{ asset(ltrim($method->lesson[$i], '/')) }}" class="btn btn-primary" target="_blank">
-                                                    {{ $method->title_lesson[$i] }}
-                                                </a>
-                                            @endfor
-                                        @else
-                                            Нет данных
-                                        @endif
-                                    </td>
-                                    <td>
-                                        @if($method->title_exercise && is_array($method->title_exercise) && $method->exercise && is_array($method->exercise))
-                                            @for($i = 0; $i < min(count($method->title_exercise), count($method->exercise)); $i++)
-                                                <a href="{{ asset(ltrim($method->exercise[$i], '/')) }}" class="btn btn-primary" target="_blank">
-                                                    {{ $method->title_exercise[$i] }}
-                                                </a>
-                                            @endfor
-                                        @else
-                                            Нет данных
-                                        @endif
-                                    </td>
-                                    <td>
-                                        @if($method->title_book && is_array($method->title_book) && $method->book && is_array($method->book))
-                                            @for($i = 0; $i < min(count($method->title_book), count($method->book)); $i++)
-                                                <a href="{{ asset(ltrim($method->book[$i], '/')) }}" class="btn btn-primary" target="_blank">
-                                                    {{ $method->title_book[$i] }}
-                                                </a>
-                                            @endfor
-                                        @else
-                                            Нет данных
-                                        @endif
-                                    </td>
-                                    <td>
-                                        @if($method->title_video && is_array($method->title_video) && $method->video && is_array($method->video))
-                                            @for($i = 0; $i < min(count($method->title_video), count($method->video)); $i++)
-                                                <a href="{{ $method->video[$i] }}" class="btn btn-primary" target="_blank">
-                                                    {{ $method->title_video[$i] }}
-                                                </a>
-                                            @endfor
-                                        @else
-                                            Нет данных
-                                        @endif
-                                    </td>
-                                    <td>
-                                        @if($method->title_presentation && is_array($method->title_presentation) && $method->presentation && is_array($method->presentation))
-                                            @for($i = 0; $i < min(count($method->title_presentation), count($method->presentation)); $i++)
-                                                <a href="{{ asset(ltrim($method->presentation[$i], '/')) }}" class="btn btn-primary" target="_blank">
-                                                    {{ $method->title_presentation[$i] }}
-                                                </a>
-                                            @endfor
-                                        @else
-                                            Нет данных
-                                        @endif
-                                    </td>
-                                    <td>
-                                        @if($method->title_test && is_array($method->title_test) && $method->test && is_array($method->test))
-                                            @for($i = 0; $i < min(count($method->title_test), count($method->test)); $i++)
-                                                <a href="{{ asset(ltrim($method->test[$i], '/')) }}" class="btn btn-primary" target="_blank">
-                                                    {{ $method->title_test[$i] }}
-                                                </a>
-                                            @endfor
-                                        @else
-                                            Нет данных
-                                        @endif
-                                    </td>
-                                    <td>
-                                        @if($method->title_article && is_array($method->title_article) && $method->article && is_array($method->article))
-                                            @for($i = 0; $i < min(count($method->title_article), count($method->article)); $i++)
-                                                <a href="{{ $method->article[$i] }}" class="btn btn-primary" target="_blank">
-                                                    {{ $method->title_article[$i] }}
-                                                </a>
-                                            @endfor
-                                        @else
-                                            Нет данных
-                                        @endif
-                                    </td>
+                                    <th>№</th>
+                                    <th>Описание</th>
+                                    <th>Домашние задания</th>
+                                    <th>Уроки</th>
+                                    <th>Практические задания</th>
+                                    <th>Книги</th>
+                                    <th>Видео</th>
+                                    <th>Презентации</th>
+                                    <th>Тесты</th>
+                                    <th>Статьи</th>
                                 </tr>
-                            @endforeach
-                            @if (isset($_GET['edit_mode']) && $_GET['edit_mode'] == 1)
-                                <tr>
-                                    <td colspan="11" style="text-align: center; padding: 20px;">
-                                        <button type="button" class="create-btn" 
-                                                style="background: var( --btn-primary); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px;"
-                                                onclick="openModal('addMethodModal')">
-                                            + Добавить новый метод
-                                        </button>
-                                    </td>
-                                </tr>
-                            @endif
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                <?php $i = 0; ?>
+                                @foreach ($methods as $method)
+                                <?php $i += 1; ?>
+                                    <tr>
+                                        @if (isset($_GET['edit_mode']) && $_GET['edit_mode'] == 1)
+                                            <td style="position: relative; width: 50px;">
+                                                <div style="display: flex; gap: 5px;">
+                                                    <button type="button" class="edit-method-btn" 
+                                                            style="background: none; border: none; color: var(--primary-color); cursor: pointer; font-size: 16px; padding: 2px 6px;"
+                                                            onclick="openEditMethodModal({{ $method->id }}, '{{ addslashes($method->title) }}', '{{ addslashes(json_encode($method->title_homework ?? [])) }}', '{{ addslashes(json_encode($method->homework ?? [])) }}', '{{ addslashes(json_encode($method->title_lesson ?? [])) }}', '{{ addslashes(json_encode($method->lesson ?? [])) }}', '{{ addslashes(json_encode($method->title_exercise ?? [])) }}', '{{ addslashes(json_encode($method->exercise ?? [])) }}', '{{ addslashes(json_encode($method->title_book ?? [])) }}', '{{ addslashes(json_encode($method->book ?? [])) }}', '{{ addslashes(json_encode($method->title_video ?? [])) }}', '{{ addslashes(json_encode($method->video ?? [])) }}', '{{ addslashes(json_encode($method->title_presentation ?? [])) }}', '{{ addslashes(json_encode($method->presentation ?? [])) }}', '{{ addslashes(json_encode($method->title_test ?? [])) }}', '{{ addslashes(json_encode($method->test ?? [])) }}', '{{ addslashes(json_encode($method->title_article ?? [])) }}', '{{ addslashes(json_encode($method->article ?? [])) }}')">
+                                                        ✎
+                                                    </button>
+                                                    <form method="POST" action="{{ route('method.delete') }}" class="delete-method-form" style="display:inline;">
+                                                        @csrf
+                                                        <input type="hidden" name="method_id" value="{{ $method->id }}">
+                                                        <button type="submit" class="delete-btn" onclick="return confirm('Вы уверены, что хотите удалить этот метод?')">✕</button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        @endif
+                                        <td>{{ $i }}</td>
+                                        <td>{{ $method->title }}</td>
+                                        <td>
+                                            @if($method->title_homework && is_array($method->title_homework) && $method->homework && is_array($method->homework))
+                                                @for($i = 0; $i < min(count($method->title_homework), count($method->homework)); $i++)
+                                                    <a href="{{ asset(ltrim($method->homework[$i], '/')) }}" class="btn btn-primary" target="_blank">
+                                                        {{ $method->title_homework[$i] }}
+                                                    </a>
+                                                @endfor
+                                            @else
+                                                Нет данных
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($method->title_lesson && is_array($method->title_lesson) && $method->lesson && is_array($method->lesson))
+                                                @for($i = 0; $i < min(count($method->title_lesson), count($method->lesson)); $i++)
+                                                    <a href="{{ asset(ltrim($method->lesson[$i], '/')) }}" class="btn btn-primary" target="_blank">
+                                                        {{ $method->title_lesson[$i] }}
+                                                    </a>
+                                                @endfor
+                                            @else
+                                                Нет данных
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($method->title_exercise && is_array($method->title_exercise) && $method->exercise && is_array($method->exercise))
+                                                @for($i = 0; $i < min(count($method->title_exercise), count($method->exercise)); $i++)
+                                                    <a href="{{ asset(ltrim($method->exercise[$i], '/')) }}" class="btn btn-primary" target="_blank">
+                                                        {{ $method->title_exercise[$i] }}
+                                                    </a>
+                                                @endfor
+                                            @else
+                                                Нет данных
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($method->title_book && is_array($method->title_book) && $method->book && is_array($method->book))
+                                                @for($i = 0; $i < min(count($method->title_book), count($method->book)); $i++)
+                                                    <a href="{{ asset(ltrim($method->book[$i], '/')) }}" class="btn btn-primary" target="_blank">
+                                                        {{ $method->title_book[$i] }}
+                                                    </a>
+                                                @endfor
+                                            @else
+                                                Нет данных
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($method->title_video && is_array($method->title_video) && $method->video && is_array($method->video))
+                                                @for($i = 0; $i < min(count($method->title_video), count($method->video)); $i++)
+                                                    <a href="{{ $method->video[$i] }}" class="btn btn-primary" target="_blank">
+                                                        {{ $method->title_video[$i] }}
+                                                    </a>
+                                                @endfor
+                                            @else
+                                                Нет данных
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($method->title_presentation && is_array($method->title_presentation) && $method->presentation && is_array($method->presentation))
+                                                @for($i = 0; $i < min(count($method->title_presentation), count($method->presentation)); $i++)
+                                                    <a href="{{ asset(ltrim($method->presentation[$i], '/')) }}" class="btn btn-primary" target="_blank">
+                                                        {{ $method->title_presentation[$i] }}
+                                                    </a>
+                                                @endfor
+                                            @else
+                                                Нет данных
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($method->title_test && is_array($method->title_test) && $method->test && is_array($method->test))
+                                                @for($i = 0; $i < min(count($method->title_test), count($method->test)); $i++)
+                                                    <a href="{{ asset(ltrim($method->test[$i], '/')) }}" class="btn btn-primary" target="_blank">
+                                                        {{ $method->title_test[$i] }}
+                                                    </a>
+                                                @endfor
+                                            @else
+                                                Нет данных
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($method->title_article && is_array($method->title_article) && $method->article && is_array($method->article))
+                                                @for($i = 0; $i < min(count($method->title_article), count($method->article)); $i++)
+                                                    <a href="{{ $method->article[$i] }}" class="btn btn-primary" target="_blank">
+                                                        {{ $method->title_article[$i] }}
+                                                    </a>
+                                                @endfor
+                                            @else
+                                                Нет данных
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                                @if (isset($_GET['edit_mode']) && $_GET['edit_mode'] == 1)
+                                    <tr>
+                                        <td colspan="11" style="text-align: center; padding: 20px;">
+                                            <button type="button" class="create-btn" 
+                                                    style="background: var( --btn-primary); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px;"
+                                                    onclick="openModal('addMethodModal')">
+                                                + Добавить новый метод
+                                            </button>
+                                        </td>
+                                    </tr>
+                                @endif
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -211,7 +263,7 @@
     <!-- Модальное окно для редактирования метода -->
     <div id="editMethodModal" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="closeModal('editMethodModal')">&times;</span>
+            <span class="close" onclick="closeModal('editMethodModal')" style="color:var(--error-color);font-size:22px;position:absolute;right:18px;top:12px;cursor:pointer;">&times;</span>
             <h2>Редактировать метод</h2>
             
             <form method="POST" action="{{ route('method.update') }}" class="edit-method-form" id="editMethodForm" enctype="multipart/form-data">
@@ -381,7 +433,7 @@
     </style>
     <script>
     function openModal(modalId) {
-        document.getElementById(modalId).style.display = 'block';
+        document.getElementById(modalId).style.display = 'flex';
     }
     
     function closeModal(modalId) {
@@ -432,7 +484,7 @@
             // Открываем модальное окно
             const modal = document.getElementById('editMethodModal');
             if (modal) {
-                modal.style.display = 'block';
+                modal.style.display = 'flex';
                 console.log('Модальное окно редактирования метода открыто');
             } else {
                 console.error('Модальное окно editMethodModal не найдено');
@@ -530,4 +582,24 @@
             }, 3000);
         }
     });
+    
+    // Обработчик колесика мыши для таблиц
+    document.addEventListener('wheel', (event) => {
+        // Проверяем, находится ли курсор над таблицей или её контейнером
+        const target = event.target;
+        const tableScrollContainer = target.closest('.table-scroll-container');
+        
+        if (tableScrollContainer) {
+            // Предотвращаем вертикальную прокрутку страницы
+            event.preventDefault();
+            
+            // Определяем направление прокрутки
+            const scrollAmount = 300;
+            if (event.deltaY > 0) {
+                tableScrollContainer.scrollLeft += scrollAmount;
+            } else {
+                tableScrollContainer.scrollLeft -= scrollAmount;
+            }
+        }
+    }, { passive: false });
     </script>

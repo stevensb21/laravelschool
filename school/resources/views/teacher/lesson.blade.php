@@ -31,7 +31,7 @@
                 </p>
             </div>
 
-            <div class="lessons-content" style="background: #FBFBFB; border-radius: 16px; padding: 32px; box-shadow: 0 4px 24px rgba(110, 1, 4, 0.08); border: 1px solid #EDEDED;">
+            <div class="lessons-content" style="background:var(--card-bg); border-radius: 16px; padding: 32px; box-shadow: 0 4px 24px var(--card-shadow); border: 1px solid var(--card-border);">
                 <div class="lessons-card">
                     <h2 style="font-size: 1.3rem; font-weight: 600; color: #020202; margin-bottom: 24px; text-align: center;">
                         Сегодняшние уроки
@@ -95,7 +95,7 @@ body {
 
 .lessons-container {
     max-width: 100%;
-    margin: 30px auto;
+    
     background-color: var(--card-bg);
     border-radius: 15px;
     padding: 30px;
@@ -216,7 +216,7 @@ body {
 
 @media (max-width: 768px) {
     .lessons-container {
-        margin: 32px auto 0 auto;
+      
         padding: 0 16px;
     }
     
@@ -247,11 +247,7 @@ body {
     }
 }
 
-@media (max-width: 1024px) {
-    body {  
-        padding-top: 50px;
-    }
-}
+
 </style>
 
 

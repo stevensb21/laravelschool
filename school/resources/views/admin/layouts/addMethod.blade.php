@@ -3,7 +3,7 @@
 
 <div id="addMethodModal" class="modal">
     <div class="modal-content">
-        <span class="close" onclick="closeModal('addMethodModal')">&times;</span>
+        <span class="close" onclick="closeModal('addMethodModal')" style="color:var(--error-color);font-size:22px;position:absolute;right:18px;top:12px;cursor:pointer;">&times;</span>
         <h2>Добавить метод</h2>
         
         @if (session('error'))

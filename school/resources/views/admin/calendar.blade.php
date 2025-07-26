@@ -223,6 +223,7 @@ $colorVars = [
 <!-- Модальное окно для добавления урока -->
 <div id="addLessonModal" class="lesson-modal" style="display: none;">
     <div class="modal-content">
+        <span class="close" onclick="closeModal('addLessonModal')" style="color:var(--error-color);font-size:22px;position:absolute;right:18px;top:12px;cursor:pointer;">&times;</span>
         <h3>Добавить урок</h3>
         <form method="POST" action="{{ route('calendar.add-lesson') }}">
             @csrf
@@ -277,7 +278,7 @@ $colorVars = [
             
             <div class="form-buttons">
                 <button type="submit" name="save_lesson">Сохранить</button>
-                <button type="button" class="cancel-btn" onclick="closeModal()">Отмена</button>
+                <button type="button" class="cancel-btn" onclick="closeModal('addLessonModal')">Отмена</button>
             </div>
         </form>
     </div>
@@ -315,15 +316,15 @@ function showModal(date, startTime) {
     modal.style.display = 'flex';
 }
 
-function closeModal() {
-    document.getElementById('addLessonModal').style.display = 'none';
+function closeModal(modalId) {
+    document.getElementById(modalId).style.display = 'none';
 }
 
 // Закрытие модального окна при клике вне его
 window.onclick = function(event) {
     const modal = document.getElementById('addLessonModal');
     if (event.target == modal) {
-        closeModal();
+        closeModal('addLessonModal');
     }
 }
 

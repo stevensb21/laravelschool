@@ -11,7 +11,7 @@
             </div>
             
             <!-- Информация о преподавателе -->
-            <div class="teacher-info-card">
+            <div class="profile-section" style="background:var(--card-bg);border-radius:12px;box-shadow:0 2px 8px var(--card-shadow);padding:24px;">
                 <div class="teacher-avatar">
                     <img src="{{ asset('images/man.png') }}" alt="{{ $teacher->fio }}">
                 </div>
@@ -49,16 +49,28 @@
             <!-- Статистика преподавателя -->
             <div class="teacher-stats-grid">
                 <div class="stat-card">
-                    <div class="stat-value">{{ number_format($teacher->average_performance, 1) }}</div>
+                    <div class="stat-value">{{ number_format($statistics['average_performance'] ?? 0, 1) }}</div>
                     <div class="stat-label">Средняя успеваемость</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value">{{ number_format($teacher->average_attendance, 1) }}%</div>
+                    <div class="stat-value">{{ number_format($statistics['average_attendance'] ?? 0, 1) }}%</div>
                     <div class="stat-label">Средняя посещаемость</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value">{{ number_format($teacher->average_exam_score, 1) }}</div>
+                    <div class="stat-value">{{ number_format($statistics['average_homework'] ?? ($statistics['average_exam_score'] ?? 0), 1) }}</div>
                     <div class="stat-label">Средний балл экзаменов</div>
+                </div>
+            </div>
+
+            <!-- Блок звёзд рейтинга -->
+            <div class="teacher-rating-block" >
+                <div class="review-rating" >
+                    <div class="rating-stars">
+                        @for($i = 1; $i <= 5; $i++)
+                            <span class="star {{ $i <= round($average_rating) ? 'filled' : 'empty' }}">★</span>
+                        @endfor
+                    </div>
+                    <span class="rating-value">{{ number_format($average_rating, 1) }}/5</span>
                 </div>
             </div>
 
@@ -76,7 +88,7 @@
                 @else
                     <div class="reviews-list">
                         @foreach($teacherReviews as $review)
-                            <div class="review-item">
+                            <div class="review-card approved">
                                 <div class="review-header">
                                     <div class="review-sender">
                                         <img src="{{ asset('images/man.png') }}" alt="Avatar">
@@ -94,13 +106,11 @@
                                         <span class="rating-value">{{ $review->rating }}/5</span>
                                     </div>
                                 </div>
-                                
                                 <div class="review-content">
                                     <div class="review-text">
                                         {{ $review->review_text }}
                                     </div>
                                 </div>
-                                
                                 <div class="review-meta">
                                     <span class="review-date">{{ $review->created_at->format('d.m.Y') }}</span>
                                 </div>
@@ -129,17 +139,21 @@
     border-bottom: 2px solid #e0e0e0;
 }
 
-.teacher-info-card {
+.profile-section {
     display: flex;
-    background: white;
+    background: var(--card-bg);
     border-radius: 12px;
+    box-shadow: 0 2px 8px var(--card-shadow);
     padding: 24px;
     margin-bottom: 30px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .teacher-avatar {
     margin-right: 24px;
+}
+
+.teacher-rating-block {
+    text-align: center;
 }
 
 .teacher-avatar img {
@@ -270,9 +284,10 @@
 }
 
 .review-rating {
-    display: flex;
+    text-align: center;
     align-items: center;
     gap: 5px;
+    display:inline-block;
 }
 
 .rating-stars {
@@ -280,24 +295,46 @@
     gap: 1px;
 }
 
+/* Стилизация звёзд рейтинга (как в admin/reviews)
 .star {
     color: #f39c12;
-    font-size: 14px;
+    font-size: 22px;
+    margin-right: 1px;
 }
-
 .star.filled {
     color: #f39c12;
 }
-
 .star.empty {
     color: #d1d5db;
-}
+} */
+
+
 
 .rating-value {
     color: #666;
     font-size: 11px;
     font-weight: 500;
+    text-align: center;
 }
+
+.rating-stars {
+    display: flex;
+    
+    gap: 2px;
+}
+
+.rating-stars .star {
+    font-size: 22px;
+    color: var(--accent-color);
+    text-shadow: 0 1px 2px var(--border-dark), 0 0 1px #fff;
+    transition: color 0.2s, text-shadow 0.2s;
+}
+.rating-stars .star.filled,
+.rating-stars .star.selected {
+    color: var(--status-pending);
+    text-shadow: 0 2px 6px var(--secondary-color), 0 0 2px #fff;
+}
+
 
 .review-content {
     margin-bottom: 10px;
@@ -342,7 +379,7 @@
         align-items: flex-start;
     }
     
-    .teacher-info-card {
+    .profile-section {
         flex-direction: column;
         text-align: center;
     }

@@ -105,23 +105,49 @@ class ManagementController extends Controller
     public function createGroup(Request $request) {
         $request->validate([
             'name' => 'required|unique:groups,name',
-            'size' => 'required|integer|min:0',
+            'teacher_id' => 'required|exists:teachers,id',
             'courses' => 'array'
         ]);
 
         $group = Group::create([
             'name' => $request->name,
-            'size' => $request->size,
+            'teacher_id' => $request->teacher_id,
             'average_rating' => 0,
             'average_attendance' => 0,
             'average_exam' => 0,
-            'courses' => $request->courses ?? [],
+            'size' => 0,
+            'courses' => $request->courses ?? []
         ]);
 
-        // Добавляем связанные курсы
         if ($request->courses) {
             $group->courses()->attach($request->courses);
         }
+
+        // --- ЧАТЫ ---
+        // 1. Создать групповой чат
+        $chat = \App\Models\GroupChat::create([
+            'group_id' => $group->id,
+            'name' => 'Чат группы ' . $group->name
+        ]);
+        // 2. Добавить всех студентов группы
+        $students = \App\Models\Student::where('group_name', $group->name)->get();
+        foreach ($students as $student) {
+            if ($student->users_id) {
+                \App\Models\UserChat::create([
+                    'group_chat_id' => $chat->id,
+                    'user_id' => $student->users_id
+                ]);
+            }
+        }
+        // 3. Добавить преподавателя
+        $teacher = \App\Models\Teacher::find($group->teacher_id);
+        if ($teacher && $teacher->users_id) {
+            \App\Models\UserChat::create([
+                'group_chat_id' => $chat->id,
+                'user_id' => $teacher->users_id
+            ]);
+        }
+        // --- конец блок чатов ---
 
         return redirect()->back()->with('success', 'Группа успешно создана');
     }
@@ -130,24 +156,51 @@ class ManagementController extends Controller
         $request->validate([
             'group_id' => 'required|exists:groups,name',
             'name' => 'required|unique:groups,name,' . $request->group_id . ',name',
-            'size' => 'required|integer|min:0',
+            'teacher_id' => 'required|exists:teachers,id',
             'courses' => 'array'
         ]);
 
         $group = Group::where('name', $request->group_id)->firstOrFail();
         $oldName = $group->name;
-        
+        $oldTeacherId = $group->teacher_id;
         $group->update([
             'name' => $request->name,
-            'size' => $request->size,
+            'teacher_id' => $request->teacher_id,
             'courses' => $request->courses ?? [],
         ]);
 
-        // Обновляем связанные курсы
         if ($request->courses) {
             $group->courses()->sync($request->courses);
         } else {
             $group->courses()->detach();
+        }
+
+        // --- ЧАТЫ: обновление преподавателя ---
+        $chat = \App\Models\GroupChat::where('group_id', $group->id)->first();
+        if ($chat) {
+            // Если преподаватель изменился
+            if ($oldTeacherId != $request->teacher_id) {
+                // Удалить старого преподавателя из чата
+                $oldTeacher = \App\Models\Teacher::find($oldTeacherId);
+                if ($oldTeacher && $oldTeacher->users_id) {
+                    \App\Models\UserChat::where('group_chat_id', $chat->id)
+                        ->where('user_id', $oldTeacher->users_id)
+                        ->delete();
+                }
+                // Добавить нового преподавателя в чат, если его нет
+                $newTeacher = \App\Models\Teacher::find($request->teacher_id);
+                if ($newTeacher && $newTeacher->users_id) {
+                    $exists = \App\Models\UserChat::where('group_chat_id', $chat->id)
+                        ->where('user_id', $newTeacher->users_id)
+                        ->exists();
+                    if (!$exists) {
+                        \App\Models\UserChat::create([
+                            'group_chat_id' => $chat->id,
+                            'user_id' => $newTeacher->users_id
+                        ]);
+                    }
+                }
+            }
         }
 
         return redirect()->back()->with('success', "Группа '{$oldName}' успешно обновлена");
@@ -174,7 +227,7 @@ class ManagementController extends Controller
         }
         return response()->json([
             'name' => $group->name,
-            'size' => $group->size,
+            'teacher_id' => $group->teacher_id,
             'courses' => $courses->pluck('id')->toArray(),
             'courses_json' => $courses_json,
         ]);
@@ -322,6 +375,19 @@ class ManagementController extends Controller
         ]);
     }
 
+    public function deleteBackup(Request $request) {
+        $request->validate([
+            'backup_name' => 'required|string'
+        ]);
+        $backupService = new \App\Services\BackupService();
+        $result = $backupService->deleteBackup($request->backup_name);
+        if ($result['success']) {
+            return response()->json(['success' => true, 'message' => 'Бэкап успешно удалён']);
+        } else {
+            return response()->json(['success' => false, 'message' => $result['message'] ?? 'Ошибка удаления бэкапа'], 500);
+        }
+    }
+
     public function getCourseData(Request $request) {
         $course = \App\Models\Course::findOrFail($request->course_id);
         $access = is_array($course->access_) ? $course->access_ : json_decode($course->access_, true);
@@ -346,5 +412,34 @@ class ManagementController extends Controller
             'groups' => $access['groups'] ?? [],
             'teachers' => $formattedTeachers,
         ]);
+    }
+
+    public function getAutoBackupSettings() {
+        $path = storage_path('app/auto_backup_settings.json');
+        if (file_exists($path)) {
+            $data = json_decode(file_get_contents($path), true);
+            return response()->json([
+                'enabled' => $data['enabled'] ?? false,
+                'period' => $data['period'] ?? 'daily',
+                'time' => $data['time'] ?? '03:00',
+            ]);
+        } else {
+            return response()->json([
+                'enabled' => false,
+                'period' => 'daily',
+                'time' => '03:00',
+            ]);
+        }
+    }
+
+    public function saveAutoBackupSettings(Request $request) {
+        $validated = $request->validate([
+            'enabled' => 'required|boolean',
+            'period' => 'required|in:daily,weekly,monthly',
+            'time' => 'required|regex:/^\d{2}:\d{2}$/',
+        ]);
+        $path = storage_path('app/auto_backup_settings.json');
+        file_put_contents($path, json_encode($validated, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE));
+        return response()->json(['success' => true]);
     }
 }

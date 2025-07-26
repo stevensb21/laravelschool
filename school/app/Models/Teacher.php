@@ -151,11 +151,11 @@ class Teacher extends Model
         $averageLesson = 0; // средняя оценка за урок
         $averageAttendance = 0;
         $averageHomework = 0; // средняя оценка за домашнюю работу
-
+        $homeworkStats = collect();
+        $lessonIds = [];
+        $lessonStats = collect();
         if (!empty($studentIds)) {
             // --- Только уроки, которые вел этот преподаватель ---
-            $lessonStats = collect();
-            $lessonIds = [];
             foreach ($studentIds as $sid) {
                 $stats = \App\Models\Statistic::where('student_id', $sid)
                     ->get(); // убираем фильтр по grade_lesson

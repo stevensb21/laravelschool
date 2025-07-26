@@ -2,7 +2,7 @@
 
 <div id="editTeacherModal" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="closeEditModal()">&times;</span>
+            <span class="close" onclick="closeModal('editTeacherModal')" style="color:var(--error-color);font-size:22px;position:absolute;right:18px;top:12px;cursor:pointer;">&times;</span>
             <h2>Редактировать преподавателя</h2>
             
             @if (isset($error)):

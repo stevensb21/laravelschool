@@ -6,7 +6,7 @@
 
 @include('student.nav', compact('student'))
 <main class="content">
-    <div class="profile-section">
+    <div class="profile-section" style="background:var(--card-bg);border-radius:12px;box-shadow:0 2px 8px var(--card-shadow);padding:24px;">
         <h2>Информация о студенте</h2>
         <div class="profile-info">
             <div class="profile-header">

@@ -1,6 +1,24 @@
 @extends('admin.layouts.head')
 @section('head')
-
+<style>
+.table-scroll-container {
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-color) transparent;
+    max-width: none !important;
+    width: auto !important;
+    min-width: 0 !important;
+}
+.table-scroll-container::-webkit-scrollbar { height: 8px; }
+.table-scroll-container::-webkit-scrollbar-track { background: transparent; }
+.table-scroll-container::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+.table-scroll-container::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
+.students-table-container .table-scroll-container .students-table table th,
+.students-table-container .table-scroll-container .students-table table td {
+    text-align: left !important;
+}
+</style>
 @endsection
 
 @include('teacher.nav')
@@ -29,34 +47,36 @@
                         
                         <div class="students-table-container">
                             <!-- Десктопная версия таблицы -->
-                            <table class="students-table desktop-table">
-                                <thead>
-                                    <tr>
-                                        <th>ФИО</th>
-                                        <th>Пришел</th>
-                                        <th>Оценка за урок</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($students as $student)
-                                    <tr>
-                                        <td>{{ $student->fio }}</td>
-                                        <td style="text-align: center;">
-                                            <input type="checkbox" name="attendance[{{ $student->id }}]" value="1" {{ old('attendance.' . $student->id, $studentAttendance[$student->id] ?? false) ? 'checked' : '' }}>
-                                        </td>
-                                        <td style="text-align: center;">
-                                            <select name="grade[{{ $student->id }}]" class="grade-select">
-                                                <option value="">—</option>
-                                                <option value="2" {{ old('grade.' . $student->id, $studentGrades[$student->id] ?? '') == 2 ? 'selected' : '' }}>2</option>
-                                                <option value="3" {{ old('grade.' . $student->id, $studentGrades[$student->id] ?? '') == 3 ? 'selected' : '' }}>3</option>
-                                                <option value="4" {{ old('grade.' . $student->id, $studentGrades[$student->id] ?? '') == 4 ? 'selected' : '' }}>4</option>
-                                                <option value="5" {{ old('grade.' . $student->id, $studentGrades[$student->id] ?? '') == 5 ? 'selected' : '' }}>5</option>
-                                            </select>
-                                        </td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                            <div class="table-scroll-container">
+                                <table class="students-table desktop-table">
+                                    <thead>
+                                        <tr>
+                                            <th>ФИО</th>
+                                            <th>Пришел</th>
+                                            <th>Оценка за урок</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($students as $student)
+                                        <tr>
+                                            <td>{{ $student->fio }}</td>
+                                            <td style="text-align: center;">
+                                                <input type="checkbox" name="attendance[{{ $student->id }}]" value="1" {{ old('attendance.' . $student->id, $studentAttendance[$student->id] ?? false) ? 'checked' : '' }}>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <select name="grade[{{ $student->id }}]" class="grade-select">
+                                                    <option value="">—</option>
+                                                    <option value="2" {{ old('grade.' . $student->id, $studentGrades[$student->id] ?? '') == 2 ? 'selected' : '' }}>2</option>
+                                                    <option value="3" {{ old('grade.' . $student->id, $studentGrades[$student->id] ?? '') == 3 ? 'selected' : '' }}>3</option>
+                                                    <option value="4" {{ old('grade.' . $student->id, $studentGrades[$student->id] ?? '') == 4 ? 'selected' : '' }}>4</option>
+                                                    <option value="5" {{ old('grade.' . $student->id, $studentGrades[$student->id] ?? '') == 5 ? 'selected' : '' }}>5</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
                             
                             <!-- Мобильная версия с карточками -->
                             <div class="students-cards mobile-cards">
@@ -591,4 +611,19 @@ form.addEventListener('submit', function(e) {
         document.querySelectorAll('.mobile-cards input, .mobile-cards select').forEach(el => el.disabled = true);
     }
 });
+
+// Горизонтальная прокрутка таблиц с колесиком мыши
+document.addEventListener('wheel', (event) => {
+    const target = event.target;
+    const tableScrollContainer = target.closest('.table-scroll-container');
+    if (tableScrollContainer) {
+        event.preventDefault();
+        const scrollAmount = 300;
+        if (event.deltaY > 0) {
+            tableScrollContainer.scrollLeft += scrollAmount;
+        } else {
+            tableScrollContainer.scrollLeft -= scrollAmount;
+        }
+    }
+}, { passive: false });
 </script> 

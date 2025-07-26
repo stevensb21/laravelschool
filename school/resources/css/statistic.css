@@ -7,7 +7,7 @@
     border-radius: 15px;
     padding: 30px;
     box-shadow: 0 4px 6px var(--card-shadow);
-    margin: 20px;
+
     border: 1px solid var(--card-border);
 }
 
@@ -147,7 +147,7 @@
     justify-content: space-between;
     align-items: center;
     text-align: left;
-    color: var(--text-secondary);
+    color: #222;
     padding: 6px 0;
     border-bottom: 1px solid var(--border-light);
     font-size: 13px;
@@ -159,7 +159,7 @@
 
 .stat-details p span {
     text-align: left;
-    color: var(--text-muted);
+    color: #222;
     font-weight: 400;
     font-size: 16px;
 }
@@ -168,7 +168,7 @@
     text-align: right;
     min-width: 40px;
     display: inline-block;
-    color: var(--text-primary);
+    color: #111;
     font-weight: 600;
     font-size: 13px;
 }

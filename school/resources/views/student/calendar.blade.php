@@ -1,6 +1,23 @@
 @extends('admin.layouts.head')
 @section('head')
 @vite(['resources/css/calendar.css'])
+
+<style>
+/* Стили для правильного выравнивания заголовка календаря студента */
+
+
+.calendar-controls form {
+    margin: 0;
+}
+
+
+
+
+
+
+</style>
+
+
 @endsection
 
 <?php
@@ -20,25 +37,11 @@ $colorVars = [
 
 @include('student.nav')
 
-<style>
-.calendar-controls {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-.calendar-controls form {
-    margin: 0;
-}
-.currentMonth {
-    font-size: 20px;
-    font-weight: 500;
-    margin: 0 10px;
-}
-</style>
+
 
 <div class="container">
     <main class="content">
-        <div class="calendar-container">
+        <div class="calendar-container" >
             <div class="calendar-header">
                 <h2>Календарь занятий</h2>
                 <div class="calendar-controls">
@@ -171,4 +174,5 @@ $colorVars = [
 </div>
         </div>
     </main>
-</div> 
+</div>
+

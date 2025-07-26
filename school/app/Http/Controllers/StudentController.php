@@ -43,6 +43,24 @@ class StudentController extends Controller
             return $student->user !== null;
         });
         
+        // Пересчитываем средний балл и посещаемость для каждого студента (как в личном кабинете преподавателя)
+        foreach ($students as $student) {
+            $lessonStats = collect();
+            $lessonIds = [];
+            foreach ($student->statistics as $stat) {
+                if (preg_match('/lesson:(\d+)/', $stat->notes, $m)) {
+                    $lessonId = $m[1];
+                    $calendar = \App\Models\Calendar::find($lessonId);
+                    $lessonStats->push($stat);
+                    $lessonIds[] = $lessonId;
+                }
+            }
+            $student->average_performance = $lessonStats->where('grade_lesson', '>', 0)->avg('grade_lesson') ? round($lessonStats->where('grade_lesson', '>', 0)->avg('grade_lesson'), 1) : 0;
+            $totalLessons = $lessonStats->count();
+            $attendedLessons = $lessonStats->where('attendance', true)->count();
+            $student->average_attendance = $totalLessons > 0 ? round($attendedLessons / $totalLessons * 100, 1) : 0;
+        }
+        
         // Получаем уникальные предметы для выпадающего списка
         
 
@@ -91,6 +109,9 @@ class StudentController extends Controller
                 throw new \Exception('Студент не найден');
             }
 
+            // Сохраняем старую группу до обновления
+            $oldGroupName = $student->group_name;
+
             // Находим пользователя
             $user = User::find($validated['users_id']);
             if (!$user) {
@@ -136,6 +157,31 @@ class StudentController extends Controller
                 'subjects' => $courseNames,
                 'achievements' => $achievements,
             ]);
+
+            // Если группа изменилась — удалить из чата старой группы
+            if ($oldGroupName !== $validated['group']) {
+                $oldGroup = Group::where('name', $oldGroupName)->first();
+                if ($oldGroup) {
+                    $oldGroupChat = \App\Models\GroupChat::where('group_id', $oldGroup->id)->first();
+                    if ($oldGroupChat) {
+                        \App\Models\UserChat::where('group_chat_id', $oldGroupChat->id)
+                            ->where('user_id', $student->users_id)
+                            ->delete();
+                    }
+                }
+            }
+
+            // Добавляем студента в чат группы, если он ещё не добавлен
+            $groupChat = \App\Models\GroupChat::where('group_id', $group->id)->first();
+            if ($groupChat) {
+                $exists = \App\Models\UserChat::where('group_chat_id', $groupChat->id)->where('user_id', $student->users_id)->exists();
+                if (!$exists) {
+                    \App\Models\UserChat::create([
+                        'group_chat_id' => $groupChat->id,
+                        'user_id' => $student->users_id
+                    ]);
+                }
+            }
 
             DB::commit();
             \Log::info('Студент успешно отредактирован', ['student_id' => $student->id]);
@@ -246,6 +292,18 @@ class StudentController extends Controller
                 'average_attendance' => 0,
                 'average_exam_score' => 0
             ]);
+
+            // Добавляем студента в чат группы, если он ещё не добавлен
+            $groupChat = \App\Models\GroupChat::where('group_id', $group->id)->first();
+            if ($groupChat) {
+                $exists = \App\Models\UserChat::where('group_chat_id', $groupChat->id)->where('user_id', $user->id)->exists();
+                if (!$exists) {
+                    \App\Models\UserChat::create([
+                        'group_chat_id' => $groupChat->id,
+                        'user_id' => $user->id
+                    ]);
+                }
+            }
 
             \Log::info('студент создан', ['student_id' => $student->id]);
 
@@ -635,32 +693,47 @@ class StudentController extends Controller
         $student = $user->student;
         $admins = \App\Models\User::where('role', 'admin')->get();
         $teachers = collect();
-        if ($student && $student->group) {
-            $courseIds = $student->group->courses ?? [];
-            if (!is_array($courseIds)) {
-                $courseIds = json_decode($courseIds, true) ?? [];
-            }
-            $teacherIds = collect();
-            foreach ($courseIds as $courseId) {
-                $course = \App\Models\Course::find($courseId);
-                if ($course && $course->access_) {
-                    $access = is_array($course->access_) ? $course->access_ : json_decode($course->access_, true);
-                    if (isset($access['teachers']) && is_array($access['teachers'])) {
-                        foreach ($access['teachers'] as $teacherId) {
-                            // Фильтруем только числовые id
-                            if (is_numeric($teacherId)) {
-                                $teacherIds->push((int)$teacherId);
-                            }
-                        }
+        
+        // Получаем всех преподавателей из всех групп, в которых состоит студент
+        if ($student && $student->group_name) {
+            // Разбиваем group_name на отдельные группы (если студент в нескольких группах)
+            $groupNames = array_map('trim', explode(',', $student->group_name));
+            
+            \Log::info('Student appeals debug', [
+                'student_id' => $student->id,
+                'group_name' => $student->group_name,
+                'group_names' => $groupNames
+            ]);
+            
+            foreach ($groupNames as $groupName) {
+                $group = \App\Models\Group::where('name', $groupName)->first();
+                
+                \Log::info('Group found', [
+                    'group_name' => $groupName,
+                    'group' => $group ? $group->toArray() : null
+                ]);
+                
+                if ($group && $group->teacher_id) {
+                    // Получаем преподавателя по teacher_id (первичный ключ из таблицы teachers)
+                    $teacher = \App\Models\Teacher::find($group->teacher_id);
+                    
+                    \Log::info('Teacher found', [
+                        'group_teacher_id' => $group->teacher_id,
+                        'teacher' => $teacher ? $teacher->toArray() : null
+                    ]);
+                    
+                    if ($teacher && !$teachers->contains('id', $teacher->id)) {
+                        $teachers = $teachers->push($teacher);
+                        \Log::info('Teacher added to collection', ['teacher_id' => $teacher->id]);
                     }
                 }
             }
-            $teacherIds = $teacherIds->unique()->filter();
-            // Получаем преподавателей с их ФИО из таблицы teachers
-            if ($teacherIds->isNotEmpty()) {
-                $teachers = \App\Models\Teacher::whereIn('users_id', $teacherIds)->get();
-            }
         }
+        
+        \Log::info('Final teachers collection', [
+            'teachers_count' => $teachers->count(),
+            'teachers' => $teachers->toArray()
+        ]);
         
         // Получаем обращения где студент отправитель или получатель
         $appeals = \App\Models\Appeal::where('sender_id', $user->id)
@@ -747,6 +820,17 @@ class StudentController extends Controller
                 $review->sender_name = $sender ? $sender->fio : 'Студент';
             }
         });
+        // Пересчитываем средний балл и посещаемость (как в личном кабинете преподавателя)
+        $lessonStats = collect();
+        foreach ($student->statistics as $stat) {
+            if (preg_match('/lesson:(\d+)/', $stat->notes, $m)) {
+                $lessonStats->push($stat);
+            }
+        }
+        $student->average_performance = $lessonStats->where('grade_lesson', '>', 0)->avg('grade_lesson') ? round($lessonStats->where('grade_lesson', '>', 0)->avg('grade_lesson'), 1) : 0;
+        $totalLessons = $lessonStats->count();
+        $attendedLessons = $lessonStats->where('attendance', true)->count();
+        $student->average_attendance = $totalLessons > 0 ? round($attendedLessons / $totalLessons * 100, 1) : 0;
         return view('admin.student', compact('student', 'reviews'));
     }
 }

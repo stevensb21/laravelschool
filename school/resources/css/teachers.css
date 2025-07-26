@@ -3,7 +3,7 @@
 .teachers-container {
     background-color: var(--card-bg);
     border-radius: 15px;
-    padding: 20px;
+    padding: 30px;
     box-shadow: 0 4px 6px var(--card-shadow);
     width: 100%;
 }
@@ -358,12 +358,14 @@
     z-index: 1000;
     overflow-y: auto;
     padding: 20px 0;
+    align-items: center;
+    justify-content: center;
 }
 
 .modal-content {
     position: relative;
     background-color: #fff;
-    margin: 20px auto;
+    margin: 0 auto;
     padding: 30px;
     width: 90%;
     max-width: 600px;

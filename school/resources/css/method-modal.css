@@ -9,9 +9,7 @@
     border-left: 3px solid var( --table-header);
 }
 
-.modal {
-    top: 50px !important;
-}
+
 
 .modal-content {
     margin-top: 50px !important;

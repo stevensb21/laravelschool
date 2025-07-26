@@ -148,11 +148,13 @@
     width: 100%;
     height: 100%;
     background-color: var(--modal-overlay);
+    align-items: center;
+    justify-content: center;
 }
 
 .modal-content {
     background-color: var(--card-bg);
-    margin: 5% auto;
+    margin: 0 auto;
     padding: 30px;
     border-radius: 10px;
     width: 90%;
@@ -251,12 +253,12 @@
 }
 
 .btn-danger {
-    background-color: var(--btn-danger);
+    background-color: var(--btn-primary);
     color: var(--text-light);
 }
 
 .btn-danger:hover {
-    background-color: var(--btn-danger-hover);
+    background-color: var(--btn-primary-hover);
 }
 
 .warning {

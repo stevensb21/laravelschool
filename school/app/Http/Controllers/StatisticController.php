@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use App\Exports\StatisticsExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Exports\GroupsStatsExport;
 
 class StatisticController extends Controller
 {
@@ -69,12 +70,65 @@ class StatisticController extends Controller
         $satisfactory_percent = $total_grades > 0 ? round($satisfactory / $total_grades * 100) : 0;
         $unsatisfactory_percent = $total_grades > 0 ? round($unsatisfactory / $total_grades * 100) : 0;
 
-        // Категории посещаемости (на основе домашних заданий)
-        $homework_grades = $all->where('homework', '>', 0)->pluck('homework');
-        $excellent_attendance = $homework_grades->filter(function($grade) { return $grade >= 4.5; })->count();
-        $good_attendance = $homework_grades->filter(function($grade) { return $grade >= 3.5 && $grade < 4.5; })->count();
-        $satisfactory_attendance = $homework_grades->filter(function($grade) { return $grade >= 2.5 && $grade < 3.5; })->count();
-        $unsatisfactory_attendance = $homework_grades->filter(function($grade) { return $grade < 2.5; })->count();
+        // Категории посещаемости по студентам
+        $all_students = Student::with('statistics')->get();
+        $excellent_attendance = $all_students->filter(function($student) {
+            $lessonStats = $student->statistics->filter(function($stat) {
+                return strpos(trim(strtolower($stat->notes)), 'lesson:') === 0;
+            });
+            $total = $lessonStats->count();
+            $attended = $lessonStats->where('attendance', true)->count();
+            $percent = $total > 0 ? ($attended / $total) * 100 : 0;
+            return $percent >= 90;
+        })->count();
+        $good_attendance = $all_students->filter(function($student) {
+            $lessonStats = $student->statistics->filter(function($stat) {
+                return strpos(trim(strtolower($stat->notes)), 'lesson:') === 0;
+            });
+            $total = $lessonStats->count();
+            $attended = $lessonStats->where('attendance', true)->count();
+            $percent = $total > 0 ? ($attended / $total) * 100 : 0;
+            return $percent >= 80 && $percent < 90;
+        })->count();
+        $satisfactory_attendance = $all_students->filter(function($student) {
+            $lessonStats = $student->statistics->filter(function($stat) {
+                return strpos(trim(strtolower($stat->notes)), 'lesson:') === 0;
+            });
+            $total = $lessonStats->count();
+            $attended = $lessonStats->where('attendance', true)->count();
+            $percent = $total > 0 ? ($attended / $total) * 100 : 0;
+            return $percent >= 70 && $percent < 80;
+        })->count();
+        $unsatisfactory_attendance = $all_students->filter(function($student) {
+            $lessonStats = $student->statistics->filter(function($stat) {
+                return strpos(trim(strtolower($stat->notes)), 'lesson:') === 0;
+            });
+            $total = $lessonStats->count();
+            $attended = $lessonStats->where('attendance', true)->count();
+            $percent = $total > 0 ? ($attended / $total) * 100 : 0;
+            return $percent < 70;
+        })->count();
+
+        // Категории успеваемости по средним баллам студентов
+        $students = \App\Models\Student::with('statistics')->get();
+        $student_averages = [];
+        foreach ($students as $student) {
+            $grades = $student->statistics->where('grade_lesson', '>', 0)->pluck('grade_lesson');
+            if ($grades->count() > 0) {
+                $student_averages[] = $grades->avg();
+            }
+        }
+        $total_students = count($student_averages);
+        $excellent = collect($student_averages)->filter(fn($avg) => $avg >= 4.5)->count();
+        $good = collect($student_averages)->filter(fn($avg) => $avg >= 3.5 && $avg < 4.5)->count();
+        $satisfactory = collect($student_averages)->filter(fn($avg) => $avg >= 2.5 && $avg < 3.5)->count();
+        $unsatisfactory = collect($student_averages)->filter(fn($avg) => $avg < 2.5)->count();
+        $excellent_percent = $total_students > 0 ? round($excellent / $total_students * 100) : 0;
+        $good_percent = $total_students > 0 ? round($good / $total_students * 100) : 0;
+        $satisfactory_percent = $total_students > 0 ? round($satisfactory / $total_students * 100) : 0;
+        $unsatisfactory_percent = $total_students > 0 ? round($unsatisfactory / $total_students * 100) : 0;
+        // Средний балл по системе теперь среднее от средних студентов
+        $avg_grade = $total_students > 0 ? round(array_sum($student_averages) / $total_students, 2) : 0;
 
         // Статистика преподавателей
         $teachers_count = Teacher::count();
@@ -122,7 +176,6 @@ class StatisticController extends Controller
         $groups_stats = Group::with(['students.statistics'])->get()->map(function($group) {
             $students = $group->students;
             $total_students = $students->count();
-            
             if ($total_students == 0) {
                 return [
                     'name' => $group->name,
@@ -132,22 +185,23 @@ class StatisticController extends Controller
                     'activity' => 'Низкая'
                 ];
             }
-
             $all_grades = collect();
             $all_attendance = collect();
             $all_homework = collect();
-
             foreach ($students as $student) {
                 $statistics = $student->statistics;
-                $all_grades = $all_grades->merge($statistics->where('grade_lesson', '>', 0)->pluck('grade_lesson'));
-                $all_attendance = $all_attendance->merge($statistics->pluck('grade_lesson'));
+                $lessonStats = $statistics->filter(function($stat) {
+                    return strpos(trim(strtolower($stat->notes)), 'lesson:') === 0;
+                });
+                $all_attendance = $all_attendance->merge($lessonStats);
+                $all_grades = $all_grades->merge($lessonStats->where('grade_lesson', '>', 0)->pluck('grade_lesson'));
                 $all_homework = $all_homework->merge($statistics->where('homework', '>', 0)->pluck('homework'));
             }
-
+            $totalLessons = $all_attendance->count();
+            $attendedLessons = $all_attendance->where('attendance', true)->count();
+            $attendance = $totalLessons > 0 ? round($attendedLessons / $totalLessons * 100, 1) : 0;
             $avg_grade = $all_grades->count() > 0 ? round($all_grades->avg(), 1) : 0;
-            $attendance = $all_attendance->count() > 0 ? round($all_attendance->where('grade_lesson', '>', 0)->count() / $all_attendance->count() * 100, 1) : 0;
             $homework_completion = $all_homework->count() > 0 ? round($all_homework->avg(), 1) : 0;
-
             // Определяем активность группы
             $activity = 'Низкая';
             if ($avg_grade >= 4.5 && $attendance >= 90) {
@@ -155,7 +209,6 @@ class StatisticController extends Controller
             } elseif ($avg_grade >= 4.0 && $attendance >= 80) {
                 $activity = 'Средняя';
             }
-
             return [
                 'name' => $group->name,
                 'avg_grade' => $avg_grade,
@@ -174,10 +227,10 @@ class StatisticController extends Controller
             'good_percent' => $good_percent,
             'satisfactory_percent' => $satisfactory_percent,
             'unsatisfactory_percent' => $unsatisfactory_percent,
-            'excellent_attendance' => round($excellent_attendance),
-            'good_attendance' => round($good_attendance),
-            'satisfactory_attendance' => round($satisfactory_attendance),
-            'unsatisfactory_attendance' => round($unsatisfactory_attendance),
+            'excellent_attendance' => $excellent_attendance,
+            'good_attendance' => $good_attendance,
+            'satisfactory_attendance' => $satisfactory_attendance,
+            'unsatisfactory_attendance' => $unsatisfactory_attendance,
             'teachers_count' => $active_teachers,
             'avg_teacher_rating' => $avg_teacher_rating,
             'avg_assignments' => round($avg_assignments),
@@ -234,22 +287,27 @@ class StatisticController extends Controller
             $all_homework = collect();
             foreach ($students as $student) {
                 $statistics = $student->statistics;
-                $all_grades = $all_grades->merge($statistics->where('grade_lesson', '>', 0)->pluck('grade_lesson'));
-                $all_attendance = $all_attendance->merge($statistics->pluck('grade_lesson'));
+                $lessonStats = $statistics->filter(function($stat) {
+                    return strpos(trim(strtolower($stat->notes)), 'lesson:') === 0;
+                });
+                $all_attendance = $all_attendance->merge($lessonStats);
+                $all_grades = $all_grades->merge($lessonStats->where('grade_lesson', '>', 0)->pluck('grade_lesson'));
                 $all_homework = $all_homework->merge($statistics->where('homework', '>', 0)->pluck('homework'));
             }
+            $totalLessons = $all_attendance->count();
+            $attendedLessons = $all_attendance->where('attendance', true)->count();
+            $attendance = $totalLessons > 0 ? round($attendedLessons / $totalLessons * 100, 1) : 0;
             $avg_grade = $all_grades->count() > 0 ? round($all_grades->avg(), 1) : 0;
-            $attendance = $all_attendance->count() > 0 ? round($all_attendance->where('grade_lesson', '>', 0)->count() / $all_attendance->count() * 100, 1) : 0;
             $homework_completion = $all_homework->count() > 0 ? round($all_homework->avg(), 1) : 0;
             $activity = 'Низкая';
             if ($avg_grade >= 4.5 && $attendance >= 90) $activity = 'Высокая';
             elseif ($avg_grade >= 4.0 && $attendance >= 80) $activity = 'Средняя';
             return [
-                'name' => $group->name,
-                'avg_grade' => $avg_grade,
-                'attendance' => $attendance,
-                'homework_completion' => $homework_completion,
-                'activity' => $activity
+                'name' => $group->name ?? '',
+                'avg_grade' => isset($avg_grade) && $avg_grade !== null ? (float)$avg_grade : 0,
+                'attendance' => isset($attendance) && $attendance !== null ? (float)$attendance : 0,
+                'homework_completion' => isset($homework_completion) && $homework_completion !== null ? (float)$homework_completion : 0,
+                'activity' => $activity ?? 'Низкая'
             ];
         });
 
@@ -261,6 +319,8 @@ class StatisticController extends Controller
                 'groups_stats' => $groups_stats
             ]);
             return $pdf->download($filename);
+        } elseif ($format === 'xlsx') {
+            return Excel::download(new GroupsStatsExport($groups_stats), $filename);
         } elseif ($format === 'csv') {
             return $this->exportToCsv($groups_stats, $filename);
         } else {

@@ -48,6 +48,9 @@
     cursor: pointer;
     transition: background 0.18s;
     margin-top: 8px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
 }
 .appeal-form button:hover {
     background: var(--btn-primary-hover);
@@ -80,6 +83,61 @@
 
 .rate-btn:hover {
     background-color: var(--status-active);
+}
+
+/* Стили для горизонтальной прокрутки таблиц */
+.table-scroll-container {
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-color) transparent;
+    max-width: none !important;
+    width: auto !important;
+    min-width: 0 !important;
+}
+
+/* Убираем ограничения ширины у родительского контейнера */
+.students-container {
+    max-width: none !important;
+    overflow: visible !important;
+    width: auto !important;
+}
+
+/* Убираем ограничения у students-table */
+.students-table {
+    max-width: none !important;
+    width: auto !important;
+    overflow: visible !important;
+}
+
+.table-scroll-container::-webkit-scrollbar {
+    height: 8px;
+}
+
+.table-scroll-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.table-scroll-container::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+}
+
+.table-scroll-container::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
+}
+
+/* Принудительная ширина таблицы для тестирования прокрутки */
+.students-container .table-scroll-container .students-table table {
+    min-width: auto !important;
+    width: 99% !important;
+}
+
+.students-container .table-scroll-container .students-table table th,
+.students-container .table-scroll-container .students-table table td {
+    min-width: auto !important;
+    white-space: normal !important;
+    text-align: left !important;
 }
 
 /* Стили для звездочек рейтинга */
@@ -192,7 +250,7 @@
     @include('student.nav')
     <div class="container" style="flex:1;min-width:0;width:100%;">
         <main class="content">
-            <div class="students-container">
+            <div class="students-container" style="background:var(--card-bg);border-radius:12px;box-shadow:0 2px 8px var(--card-shadow);padding:24px;">
                 <div class="students-header">
                     <h2>Обращения</h2>
                 </div>
@@ -246,60 +304,62 @@
                                 <p>У вас пока нет отправленных обращений.</p>
                             </div>
                         @else
-                            <div class="students-table">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Дата</th>
-                                            <th>Тема</th>
-                                            <th>Тип</th>
-                                            <th>Статус</th>
-                                            <th>Кому</th>
-                                            <th>Действия</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($sentAppeals as $appeal)
-                                            <tr class="{{ $appeal->status === 'Завершено' ? 'completed' : 'active' }}">
-                                                <td>{{ $appeal->created_at->format('d.m.Y') }}</td>
-                                                <td>
-                                                    <div class="appeal-title" onclick="openViewModal({{ $appeal->id }})">
-                                                        {{ $appeal->title ?? '—' }}
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <span class="type-badge type-{{ strtolower($appeal->type) }}">
-                                                        {{ $appeal->type }}
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    <span class="status-badge status-{{ strtolower($appeal->status) }}">
-                                                        {{ $appeal->status ?? '—' }}
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    @if($appeal->recipient)
-                                                        @if($appeal->recipient->student)
-                                                            {{ $appeal->recipient->student->fio }}
-                                                        @elseif($appeal->recipient->teacher)
-                                                            {{ $appeal->recipient->teacher->fio }}
-                                                        @else
-                                                            {{ $appeal->recipient->name }}
-                                                        @endif
-                                                    @else
-                                                        Неизвестно
-                                                    @endif
-                                                </td>
-                                                <td>
-                                                    <button onclick="openViewModal({{ $appeal->id }})" class="view-btn">Просмотр</button>
-                                                    @if($appeal->feedback && !$appeal->like_feedback)
-                                                        <button onclick="openRateModal({{ $appeal->id }})" class="rate-btn">Оценить</button>
-                                                    @endif
-                                                </td>
+                            <div class="table-scroll-container">
+                                <div class="students-table">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Дата</th>
+                                                <th>Тема</th>
+                                                <th>Тип</th>
+                                                <th>Статус</th>
+                                                <th>Кому</th>
+                                                <th>Действия</th>
                                             </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($sentAppeals as $appeal)
+                                                <tr class="{{ $appeal->status === 'Завершено' ? 'completed' : 'active' }}">
+                                                    <td>{{ $appeal->created_at->format('d.m.Y') }}</td>
+                                                    <td>
+                                                        <div class="appeal-title" onclick="openViewModal({{ $appeal->id }})">
+                                                            {{ $appeal->title ?? '—' }}
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <span class="type-badge type-{{ strtolower($appeal->type) }}">
+                                                            {{ $appeal->type }}
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <span class="status-badge status-{{ strtolower($appeal->status) }}">
+                                                            {{ $appeal->status ?? '—' }}
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        @if($appeal->recipient)
+                                                            @if($appeal->recipient->student)
+                                                                {{ $appeal->recipient->student->fio }}
+                                                            @elseif($appeal->recipient->teacher)
+                                                                {{ $appeal->recipient->teacher->fio }}
+                                                            @else
+                                                                {{ $appeal->recipient->name }}
+                                                            @endif
+                                                        @else
+                                                            Неизвестно
+                                                        @endif
+                                                    </td>
+                                                    <td>
+                                                        <button onclick="openViewModal({{ $appeal->id }})" class="view-btn">Просмотр</button>
+                                                        @if($appeal->feedback && !$appeal->like_feedback)
+                                                            <button onclick="openRateModal({{ $appeal->id }})" class="rate-btn">Оценить</button>
+                                                        @endif
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         @endif
                     </div>
@@ -311,60 +371,62 @@
                                 <p>У вас пока нет полученных обращений.</p>
                             </div>
                         @else
-                            <div class="students-table">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Дата</th>
-                                            <th>Тема</th>
-                                            <th>Тип</th>
-                                            <th>Статус</th>
-                                            <th>От кого</th>
-                                            <th>Действия</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($receivedAppeals as $appeal)
-                                            <tr class="{{ $appeal->status === 'Завершено' ? 'completed' : 'active' }}">
-                                                <td>{{ $appeal->created_at->format('d.m.Y') }}</td>
-                                                <td>
-                                                    <div class="appeal-title" onclick="openViewModal({{ $appeal->id }})">
-                                                        {{ $appeal->title ?? '—' }}
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <span class="type-badge type-{{ strtolower($appeal->type) }}">
-                                                        {{ $appeal->type }}
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    <span class="status-badge status-{{ strtolower($appeal->status) }}">
-                                                        {{ $appeal->status ?? '—' }}
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    @if($appeal->sender)
-                                                        @if($appeal->sender->student)
-                                                            {{ $appeal->sender->student->fio }}
-                                                        @elseif($appeal->sender->teacher)
-                                                            {{ $appeal->sender->teacher->fio }}
-                                                        @else
-                                                            {{ $appeal->sender->name }}
-                                                        @endif
-                                                    @else
-                                                        Неизвестно
-                                                    @endif
-                                                </td>
-                                                <td>
-                                                    <button onclick="openViewModal({{ $appeal->id }})" class="view-btn">Просмотр</button>
-                                                    @if(!$appeal->feedback)
-                                                        <button onclick="openReplyModal({{ $appeal->id }})" class="reply-btn">Ответить</button>
-                                                    @endif
-                                                </td>
+                            <div class="table-scroll-container">
+                                <div class="students-table">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Дата</th>
+                                                <th>Тема</th>
+                                                <th>Тип</th>
+                                                <th>Статус</th>
+                                                <th>От кого</th>
+                                                <th>Действия</th>
                                             </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($receivedAppeals as $appeal)
+                                                <tr class="{{ $appeal->status === 'Завершено' ? 'completed' : 'active' }}">
+                                                    <td>{{ $appeal->created_at->format('d.m.Y') }}</td>
+                                                    <td>
+                                                        <div class="appeal-title" onclick="openViewModal({{ $appeal->id }})">
+                                                            {{ $appeal->title ?? '—' }}
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <span class="type-badge type-{{ strtolower($appeal->type) }}">
+                                                            {{ $appeal->type }}
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <span class="status-badge status-{{ strtolower($appeal->status) }}">
+                                                            {{ $appeal->status ?? '—' }}
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        @if($appeal->sender)
+                                                            @if($appeal->sender->student)
+                                                                {{ $appeal->sender->student->fio }}
+                                                            @elseif($appeal->sender->teacher)
+                                                                {{ $appeal->sender->teacher->fio }}
+                                                            @else
+                                                                {{ $appeal->sender->name }}
+                                                            @endif
+                                                        @else
+                                                            Неизвестно
+                                                        @endif
+                                                    </td>
+                                                    <td>
+                                                        <button onclick="openViewModal({{ $appeal->id }})" class="view-btn">Просмотр</button>
+                                                        @if(!$appeal->feedback)
+                                                            <button onclick="openReplyModal({{ $appeal->id }})" class="reply-btn">Ответить</button>
+                                                        @endif
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         @endif
                     </div>
@@ -376,7 +438,7 @@
 <!-- Модальное окно просмотра обращения -->
 <div id="viewModal" class="modal">
     <div class="modal-content">
-        <span class="close" onclick="closeViewModal()">&times;</span>
+        <span class="close" onclick="closeViewModal()" style="color:var(--error-color);font-size:22px;position:absolute;right:18px;top:12px;cursor:pointer;">&times;</span>
         <div id="viewContent">
             <!-- Содержимое будет загружено динамически -->
         </div>
@@ -386,7 +448,7 @@
 <!-- Модальное окно оценки ответа -->
 <div id="rateModal" class="modal">
     <div class="modal-content">
-        <span class="close" onclick="closeRateModal()">&times;</span>
+        <span class="close" onclick="closeRateModal()" style="color:var(--error-color);font-size:22px;position:absolute;right:18px;top:12px;cursor:pointer;">&times;</span>
         <h3>Оценить ответ</h3>
         <form id="rateForm">
             <input type="hidden" id="rateAppealId" name="appeal_id">
@@ -412,7 +474,7 @@
 <!-- Модальное окно ответа на обращение -->
 <div id="replyModal" class="modal">
     <div class="modal-content">
-        <span class="close" onclick="closeReplyModal()">&times;</span>
+        <span class="close" onclick="closeReplyModal()" style="color:var(--error-color);font-size:22px;position:absolute;right:18px;top:12px;cursor:pointer;">&times;</span>
         <h3>Ответить на обращение</h3>
         <form id="replyForm">
             <input type="hidden" id="replyAppealId" name="appeal_id">
@@ -432,155 +494,198 @@
 <div id="toast"></div>
 
 <script>
-function showToast(message, type = 'info') {
-    const toast = document.getElementById('toast');
-    toast.textContent = message;
-    toast.className = `toast toast-${type}`;
-    toast.style.display = 'block';
-    setTimeout(() => {
-        toast.style.display = 'none';
-    }, 3000);
-}
+// Ожидаем полной загрузки DOM
+document.addEventListener('DOMContentLoaded', function() {
 
-function openViewModal(appealId) {
-    fetch(`/appeals/${appealId}`)
+    
+    function showToast(message, type = 'info') {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.className = `toast toast-${type}`;
+        toast.style.display = 'block';
+        setTimeout(() => {
+            toast.style.display = 'none';
+        }, 3000);
+    }
+
+    function openViewModal(appealId) {
+        fetch(`/appeals/${appealId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('viewContent').innerHTML = data.html;
+                    document.getElementById('viewModal').style.display = 'flex';
+                } else {
+                    showToast('Ошибка при загрузке обращения', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Произошла ошибка при загрузке обращения', 'error');
+            });
+    }
+
+    function closeViewModal() {
+        document.getElementById('viewModal').style.display = 'none';
+    }
+
+    function openRateModal(appealId) {
+        document.getElementById('rateAppealId').value = appealId;
+        document.getElementById('rateModal').style.display = 'flex';
+    }
+
+    function closeRateModal() {
+        document.getElementById('rateModal').style.display = 'none';
+    }
+
+    function openReplyModal(appealId) {
+        document.getElementById('replyAppealId').value = appealId;
+        document.getElementById('replyModal').style.display = 'flex';
+    }
+
+    function closeReplyModal() {
+        document.getElementById('replyModal').style.display = 'none';
+    }
+
+    // Функция переключения вкладок
+    function showTab(tabName) {
+        // Скрываем все вкладки
+        const tabContents = document.querySelectorAll('.tab-content');
+        tabContents.forEach(content => {
+            content.classList.remove('active');
+        });
+        
+        // Убираем активный класс у всех кнопок
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        tabBtns.forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        // Показываем нужную вкладку
+        document.getElementById(tabName + '-tab').classList.add('active');
+        
+        // Активируем нужную кнопку
+        event.target.classList.add('active');
+    }
+
+    // Делаем функции глобальными
+    window.openViewModal = openViewModal;
+    window.closeViewModal = closeViewModal;
+    window.openRateModal = openRateModal;
+    window.closeRateModal = closeRateModal;
+    window.openReplyModal = openReplyModal;
+    window.closeReplyModal = closeReplyModal;
+    window.showTab = showTab;
+
+    // Обработчики форм
+    document.getElementById('rateForm').onsubmit = function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const appealId = formData.get('appeal_id');
+        formData.append('_method', 'PUT');
+        
+        fetch(`/appeals/${appealId}`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            },
+            body: formData
+        })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                document.getElementById('viewContent').innerHTML = data.html;
-                document.getElementById('viewModal').style.display = 'block';
+                closeRateModal();
+                showToast(data.message, 'success');
+                setTimeout(() => location.reload(), 1000);
             } else {
-                showToast('Ошибка при загрузке обращения', 'error');
+                showToast('Ошибка при оценке: ' + data.message, 'error');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            showToast('Произошла ошибка при загрузке обращения', 'error');
+            showToast('Произошла ошибка при оценке', 'error');
         });
-}
+    };
 
-function closeViewModal() {
-    document.getElementById('viewModal').style.display = 'none';
-}
+    document.getElementById('replyForm').onsubmit = function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const appealId = formData.get('appeal_id');
+        formData.append('_method', 'PUT');
+        
+        fetch(`/student/appeals/${appealId}/reply`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                closeReplyModal();
+                showToast(data.message, 'success');
+                setTimeout(() => location.reload(), 1000);
+            } else {
+                showToast('Ошибка при ответе: ' + data.message, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('Произошла ошибка при ответе', 'error');
+        });
+    };
 
-function openRateModal(appealId) {
-    document.getElementById('rateAppealId').value = appealId;
-    document.getElementById('rateModal').style.display = 'block';
-}
-
-function closeRateModal() {
-    document.getElementById('rateModal').style.display = 'none';
-}
-
-function openReplyModal(appealId) {
-    document.getElementById('replyAppealId').value = appealId;
-    document.getElementById('replyModal').style.display = 'block';
-}
-
-function closeReplyModal() {
-    document.getElementById('replyModal').style.display = 'none';
-}
-
-document.getElementById('rateForm').onsubmit = function(e) {
-    e.preventDefault();
-    const formData = new FormData(this);
-    const appealId = formData.get('appeal_id');
-    formData.append('_method', 'PUT');
-    
-    fetch(`/appeals/${appealId}`, {
-        method: 'POST',
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-        },
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            closeRateModal();
-            showToast(data.message, 'success');
-            setTimeout(() => location.reload(), 1000);
-        } else {
-            showToast('Ошибка при оценке: ' + data.message, 'error');
+    // Закрытие модальных окон при клике вне их
+    window.onclick = function(event) {
+        if (event.target.classList.contains('modal')) {
+            event.target.style.display = 'none';
         }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showToast('Произошла ошибка при оценке', 'error');
-    });
-};
-
-document.getElementById('replyForm').onsubmit = function(e) {
-    e.preventDefault();
-    const formData = new FormData(this);
-    const appealId = formData.get('appeal_id');
-    formData.append('_method', 'PUT');
-    
-    fetch(`/student/appeals/${appealId}/reply`, {
-        method: 'POST',
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-        },
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            closeReplyModal();
-            showToast(data.message, 'success');
-            setTimeout(() => location.reload(), 1000);
-        } else {
-            showToast('Ошибка при ответе: ' + data.message, 'error');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showToast('Произошла ошибка при ответе', 'error');
-    });
-};
-
-// Закрытие модальных окон при клике вне их
-window.onclick = function(event) {
-    if (event.target.classList.contains('modal')) {
-        event.target.style.display = 'none';
     }
-}
 
-// Функция переключения вкладок
-function showTab(tabName) {
-    // Скрываем все вкладки
-    const tabContents = document.querySelectorAll('.tab-content');
-    tabContents.forEach(content => {
-        content.classList.remove('active');
+    // Звёздный рейтинг: выбор слева направо
+    const starLabels = document.querySelectorAll('#starRating label');
+    const starInput = document.getElementById('starRatingValue');
+    starLabels.forEach((label, idx) => {
+        label.addEventListener('mouseenter', () => {
+            starLabels.forEach((l, i) => l.classList.toggle('hovered', i <= idx));
+        });
+        label.addEventListener('mouseleave', () => {
+            starLabels.forEach(l => l.classList.remove('hovered'));
+        });
+        label.addEventListener('click', () => {
+            starInput.value = idx + 1;
+            starLabels.forEach((l, i) => l.classList.toggle('selected', i <= idx));
+        });
     });
-    
-    // Убираем активный класс у всех кнопок
-    const tabBtns = document.querySelectorAll('.tab-btn');
-    tabBtns.forEach(btn => {
-        btn.classList.remove('active');
-    });
-    
-    // Показываем нужную вкладку
-    document.getElementById(tabName + '-tab').classList.add('active');
-    
-    // Активируем нужную кнопку
-    event.target.classList.add('active');
-}
 
-// Звёздный рейтинг: выбор слева направо
-const starLabels = document.querySelectorAll('#starRating label');
-const starInput = document.getElementById('starRatingValue');
-starLabels.forEach((label, idx) => {
-    label.addEventListener('mouseenter', () => {
-        starLabels.forEach((l, i) => l.classList.toggle('hovered', i <= idx));
-    });
-    label.addEventListener('mouseleave', () => {
-        starLabels.forEach(l => l.classList.remove('hovered'));
-    });
-    label.addEventListener('click', () => {
-        starInput.value = idx + 1;
-        starLabels.forEach((l, i) => l.classList.toggle('selected', i <= idx));
-    });
+    // Обработчик колесика мыши для таблиц
+    document.addEventListener('wheel', (event) => {
+    
+        
+        // Проверяем, находится ли курсор над таблицей или её контейнером
+        const target = event.target;
+        const tableScrollContainer = target.closest('.table-scroll-container');
+        
+        if (tableScrollContainer) {
+    
+            
+            // Предотвращаем вертикальную прокрутку страницы
+            event.preventDefault();
+            
+            // Определяем направление прокрутки
+            const scrollAmount = 300; // Увеличиваем шаг прокрутки
+            if (event.deltaY > 0) {
+                tableScrollContainer.scrollLeft += scrollAmount;
+            
+            } else {
+                tableScrollContainer.scrollLeft -= scrollAmount;
+       
+            }
+        }
+    }, { passive: false });
+
+    
 });
 </script>
 

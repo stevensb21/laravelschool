@@ -1,6 +1,7 @@
-<div id="editCourseModal" class="modal" style="top: 50px;">
+@vite(['resources/css/colors.css'])
+<div id="editCourseModal" class="modal">
     <div class="modal-content" style="max-height:80vh;overflow-y:auto;">
-        <span class="close" onclick="closeModal('editCourseModal')">&times;</span>
+        <span class="close" onclick="closeModal('editCourseModal')" style="color:var(--error-color);font-size:22px;position:absolute;right:18px;top:12px;cursor:pointer;">&times;</span>
         <h3>Редактировать курс</h3>
         <form action="{{ route('management.updateCourse') }}" method="POST">
             @csrf
@@ -53,18 +54,21 @@
 
 <!-- Красивый скролл для модального окна -->
 <style>
-.modal-content {
-    scrollbar-width: thin;
-    scrollbar-color: #2563eb #f8fafc;
-}
-.modal-content::-webkit-scrollbar {
-    width: 8px;
-}
-.modal-content::-webkit-scrollbar-thumb {
-    background: #2563eb;
-    border-radius: 4px;
-}
-.modal-content::-webkit-scrollbar-track {
-    background: #f8fafc;
-}
-</style> 
+  .modal-content {
+      scrollbar-width: thin;
+      scrollbar-color: #EDEDED #FBFBFB;
+  }
+  .modal-content::-webkit-scrollbar {
+      width: 8px;
+  }
+  .modal-content::-webkit-scrollbar-thumb {
+      background: #EDEDED;
+      border-radius: 4px;
+  }
+  .modal-content::-webkit-scrollbar-thumb:hover {
+      background: #383E33;
+  }
+  .modal-content::-webkit-scrollbar-track {
+      background: #FBFBFB;
+  }
+  </style>

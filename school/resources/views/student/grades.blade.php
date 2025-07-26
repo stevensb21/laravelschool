@@ -13,7 +13,11 @@
 }
 .students-table th {
     font-weight: 600;
-    background: #f7fafc;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+.students-table td {
+    color: var(--text-secondary);
 }
 </style>
 @endsection
@@ -22,54 +26,54 @@
     @include('student.nav')
     <div class="container">
         <main class="content">
-            <div class="students-container">
+            <div class="students-container" style="background:var(--card-bg);border-radius:12px;box-shadow:0 2px 8px var(--card-shadow);padding:24px;max-width:900px;margin:0 auto;">
                 <div class="students-header">
                     <h2>Оценки</h2>
                 </div>
                 
                 @if($grades->isEmpty())
-                    <div style="text-align:center;padding:40px;color:#718096;">
+                    <div style="text-align:center;padding:40px;color:var(--text-color);">
                         <p>У вас пока нет оценок.</p>
                     </div>
                 @else
                     <!-- Общая статистика -->
-                    <div style="background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.04);padding:24px;margin-bottom:24px;">
-                        <h3 style="font-size:1.3rem;font-weight:600;margin:0 0 16px 0;color:#2d3748;">Общая статистика</h3>
+                    <div style="background:var(--card-bg);border-radius:12px;box-shadow:0 2px 8px var(--card-shadow);padding:24px;margin-bottom:24px;">
+                        <h3 style="font-size:1.3rem;font-weight:600;margin:0 0 16px 0;color:var(--text-primary);">Общая статистика</h3>
                         <div style="display:flex;gap:20px;flex-wrap:wrap;">
-                            <div style="flex:1;text-align:center;padding:16px;background:#f7fafc;border-radius:8px;border:2px solid #e2e8f0;min-width:180px;">
-                                <div style="font-size:1.8rem;font-weight:700;color:#2b6cb0;">{{ $average }}</div>
-                                <div style="font-size:0.9rem;color:#4a5568;font-weight:500;">Средний балл</div>
+                            <div style="flex:1;text-align:center;padding:16px;background:var(--bg-secondary);border-radius:8px;border:2px solid var(--border-color);min-width:180px;">
+                                <div style="font-size:1.8rem;font-weight:700;color:var(--info-color);">{{ $average }}</div>
+                                <div style="font-size:0.9rem;color:var(--text-secondary);font-weight:500;">Средний балл</div>
                             </div>
-                            <div style="flex:1;text-align:center;padding:16px;background:#f7fafc;border-radius:8px;border:2px solid #e2e8f0;min-width:180px;">
-                                <div style="font-size:1.8rem;font-weight:700;color:#c05621;">{{ $average_exam }}</div>
-                                <div style="font-size:0.9rem;color:#4a5568;font-weight:500;">Средний балл за экзамен</div>
+                            <div style="flex:1;text-align:center;padding:16px;background:var(--bg-secondary);border-radius:8px;border:2px solid var(--border-color);min-width:180px;">
+                                <div style="font-size:1.8rem;font-weight:700;color:var(--warning-color);">{{ $average_exam }}</div>
+                                <div style="font-size:0.9rem;color:var(--text-secondary);font-weight:500;">Средний балл за экзамен</div>
                             </div>
-                            <div style="flex:1;text-align:center;padding:16px;background:#f7fafc;border-radius:8px;border:2px solid #e2e8f0;min-width:180px;">
-                                <div style="font-size:1.8rem;font-weight:700;color:#2f855a;">{{ $attendance }}%</div>
-                                <div style="font-size:0.9rem;color:#4a5568;font-weight:500;">Посещаемость</div>
+                            <div style="flex:1;text-align:center;padding:16px;background:var(--bg-secondary);border-radius:8px;border:2px solid var(--border-color);min-width:180px;">
+                                <div style="font-size:1.8rem;font-weight:700;color:var(--success-color);">{{ $attendance }}%</div>
+                                <div style="font-size:0.9rem;color:var(--text-secondary);font-weight:500;">Посещаемость</div>
                             </div>
                         </div>
                     </div>
                     
                     <!-- Статистика оценок -->
-                    <div style="background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.04);padding:24px;margin-bottom:24px;">
-                        <h3 style="font-size:1.3rem;font-weight:600;margin:0 0 16px 0;color:#2d3748;">Статистика оценок</h3>
+                    <div style="background:var(--card-bg);border-radius:12px;box-shadow:0 2px 8px var(--card-shadow);padding:24px;margin-bottom:24px;">
+                        <h3 style="font-size:1.3rem;font-weight:600;margin:0 0 16px 0;color:var(--text-primary);">Статистика оценок</h3>
                         <div style="display:flex;gap:16px;flex-wrap:wrap;">
-                            <div style="flex:1;text-align:center;padding:16px;background:#e6f7e6;border-radius:8px;border:2px solid #68d391;min-width:150px;">
-                                <div style="font-size:2rem;font-weight:700;color:#2f855a;">{{ $gradeStats['fives'] }}</div>
-                                <div style="font-size:0.9rem;color:#2f855a;font-weight:500;">Пятёрок</div>
+                            <div style="flex:1;text-align:center;padding:16px;background:var(--success-bg);border-radius:8px;border:2px solid var(--success-color);min-width:150px;">
+                                <div style="font-size:2rem;font-weight:700;color:var(--success-color);">{{ $gradeStats['fives'] }}</div>
+                                <div style="font-size:0.9rem;color:var(--success-color);font-weight:500;">Пятёрок</div>
                             </div>
-                            <div style="flex:1;text-align:center;padding:16px;background:#ebf8ff;border-radius:8px;border:2px solid #63b3ed;min-width:150px;">
-                                <div style="font-size:2rem;font-weight:700;color:#2b6cb0;">{{ $gradeStats['fours'] }}</div>
-                                <div style="font-size:0.9rem;color:#2b6cb0;font-weight:500;">Четвёрок</div>
+                            <div style="flex:1;text-align:center;padding:16px;background:var(--info-bg);border-radius:8px;border:2px solid var(--info-color);min-width:150px;">
+                                <div style="font-size:2rem;font-weight:700;color:var(--info-color);">{{ $gradeStats['fours'] }}</div>
+                                <div style="font-size:0.9rem;color:var(--info-color);font-weight:500;">Четвёрок</div>
                             </div>
-                            <div style="flex:1;text-align:center;padding:16px;background:#fef5e7;border-radius:8px;border:2px solid #ed8936;min-width:150px;">
-                                <div style="font-size:2rem;font-weight:700;color:#c05621;">{{ $gradeStats['threes'] }}</div>
-                                <div style="font-size:0.9rem;color:#c05621;font-weight:500;">Троек</div>
+                            <div style="flex:1;text-align:center;padding:16px;background:var(--warning-bg);border-radius:8px;border:2px solid var(--warning-color);min-width:150px;">
+                                <div style="font-size:2rem;font-weight:700;color:var(--warning-color);">{{ $gradeStats['threes'] }}</div>
+                                <div style="font-size:0.9rem;color:var(--warning-color);font-weight:500;">Троек</div>
                             </div>
-                            <div style="flex:1;text-align:center;padding:16px;background:#fed7d7;border-radius:8px;border:2px solid #fc8181;min-width:150px;">
-                                <div style="font-size:2rem;font-weight:700;color:#c53030;">{{ $gradeStats['twos'] }}</div>
-                                <div style="font-size:0.9rem;color:#c53030;font-weight:500;">Двоек</div>
+                            <div style="flex:1;text-align:center;padding:16px;background:var(--danger-bg);border-radius:8px;border:2px solid var(--danger-color);min-width:150px;">
+                                <div style="font-size:2rem;font-weight:700;color:var(--danger-color);">{{ $gradeStats['twos'] }}</div>
+                                <div style="font-size:0.9rem;color:var(--danger-color);font-weight:500;">Двоек</div>
                             </div>
                         </div>
                     </div>
@@ -78,10 +82,10 @@
                         <table>
                             <thead>
                                 <tr>
-                                    <th title="Дата выставления оценки" style="color:#2d3748;">Дата</th>
-                                    <th title="Название предмета" style="color:#2d3748;">Предмет</th>
-                                    <th title="Тип оценки: урок или домашнее задание" style="color:#2d3748;">Тип</th>
-                                    <th title="Оценка по 5-балльной шкале" style="color:#2d3748;">Оценка</th>
+                                    <th title="Дата выставления оценки" style="color:var(--text-primary);">Дата</th>
+                                    <th title="Название предмета" style="color:var(--text-primary);">Предмет</th>
+                                    <th title="Тип оценки: урок или домашнее задание" style="color:var(--text-primary);">Тип</th>
+                                    <th title="Оценка по 5-балльной шкале" style="color:var(--text-primary);">Оценка</th>
                                 </tr>
                             </thead>
                             <tbody>

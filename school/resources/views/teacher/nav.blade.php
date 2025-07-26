@@ -1,4 +1,4 @@
-<nav id="teacherSidebar">
+<nav id="teacherSidebar" style="background:var(--nav-bg);color:var(--nav-text);">
     <div class="mobile-nav-header">
         <span class="mobile-logo">okapi-board</span>
         <button class="mobile-nav-toggle" id="teacherNavToggle" aria-label="Открыть меню">
@@ -14,6 +14,7 @@
         <a href="{{ route('teacher.methodology') }}">Методпакеты</a>
         <a href="{{ route('teacher.homework') }}">Домашнее задание</a>
         <a href="{{ route('teacher.appeals') }}">Обращения</a>
+        <a href="{{ route('chats.index') }}">Чаты</a>
         <a href="{{ route('teacher.reviews') }}">Отзывы</a>
         <form action="{{ route('logout') }}" method="POST" style="display: inline;">
             @csrf

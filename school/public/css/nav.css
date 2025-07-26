@@ -46,6 +46,7 @@ nav a:hover {
 }
 
 .photoNav {
+    background-color: #ffd4d4;
     border-radius: 50%;
     width: 120px;
     height: 120px;

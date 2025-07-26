@@ -22,10 +22,8 @@ class AccountController extends Controller
         } elseif ($user->role === 'teacher') {
             return app(\App\Http\Controllers\TeacherController::class)->account(request());
         } else {
-            $student = $user->student;
-            $group = $student->group;
-            $subjects = $group->subjects;
-            return view('student/account', compact('user', 'student', 'subjects'));
+            // Исправлено: вызываем StudentController@account
+            return app(\App\Http\Controllers\StudentController::class)->account(request());
         }
     }
 }

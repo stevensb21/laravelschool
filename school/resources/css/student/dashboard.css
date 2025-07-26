@@ -159,3 +159,34 @@
     color: #718096;
     font-size: 12px;
 } 
+
+.rating-stars {
+    display: flex;
+    gap: 2px;
+}
+
+.rating-stars .star {
+    font-size: 22px;
+    color: var(--accent-color);
+    text-shadow: 0 1px 2px var(--border-dark), 0 0 1px #fff;
+    transition: color 0.2s, text-shadow 0.2s;
+}
+.rating-stars .star.filled,
+.rating-stars .star.selected {
+    color: var(--status-pending);
+    text-shadow: 0 2px 6px var(--secondary-color), 0 0 2px #fff;
+}
+.rating-stars .star {
+    opacity: 1;
+}
+
+.rating-value {
+    color: var(--text-secondary);
+    text-align: center;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.review-rating {
+    text-align: center;
+}

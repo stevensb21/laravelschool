@@ -5,6 +5,7 @@
         <li style="margin-bottom:18px;"><a href="{{ route('student.homework') }}" class="student-nav-link">Домашние задания</a></li>
         <li style="margin-bottom:18px;"><a href="{{ route('student.grades') }}" class="student-nav-link">Оценки</a></li>
         <li style="margin-bottom:18px;"><a href="{{ route('student.attendance') }}" class="student-nav-link">Посещаемость</a></li>
+        <li style="margin-bottom:18px;"><a href="{{ route('chats.index') }}" class="student-nav-link">Чаты</a></li>
         <li><a href="{{ route('student.appeals') }}" class="student-nav-link">Обращения</a></li>
     </ul>
 </nav>

@@ -144,6 +144,15 @@ class TeacherController extends Controller
         }
         
         $teachers = $query->get();
+        // Пересчитываем статистику для каждого преподавателя через getStatistics()
+        foreach ($teachers as $teacher) {
+            if (method_exists($teacher, 'getStatistics')) {
+                $stats = $teacher->getStatistics();
+                $teacher->average_attendance = $stats['average_attendance'] ?? 0;
+                $teacher->average_exam_score = $stats['average_homework'] ?? ($stats['average_exam_score'] ?? 0);
+                $teacher->average_performance = $stats['average_performance'] ?? 0;
+            }
+        }
         
         // Получаем уникальные предметы для выпадающего списка
         
@@ -359,31 +368,19 @@ class TeacherController extends Controller
             return redirect()->route('login')->with('error', 'Преподаватель не найден');
         }
 
-        $teacherId = $teacher->users_id;
+        $teacherId = $teacher->id; // Используем ID преподавателя из таблицы teachers
         
-        // 1. Получаем id курсов, где access_ содержит id преподавателя
-        $courseIds = \App\Models\Course::where(function($q) use ($teacher) {
-            $q->whereJsonContains('access_->teachers', (int)$teacher->users_id)
-              ->orWhereJsonContains('access_->teachers', (string)$teacher->users_id);
-        })->pluck('id')->toArray();
+        // Получаем все группы, где этот преподаватель записан в teacher_id
+        $groups = \App\Models\Group::where('teacher_id', $teacherId)->pluck('name');
+        
+        $allGroups = $groups;
 
-        // 2. Если нет курсов — показываем пусто
-        if (empty($courseIds)) {
-            $allGroups = collect();
+        // Если у преподавателя нет групп - показываем пусто
+        if ($groups->isEmpty()) {
             $students = collect();
             $isAdmin = auth()->user()->role === 'admin';
             return view('teacher.students', compact('students', 'teacher', 'allGroups', 'isAdmin'));
         }
-
-        // 3. Получаем только группы, где courses содержит хотя бы один из $courseIds
-        $groups = \App\Models\Group::where(function($q) use ($courseIds) {
-            foreach ($courseIds as $cid) {
-                $q->orWhereJsonContains('courses', (int)$cid)
-                  ->orWhereJsonContains('courses', (string)$cid);
-            }
-        })->pluck('name');
-
-        $allGroups = $groups;
 
         $studentsQuery = \App\Models\Student::whereIn('group_name', $groups)->with('user', 'group');
         if ($request->filled('group')) {
@@ -537,28 +534,12 @@ class TeacherController extends Controller
         // Получаем администраторов для выпадающего списка
         $admins = \App\Models\User::where('role', 'admin')->get();
         
-        // Получаем студентов, которые могут обращаться к преподавателю
+        // Получаем студентов из групп, где этот преподаватель записан в teacher_id
+        $groups = \App\Models\Group::where('teacher_id', $teacher->id)->pluck('name');
         $students = collect();
         
-        // Получаем курсы, которые ведет преподаватель
-        $courseIds = \App\Models\Course::where(function($q) use ($teacher) {
-            $q->whereJsonContains('access_->teachers', (int)$teacher->users_id)
-              ->orWhereJsonContains('access_->teachers', (string)$teacher->users_id);
-        })->pluck('id')->toArray();
-        
-        // Получаем группы, где преподает этот преподаватель
-        if (!empty($courseIds)) {
-            $groupNames = \App\Models\Group::where(function($q) use ($courseIds) {
-                foreach ($courseIds as $cid) {
-                    $q->orWhereJsonContains('courses', (int)$cid)
-                      ->orWhereJsonContains('courses', (string)$cid);
-                }
-            })->pluck('name')->toArray();
-            
-            // Получаем студентов из этих групп
-            if (!empty($groupNames)) {
-                $students = \App\Models\Student::whereIn('group_name', $groupNames)->with('user')->get();
-            }
+        if (!$groups->isEmpty()) {
+            $students = \App\Models\Student::whereIn('group_name', $groups)->with('user')->get();
         }
         
         // Получаем все обращения где преподаватель отправитель или получатель
@@ -660,23 +641,28 @@ class TeacherController extends Controller
             ]);
         }
         
-        // Получаем id курсов, которые ведёт преподаватель
-        $courseIds = \App\Models\Course::where(function($q) use ($teacher) {
-            $q->whereJsonContains('access_->teachers', (int)$teacher->users_id)
-              ->orWhereJsonContains('access_->teachers', (string)$teacher->users_id);
-        })->pluck('id')->toArray();
-        // Для фильтров: только "свои" группы и предметы
-        $groups = \App\Models\Group::where(function($q) use ($courseIds) {
-            foreach ($courseIds as $cid) {
-                $q->orWhereJsonContains('courses', (int)$cid)
-                  ->orWhereJsonContains('courses', (string)$cid);
+        // Получаем группы, где этот преподаватель записан в teacher_id
+        $groups = \App\Models\Group::where('teacher_id', $teacher->id)->get();
+        
+        // Получаем предметы из курсов этих групп
+        $courseIds = [];
+        foreach ($groups as $group) {
+            if ($group->courses) {
+                $groupCourses = is_array($group->courses) ? $group->courses : json_decode($group->courses, true);
+                if (is_array($groupCourses)) {
+                    $courseIds = array_merge($courseIds, $groupCourses);
+                }
             }
-        })->get();
+        }
+        $courseIds = array_unique($courseIds);
+        
         $subjects = \App\Models\Course::whereIn('id', $courseIds)->pluck('name')->toArray();
+        
         // Для отображения: ВСЕ уроки этого преподавателя за неделю
         $allLessonsQuery = \App\Models\Calendar::whereBetween('date_', [session('monday'), session('sunday')])
             ->where('teacher', $teacher->fio);
         $lessons = $allLessonsQuery->get();
+        
         // Применяем фильтры только если выбраны
         if (request('group')) {
             $lessons = $lessons->where('name_group', request('group'));
@@ -997,7 +983,10 @@ class TeacherController extends Controller
                 $review->sender_name = $sender ? $sender->fio : 'Студент';
             }
         });
-        return view('admin.teacher-profile', compact('teacher', 'teacherReviews'));
+        // Получаем статистику динамически
+        $statistics = $teacher->getStatistics();
+        $average_rating = $teacher->average_rating ?? 0;
+        return view('admin.teacher-profile', compact('teacher', 'teacherReviews', 'statistics', 'average_rating'));
     }
 }
 

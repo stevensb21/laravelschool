@@ -11,6 +11,7 @@
     <title>Личный кабинет администратора</title>
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     @vite(['resources/css/nav.css'])
+    @vite(['resources/css/colors.css'])
     <link rel="stylesheet" href="{{ asset('css/admin/account.css') }}">
     
 

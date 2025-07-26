@@ -3,6 +3,7 @@
  <!-- Модальное окно для подтверждения удаления -->
 <div id="deleteTeacherModal" class="modal">
     <div class="modal-content">
+        <span class="close" onclick="closeModal('deleteTeacherModal')" style="color:var(--error-color);font-size:22px;position:absolute;right:18px;top:12px;cursor:pointer;">&times;</span>
         <h2>Подтверждение удаления</h2>
         <p id="delete-confirmation-text"></p>
         

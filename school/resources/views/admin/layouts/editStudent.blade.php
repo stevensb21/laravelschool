@@ -2,7 +2,7 @@
 <!-- Модальное окно для редактирования студента -->
     <div id="editStudentModal" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="closeModal('editStudentModal')">&times;</span>
+            <span class="close" onclick="closeModal('editStudentModal')" style="color:var(--error-color);font-size:22px;position:absolute;right:18px;top:12px;cursor:pointer;">&times;</span>
             <h2>Редактировать студента</h2>
             
             <?php if (isset($error)): ?>

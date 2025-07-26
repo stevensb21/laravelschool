@@ -88,7 +88,7 @@
     <!-- Модальное окно для продления срока -->
     <div id="extendModal" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="closeExtendModal()">&times;</span>
+            <span class="close" onclick="closeExtendModal()" style="color:var(--error-color);font-size:22px;position:absolute;right:18px;top:12px;cursor:pointer;">&times;</span>
             <h3>Продлить срок сдачи</h3>
             <form id="extendForm">
                 <input type="hidden" id="homeworkId" name="homework_id">
@@ -111,7 +111,7 @@
     <!-- Модальное окно для удаления задания -->
     <div id="deleteModal" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="closeDeleteModal()">&times;</span>
+            <span class="close" onclick="closeDeleteModal()" style="color:var(--error-color);font-size:22px;position:absolute;right:18px;top:12px;cursor:pointer;">&times;</span>
             <h3>Подтверждение удаления</h3>
             <div class="delete-warning">
                 <p><strong>Внимание!</strong> Вы собираетесь удалить домашнее задание:</p>
@@ -180,7 +180,7 @@
         const tomorrowStr = tomorrow.toISOString().split('T')[0];
         document.getElementById('newDeadline').min = tomorrowStr;
         
-        document.getElementById('extendModal').style.display = 'block';
+        document.getElementById('extendModal').style.display = 'flex';
     }
 
     function closeExtendModal() {
@@ -232,7 +232,7 @@
     function openDeleteModal(homeworkId, homeworkName) {
         homeworkToDelete = homeworkId;
         document.getElementById('deleteHomeworkName').textContent = homeworkName;
-        document.getElementById('deleteModal').style.display = 'block';
+        document.getElementById('deleteModal').style.display = 'flex';
     }
 
     function closeDeleteModal() {

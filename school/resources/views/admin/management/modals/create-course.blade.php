@@ -1,6 +1,6 @@
-<div id="createCourseModal" class="modal" style="top: 50px;">
+<div id="createCourseModal" class="modal">
     <div class="modal-content">
-        <span class="close" onclick="closeModal('createCourseModal')">&times;</span>
+        <span class="close" onclick="closeModal('createCourseModal')" style="color:var(--error-color);font-size:22px;position:absolute;right:18px;top:12px;cursor:pointer;">&times;</span>
         <h3>Создать новый курс</h3>
         <form action="{{ route('management.createCourse') }}" method="POST">
             @csrf

@@ -16,6 +16,7 @@ use App\Http\Controllers\UserController;
 use App\Models\User;
 use App\Models\Method;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\ChatController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -90,6 +91,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/admin/reviews/{id}/approve', [App\Http\Controllers\ReviewController::class, 'approve'])->name('admin.reviews.approve');
     Route::post('/admin/reviews/{id}/reject', [App\Http\Controllers\ReviewController::class, 'reject'])->name('admin.reviews.reject');
     Route::delete('/admin/reviews/{id}', [App\Http\Controllers\ReviewController::class, 'destroy'])->name('admin.reviews.destroy');
+    Route::post('/management/delete-backup', [App\Http\Controllers\ManagementController::class, 'deleteBackup'])->name('management.deleteBackup');
+    Route::get('/management/auto-backup-settings', [App\Http\Controllers\ManagementController::class, 'getAutoBackupSettings']);
+    Route::post('/management/auto-backup-settings', [App\Http\Controllers\ManagementController::class, 'saveAutoBackupSettings']);
 });
 
 Route::get('/', [HomeController::class,'index']);
@@ -550,4 +554,14 @@ Route::get('/cleanup-orphan-users', function() {
         ->where('role', '!=', 'admin')
         ->delete();
     return 'Удалено пользователей: ' . $deleted;
+});
+
+// --- ЧАТЫ ---
+Route::middleware(['auth'])->group(function () {
+    Route::get('/chats', [ChatController::class, 'index'])->name('chats.index');
+    Route::get('/chats/{chat}', [ChatController::class, 'show'])->name('chats.show');
+    Route::post('/chats/{chat}/send', [ChatController::class, 'sendMessage'])->name('chats.send');
+    Route::post('/chats/{chat}/clear', [ChatController::class, 'clearHistory'])->name('chats.clear');
+    Route::get('/chats/{chat}/fetch', [ChatController::class, 'fetchMessages'])->name('chats.fetch');
+    Route::post('/chats/create-teachers-chat', [ChatController::class, 'createTeachersChat'])->name('chats.createTeachersChat');
 });

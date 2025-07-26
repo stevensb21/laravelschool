@@ -4,6 +4,8 @@
 @vite(['resources/css/students.css'])
 @vite(['resources/css/appeals.css'])
 <style>
+
+
 .appeal-form {
     background: var(--card-bg);
     padding: 32px 24px 24px 24px;
@@ -148,7 +150,7 @@
     cursor: pointer;
     font-size: 14px;
     font-weight: 500;
-    color: var(--text-muted);
+    color: var(--text-color);
     border-bottom: 2px solid transparent;
     transition: all 0.3s;
 }
@@ -185,6 +187,57 @@
   .students-container {
     margin: 20px 0 0 0 !important;
   }
+}
+</style>
+
+
+<style>
+/* Стили для горизонтальной прокрутки таблиц */
+.table-scroll-container {
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-color) transparent;
+    max-width: none !important;
+    width: auto !important;
+    min-width: 0 !important;
+}
+
+/* Убираем ограничения ширины у родительского контейнера */
+.container-method {
+    max-width: none !important;
+    overflow: visible !important;
+    width: auto !important;
+}
+
+/* Убираем ограничения у table-container */
+.table-container {
+    max-width: none !important;
+    width: auto !important;
+    overflow: visible !important;
+}
+
+.table-scroll-container::-webkit-scrollbar {
+    height: 8px;
+}
+
+.table-scroll-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.table-scroll-container::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+}
+
+.table-scroll-container::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
+}
+
+/* Выравнивание ячеек */
+.container-method .table-scroll-container .table-container table th,
+.container-method .table-scroll-container .table-container table td {
+    text-align: left !important;
 }
 </style>
 @endsection
@@ -254,60 +307,62 @@
                             <p>У вас пока нет отправленных обращений.</p>
                         </div>
                     @else
-                        <div class="students-table">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Дата</th>
-                                        <th>Тема</th>
-                                        <th>Тип</th>
-                                        <th>Статус</th>
-                                        <th>Кому</th>
-                                        <th>Действия</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($sentAppeals as $appeal)
-                                        <tr class="{{ $appeal->status === 'Завершено' ? 'completed' : 'active' }}">
-                                            <td>{{ $appeal->created_at->format('d.m.Y') }}</td>
-                                            <td>
-                                                <div class="appeal-title" onclick="openViewModal({{ $appeal->id }})">
-                                                    {{ $appeal->title ?? '—' }}
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span class="type-badge type-{{ strtolower($appeal->type) }}">
-                                                    {{ $appeal->type }}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <span class="status-badge status-{{ strtolower($appeal->status) }}">
-                                                    {{ $appeal->status ?? '—' }}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                @if($appeal->recipient)
-                                                    @if($appeal->recipient->student)
-                                                        {{ $appeal->recipient->student->fio }}
-                                                    @elseif($appeal->recipient->teacher)
-                                                        {{ $appeal->recipient->teacher->fio }}
-                                                    @else
-                                                        {{ $appeal->recipient->name }}
-                                                    @endif
-                                                @else
-                                                    Неизвестно
-                                                @endif
-                                            </td>
-                                            <td>
-                                                <button onclick="openViewModal({{ $appeal->id }})" class="view-btn">Просмотр</button>
-                                                @if($appeal->feedback && !$appeal->like_feedback)
-                                                    <button onclick="openRateModal({{ $appeal->id }})" class="rate-btn">Оценить</button>
-                                                @endif
-                                            </td>
+                        <div class="table-scroll-container">
+                            <div class="students-table">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Дата</th>
+                                            <th>Тема</th>
+                                            <th>Тип</th>
+                                            <th>Статус</th>
+                                            <th>Кому</th>
+                                            <th>Действия</th>
                                         </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($sentAppeals as $appeal)
+                                            <tr class="{{ $appeal->status === 'Завершено' ? 'completed' : 'active' }}">
+                                                <td>{{ $appeal->created_at->format('d.m.Y') }}</td>
+                                                <td>
+                                                    <div class="appeal-title" onclick="openViewModal({{ $appeal->id }})">
+                                                        {{ $appeal->title ?? '—' }}
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <span class="type-badge type-{{ strtolower($appeal->type) }}">
+                                                        {{ $appeal->type }}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span class="status-badge status-{{ strtolower($appeal->status) }}">
+                                                        {{ $appeal->status ?? '—' }}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    @if($appeal->recipient)
+                                                        @if($appeal->recipient->student)
+                                                            {{ $appeal->recipient->student->fio }}
+                                                        @elseif($appeal->recipient->teacher)
+                                                            {{ $appeal->recipient->teacher->fio }}
+                                                        @else
+                                                            {{ $appeal->recipient->name }}
+                                                        @endif
+                                                    @else
+                                                        Неизвестно
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    <button onclick="openViewModal({{ $appeal->id }})" class="view-btn">Просмотр</button>
+                                                    @if($appeal->feedback && !$appeal->like_feedback)
+                                                        <button onclick="openRateModal({{ $appeal->id }})" class="rate-btn">Оценить</button>
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     @endif
                 </div>
@@ -319,60 +374,62 @@
                             <p>У вас пока нет полученных обращений.</p>
                         </div>
                     @else
-                        <div class="students-table">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Дата</th>
-                                        <th>Тема</th>
-                                        <th>Тип</th>
-                                        <th>Статус</th>
-                                        <th>От кого</th>
-                                        <th>Действия</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($receivedAppeals as $appeal)
-                                        <tr class="{{ $appeal->status === 'Завершено' ? 'completed' : 'active' }}">
-                                            <td>{{ $appeal->created_at->format('d.m.Y') }}</td>
-                                            <td>
-                                                <div class="appeal-title" onclick="openViewModal({{ $appeal->id }})">
-                                                    {{ $appeal->title ?? '—' }}
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span class="type-badge type-{{ strtolower($appeal->type) }}">
-                                                    {{ $appeal->type }}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <span class="status-badge status-{{ strtolower($appeal->status) }}">
-                                                    {{ $appeal->status ?? '—' }}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                @if($appeal->sender)
-                                                    @if($appeal->sender->student)
-                                                        {{ $appeal->sender->student->fio }}
-                                                    @elseif($appeal->sender->teacher)
-                                                        {{ $appeal->sender->teacher->fio }}
-                                                    @else
-                                                        {{ $appeal->sender->name }}
-                                                    @endif
-                                                @else
-                                                    Неизвестно
-                                                @endif
-                                            </td>
-                                            <td>
-                                                <button onclick="openViewModal({{ $appeal->id }})" class="view-btn">Просмотр</button>
-                                                @if(!$appeal->feedback)
-                                                    <button onclick="openReplyModal({{ $appeal->id }})" class="reply-btn">Ответить</button>
-                                                @endif
-                                            </td>
+                        <div class="table-scroll-container">
+                            <div class="students-table">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Дата</th>
+                                            <th>Тема</th>
+                                            <th>Тип</th>
+                                            <th>Статус</th>
+                                            <th>От кого</th>
+                                            <th>Действия</th>
                                         </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($receivedAppeals as $appeal)
+                                            <tr class="{{ $appeal->status === 'Завершено' ? 'completed' : 'active' }}">
+                                                <td>{{ $appeal->created_at->format('d.m.Y') }}</td>
+                                                <td>
+                                                    <div class="appeal-title" onclick="openViewModal({{ $appeal->id }})">
+                                                        {{ $appeal->title ?? '—' }}
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <span class="type-badge type-{{ strtolower($appeal->type) }}">
+                                                        {{ $appeal->type }}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span class="status-badge status-{{ strtolower($appeal->status) }}">
+                                                        {{ $appeal->status ?? '—' }}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    @if($appeal->sender)
+                                                        @if($appeal->sender->student)
+                                                            {{ $appeal->sender->student->fio }}
+                                                        @elseif($appeal->sender->teacher)
+                                                            {{ $appeal->sender->teacher->fio }}
+                                                        @else
+                                                            {{ $appeal->sender->name }}
+                                                        @endif
+                                                    @else
+                                                        Неизвестно
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    <button onclick="openViewModal({{ $appeal->id }})" class="view-btn">Просмотр</button>
+                                                    @if(!$appeal->feedback)
+                                                        <button onclick="openReplyModal({{ $appeal->id }})" class="reply-btn">Ответить</button>
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     @endif
                 </div>
@@ -384,7 +441,7 @@
 <!-- Модальное окно просмотра обращения -->
 <div id="viewModal" class="modal">
     <div class="modal-content">
-        <span class="close" onclick="closeViewModal()">&times;</span>
+        <span class="close" onclick="closeViewModal()" style="color:var(--error-color);font-size:22px;position:absolute;right:18px;top:12px;cursor:pointer;">&times;</span>
         <div id="viewContent">
             <!-- Содержимое будет загружено динамически -->
         </div>
@@ -394,7 +451,7 @@
 <!-- Модальное окно оценки ответа -->
 <div id="rateModal" class="modal">
     <div class="modal-content">
-        <span class="close" onclick="closeRateModal()">&times;</span>
+        <span class="close" onclick="closeRateModal()" style="color:var(--error-color);font-size:22px;position:absolute;right:18px;top:12px;cursor:pointer;">&times;</span>
         <h3>Оценить ответ</h3>
         <form id="rateForm">
             <input type="hidden" id="rateAppealId" name="appeal_id">
@@ -424,7 +481,7 @@
 <!-- Модальное окно ответа на обращение -->
 <div id="replyModal" class="modal">
     <div class="modal-content">
-        <span class="close" onclick="closeReplyModal()">&times;</span>
+        <span class="close" onclick="closeReplyModal()" style="color:var(--error-color);font-size:22px;position:absolute;right:18px;top:12px;cursor:pointer;">&times;</span>
         <h3>Ответить на обращение</h3>
         <form id="replyForm">
             <input type="hidden" id="replyAppealId" name="appeal_id">
@@ -460,7 +517,7 @@ function openViewModal(appealId) {
         .then(data => {
             if (data.success) {
                 document.getElementById('viewContent').innerHTML = data.html;
-                document.getElementById('viewModal').style.display = 'block';
+                document.getElementById('viewModal').style.display = 'flex';
             } else {
                 showToast('Ошибка при загрузке обращения', 'error');
             }
@@ -477,7 +534,7 @@ function closeViewModal() {
 
 function openRateModal(appealId) {
     document.getElementById('rateAppealId').value = appealId;
-    document.getElementById('rateModal').style.display = 'block';
+    document.getElementById('rateModal').style.display = 'flex';
 }
 
 function closeRateModal() {
@@ -486,7 +543,7 @@ function closeRateModal() {
 
 function openReplyModal(appealId) {
     document.getElementById('replyAppealId').value = appealId;
-    document.getElementById('replyModal').style.display = 'block';
+    document.getElementById('replyModal').style.display = 'flex';
 }
 
 function closeReplyModal() {
@@ -578,4 +635,19 @@ function showTab(tabName) {
     // Активируем нужную кнопку
     event.target.classList.add('active');
 }
+
+// Горизонтальная прокрутка таблиц с колесиком мыши
+document.addEventListener('wheel', (event) => {
+    const target = event.target;
+    const tableScrollContainer = target.closest('.table-scroll-container');
+    if (tableScrollContainer) {
+        event.preventDefault();
+        const scrollAmount = 300;
+        if (event.deltaY > 0) {
+            tableScrollContainer.scrollLeft += scrollAmount;
+        } else {
+            tableScrollContainer.scrollLeft -= scrollAmount;
+        }
+    }
+}, { passive: false });
 </script> 

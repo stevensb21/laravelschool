@@ -316,4 +316,34 @@ class BackupService
             File::copyDirectory($filesPath . 'logs', $logsPath);
         }
     }
+
+    public function deleteBackup($backupName)
+    {
+        $backupPath = storage_path('app/backups/' . $backupName);
+        if (!is_dir($backupPath)) {
+            return ['success' => false, 'message' => 'Бэкап не найден'];
+        }
+        try {
+            $this->deleteDirectory($backupPath);
+            return ['success' => true];
+        } catch (\Exception $e) {
+            return ['success' => false, 'message' => $e->getMessage()];
+        }
+    }
+
+    private function deleteDirectory($dir)
+    {
+        if (!file_exists($dir)) return;
+        if (!is_dir($dir)) return unlink($dir);
+        foreach (scandir($dir) as $item) {
+            if ($item == '.' || $item == '..') continue;
+            $path = $dir . DIRECTORY_SEPARATOR . $item;
+            if (is_dir($path)) {
+                $this->deleteDirectory($path);
+            } else {
+                unlink($path);
+            }
+        }
+        rmdir($dir);
+    }
 } 

@@ -16,7 +16,8 @@ class Group extends Model
         'average_rating',
         'average_attendance',
         'average_exam',
-        'courses'
+        'courses',
+        'teacher_id',
     ];
 
     protected $casts = [

@@ -1,6 +1,55 @@
 @extends('admin.layouts.head')
 @section('head')
 @vite(['resources/css/students.css'])
+<style>
+/* Стили для горизонтальной прокрутки таблиц */
+.table-scroll-container {
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-color) transparent;
+    max-width: none !important;
+    width: auto !important;
+    min-width: 0 !important;
+}
+
+/* Убираем ограничения ширины у родительского контейнера */
+.container-method {
+    max-width: none !important;
+    overflow: visible !important;
+    width: auto !important;
+}
+
+/* Убираем ограничения у table-container */
+.table-container {
+    max-width: none !important;
+    width: auto !important;
+    overflow: visible !important;
+}
+
+.table-scroll-container::-webkit-scrollbar {
+    height: 8px;
+}
+
+.table-scroll-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.table-scroll-container::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+}
+
+.table-scroll-container::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
+}
+
+/* Выравнивание ячеек */
+.container-method .table-scroll-container .table-container table th,
+.container-method .table-scroll-container .table-container table td {
+    text-align: left !important;
+}
+</style>
 @endsection
 
 @if(isset($isAdmin) && $isAdmin)
@@ -39,39 +88,57 @@
                     @endif
                 </form>
             </div>
-            <div class="students-table">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ФИО</th>
-                            <th>Группа</th>
-                            <th>Средний балл</th>
-                            <th>Посещаемость</th>
-                            <th>Статус</th>
-                            <th>Действия</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    @forelse ($students as $student)
-                        <tr>
-                            <td>{{ $student->fio }}</td>
-                            <td>{{ $student->group_name }}</td>
-                            <td>{{ $student->average_performance }}</td>
-                            <td>{{ $student->average_attendance }}</td>
-                            <td><span class="status active">Активный</span></td>
-                            <td>
-                                <button class="view-profile" onclick="window.location.href='{{ route('teacher.studentProfile', $student->id) }}'">Профиль</button>
-                                <button class="schedule-btn" onclick="window.location.href='{{ route('teacher.calendar', ['group' => $student->group_name]) }}'">Расписание</button>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="6" style="text-align:center;">Студенты не найдены</td>
-                        </tr>
-                    @endforelse
-                    </tbody>
-                </table>
+            <div class="table-scroll-container">
+                <div class="students-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ФИО</th>
+                                <th>Группа</th>
+                                <th>Средний балл</th>
+                                <th>Посещаемость</th>
+                                <th>Статус</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @forelse ($students as $student)
+                            <tr>
+                                <td>{{ $student->fio }}</td>
+                                <td>{{ $student->group_name }}</td>
+                                <td>{{ $student->average_performance }}</td>
+                                <td>{{ $student->average_attendance }}</td>
+                                <td><span class="status active">Активный</span></td>
+                                <td>
+                                    <button class="view-profile" onclick="window.location.href='{{ route('teacher.studentProfile', $student->id) }}'">Профиль</button>
+                                    <button class="schedule-btn" onclick="window.location.href='{{ route('teacher.calendar', ['group' => $student->group_name]) }}'">Расписание</button>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" style="text-align:center;">Студенты не найдены</td>
+                            </tr>
+                        @endforelse
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </main>
-</div> 
+</div>
+
+<script>
+document.addEventListener('wheel', (event) => {
+    const target = event.target;
+    const tableScrollContainer = target.closest('.table-scroll-container');
+    if (tableScrollContainer) {
+        event.preventDefault();
+        const scrollAmount = 300;
+        if (event.deltaY > 0) {
+            tableScrollContainer.scrollLeft += scrollAmount;
+        } else {
+            tableScrollContainer.scrollLeft -= scrollAmount;
+        }
+    }
+}, { passive: false });
+</script> 

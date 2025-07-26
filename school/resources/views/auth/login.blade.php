@@ -1,6 +1,14 @@
 @extends('layouts.app')
 
 @section('content')
+<style>
+body {
+    background-image: url('{{ asset('images/first_page.png') }}') !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+}
+</style>
 <h1 class="site-title">okapi-board</h1> <!-- Название сайта -->
     <div class="container">
         <div class="person-icon">

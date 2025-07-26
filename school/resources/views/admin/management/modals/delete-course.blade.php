@@ -1,6 +1,6 @@
-<div id="deleteCourseModal" class="modal" style="top: 50px;">
+<div id="deleteCourseModal" class="modal">
     <div class="modal-content">
-        <span class="close" onclick="closeModal('deleteCourseModal')">&times;</span>
+        <span class="close" onclick="closeModal('deleteCourseModal')" style="color:var(--error-color);font-size:22px;position:absolute;right:18px;top:12px;cursor:pointer;">&times;</span>
         <h3>Удалить курс</h3>
         <form action="{{ route('management.deleteCourse') }}" method="POST">
             @csrf

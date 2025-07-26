@@ -15,6 +15,7 @@
         <a href="{{route('appeals')}}">Обращения</a>
         <a href="{{route('admin.reviews.index')}}" class="{{ request()->routeIs('admin.reviews.*') ? 'active' : '' }}">Модерация отзывов</a>
         <a href="{{route('statistic')}}">Статистика</a>
+        <a href="{{route('chats.index')}}">Чаты</a>
         <a href="{{route('management')}}">Управление</a>
         <form action="{{ route('logout') }}" method="POST" style="display: inline;">
             @csrf

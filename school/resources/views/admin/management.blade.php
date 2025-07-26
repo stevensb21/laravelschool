@@ -3,6 +3,7 @@
 @section('head')
     <meta name="csrf-token" content="{{ csrf_token() }}">
     @vite(['resources/css/management.css'])
+    @vite(['resources/css/colors.css'])
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <style>
     /* Стилизация контейнера Select2 */
@@ -10,25 +11,26 @@
         min-height: 44px;
         border-radius: 8px;
         border: 1.5px solid #bfc9d1;
-        background: #f8fafc;
+        background: var(--input-bg);
         font-size: 1rem;
         padding: 4px 8px;
         transition: border-color 0.2s;
     }
     .select2-container--default .select2-selection--multiple:focus,
     .select2-container--default .select2-selection--multiple.select2-selection--focus {
-        border-color: #2563eb;
+        
         background: #fff;
         box-shadow: 0 0 0 2px #2563eb22;
     }
     .select2-container--default .select2-selection--multiple .select2-selection__choice {
-        background: #2563eb;
+     
         color: #fff;
         border: none;
         border-radius: 6px;
         margin: 2px 4px 2px 0;
         padding: 4px 10px;
         font-size: 0.98em;
+        background: var(--btn-primary);
         font-weight: 500;
     }
     .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
@@ -45,8 +47,7 @@
         outline: none;
     }
     .select2-container--default .select2-results__option--highlighted[aria-selected] {
-        background-color: #2563eb;
-        color: #fff;
+         color: #fff;
     }
     .select2-container--default .select2-results__option[aria-selected=true] {
         background-color: #e0e7ff;
@@ -63,9 +64,7 @@
         font-size: 1rem;
         z-index: 9999;
     }
-    .select2-container--open .select2-dropdown {
-        border-color: #2563eb;
-    }
+   
     .select2-container--default .select2-selection--multiple .select2-selection__rendered {
         padding: 0 4px 0 0;
     }
@@ -83,7 +82,7 @@
 @section('content')
 <div class="container">
     <main class="content">
-        <div class="management-container">
+        <div class="management-container" style="background:var(--card-bg);border-radius:12px;box-shadow:0 2px 8px var(--card-shadow);padding:24px;">
             <div class="management-header">
                 <h2>Управление системой</h2>
             </div>
@@ -194,7 +193,7 @@
         </div>
     </main>
     
-    <!-- Модальные окна -->
+    <!-- Модальные окна вынесены за пределы .container -->
     @include('admin.management.modals.create-group')
     @include('admin.management.modals.edit-group')
     @include('admin.management.modals.delete-group')
@@ -202,6 +201,50 @@
     @include('admin.management.modals.edit-course')
     @include('admin.management.modals.delete-course')
     @include('admin.management.modals.restore-backup')
+
+    <!-- Модальное окно подтверждения удаления бэкапа -->
+    <div id="confirmDeleteBackupModal" class="modal" style="display:none;z-index:2001;">
+        <div class="modal-content" style="max-width:400px;text-align:center;position:relative;top:20px;">
+            <span class="close" onclick="closeModal('confirmDeleteBackupModal')">&times;</span>
+            <h3 style="margin-bottom:20px;">Подтвердите удаление</h3>
+            <div id="confirmDeleteBackupText" style="margin-bottom:30px;"></div>
+            <div class="form-actions" style="justify-content:center;gap:16px;">
+                <button type="button" class="btn btn-danger" id="confirmDeleteBackupBtn" style="min-width:100px;">Удалить</button>
+                <button type="button" class="btn btn-secondary" onclick="closeModal('confirmDeleteBackupModal')" style="min-width:100px;">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно настройки автоматического бэкапа -->
+    <div id="autoBackupSettingsModal" class="modal" style="display:none;z-index:2001;">
+        <div class="modal-content" style="max-width:400px;text-align:center;position:relative;top:20px;background:var(--modal-bg);color:var(--text-primary);box-shadow:0 4px 24px var(--card-shadow);border-radius:12px;">
+            <span class="close" onclick="closeModal('autoBackupSettingsModal')" style="color:var(--error-color);font-size:22px;position:absolute;right:18px;top:12px;cursor:pointer;">&times;</span>
+            <h3 style="margin-bottom:20px;color:var(--text-primary);">Настройка автоматического бэкапа</h3>
+            <form id="autoBackupSettingsForm" autocomplete="off">
+                <div style="margin-bottom:18px;text-align:left;">
+                    <label style="display:flex;align-items:center;gap:10px;color:var(--text-primary);">
+                        <input type="checkbox" id="autoBackupEnabled" style="accent-color:var(--btn-primary);"> Включить автосоздание бэкапов
+                    </label>
+                </div>
+                <div style="margin-bottom:18px;text-align:left;">
+                    <label for="autoBackupPeriod" style="color:var(--text-primary);">Периодичность:</label><br>
+                    <select id="autoBackupPeriod" style="width:100%;margin-top:5px;padding:8px 10px;border-radius:6px;border:1px solid var(--input-border);background:var(--input-bg);color:var(--text-primary);">
+                        <option value="daily">Ежедневно</option>
+                        <option value="weekly">Еженедельно</option>
+                        <option value="monthly">Ежемесячно</option>
+                    </select>
+                </div>
+                <div style="margin-bottom:18px;text-align:left;">
+                    <label for="autoBackupTime" style="color:var(--text-primary);">Время запуска:</label><br>
+                    <input type="time" id="autoBackupTime" value="03:00" style="width:100%;margin-top:5px;padding:8px 10px;border-radius:6px;border:1px solid var(--input-border);background:var(--input-bg);color:var(--text-primary);">
+                </div>
+                <div class="form-actions" style="justify-content:center;gap:16px;">
+                    <button type="button" class="btn btn-primary" style="background:var(--btn-primary);color:var(--text-light);border-radius:6px;padding:10px 24px;font-weight:500;" onclick="saveAutoBackupSettings()">Сохранить</button>
+                    <button type="button" class="btn btn-secondary" style="background:var(--btn-secondary);color:var(--text-light);border-radius:6px;padding:10px 24px;font-weight:500;" onclick="closeModal('autoBackupSettingsModal')">Отмена</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <script>
     window.allCourses = @json($courses->map(fn($c) => ['id' => (string)$c->id, 'name' => $c->name]));
@@ -212,7 +255,13 @@
             .then(response => response.json())
             .then(data => {
                 document.getElementById('edit_group_name').value = data.name;
-                document.getElementById('edit_group_size').value = data.size;
+                // Преподаватель
+                const teacherSelect = document.getElementById('edit_group_teacher');
+                if (teacherSelect) {
+                    for (let i = 0; i < teacherSelect.options.length; i++) {
+                        teacherSelect.options[i].selected = (teacherSelect.options[i].value === String(data.teacher_id));
+                    }
+                }
                 let selectedIds = [];
                 if (Array.isArray(data.courses_json)) {
                     data.courses_json.forEach(val => {
@@ -258,7 +307,7 @@
             });
     }
     function openCreateGroupModal() {
-        document.getElementById('createGroupModal').style.display = 'block';
+        document.getElementById('createGroupModal').style.display = 'flex';
         // Инициализация Select2 для мультиселекта курсов (если ещё не инициализирован)
         const select = document.getElementById('group_courses');
         if (select) {
@@ -277,7 +326,7 @@
         }
     }
     function openCreateCourseModal() {
-        document.getElementById('createCourseModal').style.display = 'block';
+        document.getElementById('createCourseModal').style.display = 'flex';
         // Группы
         const selectGroups = document.getElementById('access_groups');
         if (selectGroups) {
@@ -308,19 +357,15 @@
         }
     }
     function openDeleteGroupModal() {
-        document.getElementById('deleteGroupModal').style.display = 'block';
+        document.getElementById('deleteGroupModal').style.display = 'flex';
     }
     function openDeleteCourseModal() {
-        document.getElementById('deleteCourseModal').style.display = 'block';
+        document.getElementById('deleteCourseModal').style.display = 'flex';
     }
     
     // Функции для редактирования
-    window.openEditGroupsModal = function() {
-        document.getElementById('editGroupModal').style.display = 'block';
-        window.loadGroupData();
-    }
     function openEditCoursesModal() {
-        document.getElementById('editCourseModal').style.display = 'block';
+        document.getElementById('editCourseModal').style.display = 'flex';
         // Группы
         const selectGroups = document.getElementById('edit_access_groups');
         if (selectGroups) {
@@ -359,10 +404,6 @@
     function openNotificationSettingsModal() {
         console.log('Функция настроек уведомлений будет реализована позже');
     }
-    function openRestoreModal() {
-        document.getElementById('restoreBackupModal').style.display = 'block';
-        loadBackupsList();
-    }
     
     function loadBackupsList() {
         fetch('/management/backups-list', {
@@ -386,17 +427,16 @@
     
     function displayBackupsList(backups) {
         const container = document.getElementById('backupsList');
-        
         if (backups.length === 0) {
             container.innerHTML = '<p>Резервные копии не найдены</p>';
             return;
         }
-        
         let html = '<div class="backup-items">';
         backups.forEach((backup, index) => {
             const date = new Date(backup.created_at).toLocaleString('ru-RU');
             html += `
-                <div class="backup-item">
+                <div class="backup-item" style="display:flex;align-items:center;justify-content:space-between;gap:10px;position:relative;">
+                    <div style="flex:1;">
                     <input type="radio" name="selected_backup" id="backup_${index}" value="${backup.name}">
                     <label for="backup_${index}">
                         <strong>${backup.name}</strong><br>
@@ -404,11 +444,55 @@
                         <small>Размер: ${backup.size}</small><br>
                         <small>Таблиц: ${backup.tables_count}</small>
                     </label>
+                    </div>
+                    ${index !== 0 ? `<span title='Удалить' style='cursor:pointer;font-size:22px;color:var(--danger-color);user-select:none;margin-left:10px;line-height:1;' onclick="deleteBackupByName('${encodeURIComponent(backup.name)}', this)">&times;</span>` : ''}
                 </div>
             `;
         });
         html += '</div>';
         container.innerHTML = html;
+    }
+
+    let pendingDeleteBackup = null;
+    function deleteBackupByName(backupName, btn) {
+        backupName = decodeURIComponent(backupName);
+        pendingDeleteBackup = { name: backupName, btn: btn };
+        document.getElementById('confirmDeleteBackupText').innerHTML = `Вы уверены, что хотите удалить резервную копию <b>${backupName}</b>? Это действие необратимо!`;
+        document.getElementById('confirmDeleteBackupModal').style.display = 'flex';
+        // Назначаем обработчик каждый раз при открытии
+        var confirmBtn = document.getElementById('confirmDeleteBackupBtn');
+        if (confirmBtn) {
+            confirmBtn.onclick = function() {
+                if (!pendingDeleteBackup) return;
+                const { name, btn } = pendingDeleteBackup;
+                btn.disabled = true;
+                fetch('/management/delete-backup', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ backup_name: name })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        closeModal('confirmDeleteBackupModal');
+                        alert('Резервная копия успешно удалена!');
+                        loadBackupsList();
+                    } else {
+                        alert('Ошибка при удалении: ' + (data.message || 'Неизвестная ошибка'));
+                        btn.disabled = false;
+                    }
+                })
+                .catch(error => {
+                    alert('Ошибка при удалении резервной копии: ' + error);
+                    btn.disabled = false;
+                });
+                pendingDeleteBackup = null;
+            };
+            
+        }
     }
     
     function restoreSelectedBackup() {
@@ -444,10 +528,6 @@
                 console.log('Ошибка при восстановлении резервной копии');
             });
         }
-    }
-    
-    function openBackupSettingsModal() {
-        console.log('Функция настроек автоматического бэкапа будет реализована позже');
     }
     
     function createBackup() {
@@ -547,7 +627,7 @@
         if (btn) {
             btn.addEventListener('click', function(e) {
                 e.preventDefault();
-                window.openEditGroupsModal();
+                openEditGroupsModal();
             });
         }
     });
@@ -579,6 +659,94 @@
                         $(selectTeachers).trigger('change');
                     }
                 }
+            });
+    }
+    function deleteSelectedBackup() {
+        const selectedBackup = document.querySelector('input[name="selected_backup"]:checked');
+        if (!selectedBackup) {
+            alert('Пожалуйста, выберите резервную копию для удаления');
+            return;
+        }
+        if (!confirm('Вы уверены, что хотите удалить выбранную резервную копию? Это действие необратимо!')) {
+            return;
+        }
+        const backupName = selectedBackup.value;
+        fetch('/management/delete-backup', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ backup_name: backupName })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Резервная копия успешно удалена!');
+                loadBackupsList();
+            } else {
+                alert('Ошибка при удалении: ' + (data.message || 'Неизвестная ошибка'));
+            }
+        })
+        .catch(error => {
+            alert('Ошибка при удалении резервной копии: ' + error);
+        });
+    }
+    function openEditGroupsModal() {
+        document.getElementById('editGroupModal').style.display = 'flex';
+        setTimeout(function() {
+            window.loadGroupData();
+        }, 0);
+    }
+    function openRestoreModal() {
+        document.getElementById('restoreBackupModal').style.display = 'flex';
+        loadBackupsList();
+    }
+    function openBackupSettingsModal() {
+        // Получить текущие настройки с сервера (AJAX)
+        fetch('/management/auto-backup-settings', {
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            }
+        })
+        .then(r => r.json())
+        .then(data => {
+            document.getElementById('autoBackupEnabled').checked = !!data.enabled;
+            document.getElementById('autoBackupPeriod').value = data.period || 'daily';
+            document.getElementById('autoBackupTime').value = data.time || '03:00';
+            document.getElementById('autoBackupSettingsModal').style.display = 'flex';
+        })
+        .catch(() => {
+            // Если ошибка — открыть с дефолтными значениями
+            document.getElementById('autoBackupEnabled').checked = false;
+            document.getElementById('autoBackupPeriod').value = 'daily';
+            document.getElementById('autoBackupTime').value = '03:00';
+            document.getElementById('autoBackupSettingsModal').style.display = 'flex';
+        });
+    }
+    function saveAutoBackupSettings() {
+        const enabled = document.getElementById('autoBackupEnabled').checked;
+        const period = document.getElementById('autoBackupPeriod').value;
+        const time = document.getElementById('autoBackupTime').value;
+        fetch('/management/auto-backup-settings', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ enabled, period, time })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                alert('Настройки автосоздания бэкапов сохранены!');
+                closeModal('autoBackupSettingsModal');
+            } else {
+                alert('Ошибка: ' + (data.message || 'Не удалось сохранить настройки.'));
+            }
+        })
+        .catch(() => {
+            alert('Ошибка при сохранении настроек.');
             });
     }
     </script>

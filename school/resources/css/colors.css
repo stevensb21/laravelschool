@@ -14,6 +14,7 @@
     --progress-fill: #6E0104;      /* Оранжевый */
     --link-color: #131936;         /* Розовый */
     --link-hover: #383E33;         /* Бирюзовый */
+    --text-color: #718096;
     /* Остальные переменные оставляю без изменений */
     --text-color: #020202;
     --background-color: #FBFBFB;
@@ -35,8 +36,8 @@
     --btn-primary-hover: #383E33;
     --btn-secondary: #383E33;
     --btn-secondary-hover: #131936;
-    --btn-accent: #EDEDED;
-    --btn-accent-hover: #FBFBFB;
+    --btn-accent: #383E33;
+    --btn-accent-hover: #6E0104;
     --input-bg: #FBFBFB;
     --input-border: #EDEDED;
     --input-focus: #6E0104;

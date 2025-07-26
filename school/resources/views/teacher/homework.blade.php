@@ -15,13 +15,13 @@
         
         <main class="content">
             @if(isset($isAdmin) && $isAdmin)
-                <div class="admin-header" style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                <div class="admin-header" >
                     <h2 style="margin: 0; color: #333;">Домашние задания преподавателя: {{ $teacher->fio }}</h2>
                     <a href="{{ route('admin.teacher.profile', $teacher->users_id) }}" class="action-btn" style="background: #2563eb; color: white; padding: 8px 16px; border-radius: 4px; text-decoration: none; font-size: 14px;">Назад к профилю</a>
                 </div>
             @endif
             
-            <div class="homework-container">
+            <div class="homework-container" >
                 <div class="homework-header">
                     <h2>@if(isset($isAdmin) && $isAdmin)Домашние задания преподавателя{{ $teacher->fio }}@elseУправление домашними заданиями@endif</h2>
 
@@ -153,7 +153,7 @@
         const tomorrowStr = tomorrow.toISOString().split('T')[0];
         document.getElementById('newDeadline').min = tomorrowStr;
         
-        document.getElementById('extendModal').style.display = 'block';
+        document.getElementById('extendModal').style.display = 'flex';
     }
 
     function closeExtendModal() {
@@ -214,7 +214,7 @@
     function openDeleteModal(homeworkId, homeworkName) {
         homeworkToDelete = homeworkId;
         document.getElementById('deleteHomeworkName').textContent = homeworkName;
-        document.getElementById('deleteModal').style.display = 'block';
+        document.getElementById('deleteModal').style.display = 'flex';
     }
 
     function closeDeleteModal() {

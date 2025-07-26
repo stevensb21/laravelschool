@@ -142,7 +142,7 @@
 <!-- Модальное окно для отклонения отзыва -->
 <div id="rejectModal" class="modal" style="display: none;">
     <div class="modal-content">
-        <span class="close" onclick="closeRejectModal()">&times;</span>
+        <span class="close" onclick="closeRejectModal()" style="color:var(--error-color);font-size:22px;position:absolute;right:18px;top:12px;cursor:pointer;">&times;</span>
         <h3>Отклонить отзыв</h3>
         <form id="rejectForm" method="POST">
             @csrf
@@ -161,7 +161,7 @@
 <!-- Модальное окно подтверждения удаления -->
 <div id="deleteModal" class="modal" style="display:none;">
     <div class="modal-content">
-        <span class="close" onclick="hideDeleteReviewModal()">&times;</span>
+        <span class="close" onclick="hideDeleteReviewModal()" style="color:var(--error-color);font-size:22px;position:absolute;right:18px;top:12px;cursor:pointer;">&times;</span>
         <h3>Подтвердите удаление</h3>
         <p>Вы действительно хотите удалить этот отзыв?</p>
         <div class="form-actions">
@@ -199,7 +199,7 @@ function openRejectModal(reviewId) {
     const modal = document.getElementById('rejectModal');
     const form = document.getElementById('rejectForm');
     form.action = `/admin/reviews/${reviewId}/reject`;
-    modal.style.display = 'block';
+    modal.style.display = 'flex';
 }
 
 function closeRejectModal() {
