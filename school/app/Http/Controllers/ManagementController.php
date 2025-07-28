@@ -209,6 +209,9 @@ class ManagementController extends Controller
     public function deleteGroup(Request $request) {
         $group = Group::where('name', $request->group_id)->firstOrFail();
         $groupName = $group->name;
+        
+        // Удаляем группу - чат группы и все связанные данные удалятся автоматически
+        // благодаря каскадному удалению в базе данных
         $group->delete();
 
         return redirect()->back()->with('success', "Группа '{$groupName}' успешно удалена");

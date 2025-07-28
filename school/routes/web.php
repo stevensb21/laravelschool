@@ -94,6 +94,18 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/management/delete-backup', [App\Http\Controllers\ManagementController::class, 'deleteBackup'])->name('management.deleteBackup');
     Route::get('/management/auto-backup-settings', [App\Http\Controllers\ManagementController::class, 'getAutoBackupSettings']);
     Route::post('/management/auto-backup-settings', [App\Http\Controllers\ManagementController::class, 'saveAutoBackupSettings']);
+    
+    // Маршруты для управления группами студентов
+    Route::get('/admin/student/{id}/groups', [App\Http\Controllers\StudentGroupController::class, 'index'])->name('admin.student.groups');
+    Route::post('/admin/student/{id}/add-to-group', [App\Http\Controllers\StudentGroupController::class, 'addToGroup'])->name('admin.student.add-to-group');
+    Route::post('/admin/student/{id}/remove-from-group', [App\Http\Controllers\StudentGroupController::class, 'removeFromGroup'])->name('admin.student.remove-from-group');
+    Route::post('/admin/student/{id}/set-primary-group', [App\Http\Controllers\StudentGroupController::class, 'setPrimaryGroup'])->name('admin.student.set-primary-group');
+    
+    Route::get('/admin/group/{id}/students', [App\Http\Controllers\StudentGroupController::class, 'groupStudents'])->name('admin.group.students');
+    Route::post('/admin/group/{id}/add-student', [App\Http\Controllers\StudentGroupController::class, 'addStudentToGroup'])->name('admin.group.add-student');
+    Route::post('/admin/group/{id}/remove-student', [App\Http\Controllers\StudentGroupController::class, 'removeStudentFromGroup'])->name('admin.group.remove-student');
+    
+    Route::get('/admin/groups', [App\Http\Controllers\StudentGroupController::class, 'groupsList'])->name('admin.groups.list');
 });
 
 Route::get('/', [HomeController::class,'index']);

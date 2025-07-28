@@ -10,12 +10,112 @@
     margin: 0;
 }
 
+/* Стили для мобильной версии календаря */
+.calendar-mobile {
+    display: none;
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 16px;
+    margin: 16px 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
 
+#weekday-select {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 12px;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    font-size: 16px;
+}
 
+.mobile-day-schedule h4 {
+    margin: 0 0 10px 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: #22223b;
+}
 
+.mobile-lesson-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
 
+.mobile-lesson-item {
+    background: #fff;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    padding: 10px 12px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
 
+.lesson-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+}
+
+.lesson-time {
+    font-weight: bold;
+    color: #384034;
+}
+
+.lesson-title {
+    font-size: 16px;
+    color: #22223b;
+}
+
+.lesson-teacher, .lesson-group {
+    font-size: 14px;
+    color: #6c757d;
+}
+
+.no-lessons {
+    text-align: center;
+    color: #b0b0b0;
+    font-size: 16px;
+    margin: 24px 0;
+}
+
+/* Мобильная версия: только на телефонах (до 600px) */
+@media (max-width: 600px) {
+    .grid-container-calendar { 
+        display: none !important; 
+    }
+    .calendar-mobile { 
+        display: block; 
+    }
+}
+
+/* JavaScript для переключения дней */
 </style>
+
+<script>
+function showScheduleForDay(day) {
+    // Скрываем все расписания
+    const schedules = document.querySelectorAll('.mobile-day-schedule');
+    schedules.forEach(schedule => {
+        schedule.style.display = 'none';
+    });
+    
+    // Показываем выбранное расписание
+    const selectedSchedule = document.querySelector(`[data-day="${day}"]`);
+    if (selectedSchedule) {
+        selectedSchedule.style.display = 'block';
+    }
+}
+
+// Показываем первый день по умолчанию
+document.addEventListener('DOMContentLoaded', function() {
+    showScheduleForDay(1);
+});
+</script>
 
 
 @endsection
@@ -170,6 +270,57 @@ $colorVars = [
         }
     }
     ?>
+</div>
+
+<!-- Мобильная версия календаря -->
+<div class="calendar-mobile">
+    <select id="weekday-select" onchange="showScheduleForDay(this.value)">
+        @php
+            $weekdays = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье'];
+        @endphp
+        @foreach($weekdays as $i => $day)
+            <option value="{{ $i+1 }}">{{ $day }}</option>
+        @endforeach
+    </select>
+    @foreach($weekdays as $i => $day)
+        @php
+            // Собираем все уникальные уроки на этот день
+            $uniqueLessons = [];
+            foreach ($data['lessons'] as $lesson) {
+                if (date('N', strtotime($lesson->date_)) == $i+1) {
+                    $uniqueLessons[] = $lesson;
+                }
+            }
+            // Сортируем по времени начала
+            usort($uniqueLessons, function($a, $b) {
+                return strcmp($a->start_time, $b->start_time);
+            });
+            $hasLessons = count($uniqueLessons) > 0;
+        @endphp
+        <div class="mobile-day-schedule" data-day="{{ $i+1 }}" style="display: none;">
+            <h4>{{ $day }}</h4>
+            @if($hasLessons)
+                <ul class="mobile-lesson-list">
+                    @foreach ($uniqueLessons as $lesson)
+                        <li class="mobile-lesson-item">
+                            <div class="lesson-info">
+                                <span class="lesson-time">{{ substr($lesson->start_time,0,5) }}-{{ substr($lesson->end_time,0,5) }}</span>
+                                <span class="lesson-title">{{ $lesson->subject ?? $lesson->name_group ?? '' }}</span>
+                                @if(isset($lesson->teacher))
+                                    <span class="lesson-teacher">{{ $lesson->teacher }}</span>
+                                @endif
+                                @if(isset($lesson->name_group))
+                                    <span class="lesson-group">{{ $lesson->name_group }}</span>
+                                @endif
+                            </div>
+                        </li>
+                    @endforeach
+                </ul>
+            @else
+                <div class="no-lessons">Уроков сегодня нет</div>
+            @endif
+        </div>
+    @endforeach
 </div>
 </div>
         </div>

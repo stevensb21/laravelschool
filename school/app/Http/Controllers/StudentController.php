@@ -99,7 +99,7 @@ class StudentController extends Controller
                 'email.unique' => 'Студент с таким email уже существует',
                 'femaleparent.required' => 'ФИО родителя обязательно для заполнения',
                 'numberparent.required' => 'Номер телефона родителя обязателен для заполнения',
-                'group.required' => 'Выберите группу',
+                'group.required' => 'Выберите основную группу',
                 'datebirthday.required' => 'Дата рождения обязательна для заполнения',
             ]);
 
@@ -153,15 +153,20 @@ class StudentController extends Controller
                 'email' => $validated['email'],
                 'numberparent' => $validated['numberparent'],
                 'femaleparent' => $validated['femaleparent'],
-                'group_name' => $validated['group'],
+                'group_name' => $validated['group'], // Оставляем для обратной совместимости
                 'subjects' => $courseNames,
                 'achievements' => $achievements,
             ]);
 
-            // Если группа изменилась — удалить из чата старой группы
+            // Обновляем связующую таблицу групп
+            // Если основная группа изменилась, обновляем её
             if ($oldGroupName !== $validated['group']) {
+                // Удаляем старую основную группу
                 $oldGroup = Group::where('name', $oldGroupName)->first();
                 if ($oldGroup) {
+                    $student->removeFromGroup($oldGroup->id);
+                    
+                    // Удаляем из чата старой группы
                     $oldGroupChat = \App\Models\GroupChat::where('group_id', $oldGroup->id)->first();
                     if ($oldGroupChat) {
                         \App\Models\UserChat::where('group_chat_id', $oldGroupChat->id)
@@ -169,6 +174,9 @@ class StudentController extends Controller
                             ->delete();
                     }
                 }
+                
+                // Добавляем новую основную группу
+                $student->addToGroup($group->id, true);
             }
 
             // Добавляем студента в чат группы, если он ещё не добавлен
@@ -229,7 +237,7 @@ class StudentController extends Controller
                 'email.unique' => 'Студент с таким email уже существует',
                 'femaleparent.required' => 'ФИО родителя обязательно для заполнения',
                 'numberparent.required' => 'Номер телефона родителя обязателен для заполнения',
-                'group.required' => 'Выберите группу',
+                'group.required' => 'Выберите основную группу',
                 'datebirthday.required' => 'Дата рождения обязательна для заполнения',
                 'datebirthday.before_or_equal' => 'Студенту должно быть минимум 1 год!',
             ]);
@@ -275,7 +283,7 @@ class StudentController extends Controller
                 'group_id' => $group->id
             ]);
 
-            // Создаем преподавателя
+            // Создаем студента
             $student = Student::create([
                 'users_id' => $user->id,
                 'fio' => $validated['fio'],
@@ -286,12 +294,15 @@ class StudentController extends Controller
                 'email' => $validated['email'],
                 'numberparent' => $validated['numberparent'],
                 'femaleparent' => $validated['femaleparent'],
-                'group_name' => $validated['group'],
+                'group_name' => $validated['group'], // Оставляем для обратной совместимости
                 'subjects' => $courseNames,
                 'average_performance' => 0,
                 'average_attendance' => 0,
                 'average_exam_score' => 0
             ]);
+
+            // Добавляем студента в группу через связующую таблицу
+            $student->addToGroup($group->id, true); // Делаем эту группу основной
 
             // Добавляем студента в чат группы, если он ещё не добавлен
             $groupChat = \App\Models\GroupChat::where('group_id', $group->id)->first();
@@ -364,6 +375,9 @@ class StudentController extends Controller
 
             // Сохраняем имя для сообщения
             $studentName = $student->fio;
+
+            // Удаляем студента из всех чатов групп
+            $this->removeStudentFromAllGroupChats($student);
 
             // Удаляем студента
             $student->delete();
@@ -476,13 +490,17 @@ class StudentController extends Controller
             abort(403, 'Доступ запрещён');
         }
         $student = $user->student;
-        $groupId = $student->group->id;
+        
+        // Получаем ID всех групп студента
+        $groupIds = $student->groups->pluck('id')->toArray();
+        
         $homeworks = \App\Models\HomeWork::with(['course', 'teacher', 'group', 'homeWorkStudents' => function($q) use ($student) {
             $q->where('student_id', $student->id);
         }])
-        ->where('groups_id', $groupId)
+        ->whereIn('groups_id', $groupIds)
         ->orderBy('deadline', 'desc')
         ->get();
+        
         return view('student.homework', compact('homeworks', 'student'));
     }
     public function grades() {
@@ -832,5 +850,27 @@ class StudentController extends Controller
         $attendedLessons = $lessonStats->where('attendance', true)->count();
         $student->average_attendance = $totalLessons > 0 ? round($attendedLessons / $totalLessons * 100, 1) : 0;
         return view('admin.student', compact('student', 'reviews'));
+    }
+
+    private function removeStudentFromAllGroupChats(Student $student)
+    {
+        try {
+            // Получаем все группы студента через связующую таблицу
+            $studentGroups = $student->groups;
+            
+            foreach ($studentGroups as $group) {
+                $groupChat = \App\Models\GroupChat::where('group_id', $group->id)->first();
+                if ($groupChat) {
+                    \App\Models\UserChat::where('group_chat_id', $groupChat->id)
+                        ->where('user_id', $student->users_id)
+                        ->delete();
+                }
+            }
+        } catch (\Exception $e) {
+            \Log::error('Ошибка при удалении студента из чатов групп', [
+                'student_id' => $student->id,
+                'error' => $e->getMessage()
+            ]);
+        }
     }
 }

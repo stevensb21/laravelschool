@@ -169,6 +169,30 @@ nav a:hover {
         left: 0;
         z-index: 1001;
         animation: dropdown-fade 0.2s;
+        max-height: calc(100vh - var(--mobile-nav-height));
+        overflow-y: auto;
+        overflow-x: hidden;
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none; /* IE and Edge */
+    }
+    
+    /* Полностью скрываем скроллбар в мобильной версии */
+    .sidebar-links::-webkit-scrollbar {
+        display: none;
+        width: 0;
+        background: transparent;
+    }
+    
+    .sidebar-links::-webkit-scrollbar-track {
+        display: none;
+    }
+    
+    .sidebar-links::-webkit-scrollbar-thumb {
+        display: none;
+    }
+    
+    .sidebar-links::-webkit-scrollbar-thumb:hover {
+        display: none;
     }
     .sidebar-links.open {
         display: flex;
@@ -189,6 +213,12 @@ nav a:hover {
         width: 80px;
         height: 80px;
     }
+    
+    /* Скрываем элемент shoulders в мобильной навигации */
+    .shoulders {
+        display: none !important;
+    }
+    
     .exist {
         margin: 16px 24px 0 24px;
         width: calc(100% - 48px);
@@ -209,9 +239,15 @@ nav a:hover {
     }
     .sidebar-links {
         padding: 0 0 8px 0;
+        max-height: calc(100vh - var(--mobile-nav-height) - 16px);
     }
     .photoNav {
         width: 60px;
         height: 60px;
+    }
+    
+    /* Скрываем элемент shoulders на очень маленьких экранах */
+    .shoulders {
+        display: none !important;
     }
 }

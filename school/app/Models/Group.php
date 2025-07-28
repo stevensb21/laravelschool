@@ -37,8 +37,53 @@ class Group extends Model
         return $this->courses()->pluck('name')->toArray();
     }
 
+    // Старое отношение для обратной совместимости
     public function students()
     {
         return $this->hasMany(Student::class, 'group_name', 'name');
+    }
+    
+    // Новые отношения для множественных студентов
+    public function allStudents()
+    {
+        return $this->belongsToMany(Student::class, 'student_group', 'group_id', 'student_id')
+                    ->withPivot('is_primary')
+                    ->withTimestamps();
+    }
+    
+    public function primaryStudents()
+    {
+        return $this->belongsToMany(Student::class, 'student_group', 'group_id', 'student_id')
+                    ->wherePivot('is_primary', true)
+                    ->withTimestamps();
+    }
+    
+    // Методы для работы со студентами
+    public function addStudent($studentId, $isPrimary = false)
+    {
+        return $this->allStudents()->attach($studentId, ['is_primary' => $isPrimary]);
+    }
+    
+    public function removeStudent($studentId)
+    {
+        return $this->allStudents()->detach($studentId);
+    }
+    
+    // Получить количество студентов в группе
+    public function getStudentsCount()
+    {
+        return $this->allStudents()->count();
+    }
+    
+    // Получить количество студентов, для которых это основная группа
+    public function getPrimaryStudentsCount()
+    {
+        return $this->primaryStudents()->count();
+    }
+    
+    // Отношение к чату группы
+    public function groupChat()
+    {
+        return $this->hasOne(GroupChat::class);
     }
 }

@@ -53,9 +53,9 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="edit_group">Выбор группы:</label>
+                    <label for="edit_group">Основная группа:</label>
                     <select id="edit_group" name="group" required>
-                        <option value="">Выберите группу</option>
+                        <option value="">Выберите основную группу</option>
                         @foreach ($allGroups as $group):
                             <option value="{{ $group }}" 
                             {{ request('group') == $group ? 'selected' : '' }}>
@@ -63,6 +63,9 @@
                             </option>
                         @endforeach
                     </select>
+                    <small style="color: var(--text-secondary); font-size: 12px; margin-top: 4px; display: block;">
+                        Основная группа определяет основные предметы студента. Дополнительные группы можно добавить через кнопку "Группы" в списке студентов.
+                    </small>
                 </div>
                 
                 <div class="form-group">

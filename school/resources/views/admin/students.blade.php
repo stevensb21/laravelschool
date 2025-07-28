@@ -99,7 +99,25 @@
                         <?php foreach ($students as $student): ?>
                             <tr>
                                 <td><?php echo $student->fio; ?></td>
-                                <td><?php echo $student->group_name; ?></td>
+                                <td>
+                                    <?php 
+                                    // Получаем все группы студента
+                                    $studentGroups = $student->groups;
+                                    if ($studentGroups && $studentGroups->count() > 0) {
+                                        $groupNames = [];
+                                        foreach ($studentGroups as $group) {
+                                            $groupName = $group->name;
+                                            if ($group->pivot->is_primary) {
+                                                $groupName .= ' (осн.)';
+                                            }
+                                            $groupNames[] = $groupName;
+                                        }
+                                        echo implode(', ', $groupNames);
+                                    } else {
+                                        echo $student->group_name ?? 'Не указана';
+                                    }
+                                    ?>
+                                </td>
                                 <td><?php echo $student->average_performance; ?></td>
                                 <td><?php echo $student->average_attendance; ?></td>
                                 <td><span class="status active">Активный</span></td>
@@ -117,6 +135,7 @@
                                     'achievements' => implode("\n", is_array($student->achievements) ? $student->achievements : explode(',', trim($student->achievements, '{}')))
                                 ])) ?>)">Редактировать</button>
                                 <button class="view-profile" onclick="window.location.href='{{ route('admin.student.view', $student->id) }}'">Профиль</button>
+                                <button class="groups-btn" onclick="window.location.href='{{ route('admin.student.groups', $student->id) }}'" style="background: var(--info-color); color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; margin: 2px;">Группы</button>
                                 <button class="schedule-btn" onclick="window.location.href='{{ route('calendar', ['group' => $student['group_name']]) }}'">Расписание</button>
                                 <button class="delete-btn" onclick="openDeleteStudentModal(<?= htmlspecialchars(json_encode([
                                     'users_id' => $student->users_id,

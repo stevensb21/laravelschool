@@ -78,30 +78,41 @@ class CalendarController extends Controller
             return view('teacher.calendar', compact('data'));
         } else { // student
             $student = $user->student;
-            $group = $student->group_name;
-            $groupModel = \App\Models\Group::where('name', $group)->first();
-            $subjects = [];
-            if ($groupModel) {
-                $subjects = $groupModel->courses()->pluck('name')->toArray();
-            }
-            $teachers = Teacher::whereJsonContains('subjects', $student->subjects)->get(); // или по group_name
+            
+            // Получаем все группы студента
+            $studentGroups = $student->groups;
+            $groupNames = $studentGroups->pluck('name')->toArray();
+            
+            // Получаем все предметы из всех групп студента
+            $subjects = $student->getAllSubjects();
+            
+            // Получаем преподавателей для всех предметов студента
+            $teachers = Teacher::whereJsonContains('subjects', $subjects)->get();
+            
+            // Получаем уроки для всех групп студента
             $query = \App\Models\Calendar::whereBetween('date_', [session('monday'), session('sunday')])
-                ->where('name_group', $group);
+                ->whereIn('name_group', $groupNames);
+                
             if (request('teacher')) {
                 $query->where('teacher', request('teacher'));
             }
             if (request('subject')) {
                 $query->where('subject', request('subject'));
             }
+            if (request('group')) {
+                $query->where('name_group', request('group'));
+            }
+            
             $lessons = $query->get();
+            
             $data = [
                 'lessons' => $lessons,
-                'groups' => [Group::where('name', $group)->first()],
+                'groups' => $studentGroups,
                 'subjects' => $subjects,
                 'teachers' => $teachers,
                 'user' => $user,
                 'schedule' => $this->buildShedule($lessons),
-                'selectedGroup' => $group,
+                'selectedGroup' => request('group', ''),
                 'selectedSubject' => request('subject', ''),
                 'selectedTeacher' => request('teacher', ''),
                 'isAdmin' => false,

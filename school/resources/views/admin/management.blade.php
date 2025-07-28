@@ -116,6 +116,7 @@
                         <button class="action-btn" onclick="openCreateGroupModal()">Создать группу</button>
                         <button class="action-btn" onclick="openEditGroupsModal()">Редактировать группы</button>
                         <button class="action-btn" onclick="openDeleteGroupModal()">Удалить группу</button>
+                        <button class="action-btn" onclick="window.location.href='{{ route('admin.groups.list') }}'">Просмотр студентов групп</button>
                         <div class="groups-list">
                             <h4>Существующие группы ({{ $totalGroups }})</h4>
                             <ul>
