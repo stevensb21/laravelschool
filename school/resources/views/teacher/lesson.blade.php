@@ -82,8 +82,7 @@
 body {
     font-family: 'Source Serif Pro', serif;
     background:  #d5d5d5;
-    margin: 0;
-    padding: 0;
+   
 }
 
 .content {

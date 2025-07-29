@@ -34,8 +34,7 @@ $colorVars = [
 ];
 ?>
  
-
-<div class="container">
+    <div class="container">
     <main class="content">
         <div class="calendar-container">
             <div class="calendar-header">
@@ -218,7 +217,7 @@ $colorVars = [
     }
     ?>
 </div>
-</div>
+
 
 <!-- Модальное окно для добавления урока -->
 <div id="addLessonModal" class="lesson-modal" style="display: none;">
@@ -282,6 +281,8 @@ $colorVars = [
             </div>
         </form>
     </div>
+</div>
+</div>
 </div>
 
 <script>

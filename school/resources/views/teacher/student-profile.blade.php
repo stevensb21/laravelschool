@@ -4,6 +4,7 @@
 @endsection
 
 @include('teacher.nav')
+<div class="container">
 <main class="content">
     <div class="profile-section">
         <h2>Информация о студенте</h2>
@@ -83,3 +84,4 @@
         </div>
     @endif
 </main> 
+</div>

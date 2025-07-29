@@ -63,10 +63,10 @@
                                         @csrf
                                         <label style="background:var(--bg-light);padding:8px 16px;border-radius:6px;cursor:pointer;font-size:0.98rem;display:flex;align-items:center;gap:10px;">
                                             <input type="file" name="file" required style="display:none;" onchange="this.parentNode.querySelector('.file-name').innerText = this.files[0]?.name || 'Файл не выбран'">
-                                            <span>Выберите файл</span>
-                                            <span class="file-name" style="color:var(--text-light);">Файл не выбран</span>
+                                            <span class="file-name" style="color:var(--btn-primary);max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;">Файл не выбран</span>
+                                            
                                         </label>
-                                        <button type="submit" style="background:var(--btn-primary);color:var(--btn-text);padding:8px 18px;border:none;border-radius:6px;font-size:1rem;cursor:pointer;transition:background 0.2s;">Сдать работу</button>
+                                        <button type="submit" style="background:var(--btn-primary);color:var(--text-light);padding:8px 18px;border:none;border-radius:6px;font-size:1rem;cursor:pointer;transition:background 0.2s;">Сдать работу</button>
                                     </form>
                                 @endif
                             </div>

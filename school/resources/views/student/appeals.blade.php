@@ -205,9 +205,10 @@
     cursor: pointer;
     font-size: 14px;
     font-weight: 500;
-    color: var(--text-muted);
+    color: var(--text-primary); 
     border-bottom: 2px solid transparent;
     transition: all 0.3s;
+
 }
 
 .tab-btn:hover {
@@ -238,11 +239,7 @@
     opacity: 0.85;
 }
 
-@media (max-width: 600px) {
-  .students-container {
-    margin: 20px 0 0 0 !important;
-  }
-}
+
 </style>
 @endsection
 

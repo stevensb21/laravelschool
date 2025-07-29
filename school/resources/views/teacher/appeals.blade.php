@@ -183,11 +183,7 @@
     opacity: 0.85;
 }
 
-@media (max-width: 600px) {
-  .students-container {
-    margin: 20px 0 0 0 !important;
-  }
-}
+
 </style>
 
 

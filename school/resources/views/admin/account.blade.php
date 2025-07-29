@@ -1,8 +1,9 @@
 @extends('admin.layouts.head')
 @section('head')
+@include('admin.layouts.adminNav')
 <div class="container">
 
-    @include('admin.layouts.adminNav')
+   
         
     <main class="content">
         <div class="admin-dashboard">

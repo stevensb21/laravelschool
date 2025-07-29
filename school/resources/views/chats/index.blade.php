@@ -13,8 +13,8 @@
 
 <div class="container">
     <main class="content">
-        <div class="index" style="background:var(--card-bg);border-radius:12px;box-shadow:0 2px 8px var(--card-shadow);padding:24px;max-width:900px;margin:0 auto;">
-            <h2 style="text-align:center; margin-bottom: 30px;">Чаты групп</h2>
+        <div class="index" style="background:var(--card-bg);border-radius:12px;box-shadow:0 2px 8px var(--card-shadow);padding:24px;margin:0 auto;">
+            <h2 style=" margin-bottom: 30px;">Чаты групп</h2>
             @if($user->role === 'admin')
                 @php $hasTeachersChat = \App\Models\GroupChat::where('name', 'Чат с преподавателями')->exists(); @endphp
                 @if(!$hasTeachersChat)

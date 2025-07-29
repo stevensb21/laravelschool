@@ -186,8 +186,7 @@
 body {
     font-family: 'Source Serif Pro', serif;
     background:  #d5d5d5;    
-    margin: 0;
-    padding: 0;
+    
 }
 
 .content {
@@ -199,7 +198,7 @@ body {
 
 .lesson-container {
     max-width: 100%;
-    margin: 30px auto;
+    
     background-color: var(--card-bg);
     border-radius: 15px;
     padding: 30px;
@@ -519,7 +518,7 @@ body {
 
 @media (max-width: 768px) {
     .lesson-container {
-        margin: 20px auto;
+       
         padding: 20px;
         border-radius: 12px;
     }
@@ -566,11 +565,7 @@ body {
     }
 }
 
-@media (max-width: 1024px) {
-    body {  
-        padding-top: 50px;
-    }
-}
+
 </style>
 
 <script>
