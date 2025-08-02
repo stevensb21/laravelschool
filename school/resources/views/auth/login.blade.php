@@ -22,7 +22,7 @@ html, body {
 body {
     background-image: url('{{ asset('images/first_page.png') }}') !important;
     background-size: cover !important;
-    background-position: center !important;
+    background-position: center center !important;
     background-repeat: no-repeat !important;
     background-attachment: fixed !important;
     display: flex !important;
@@ -34,7 +34,7 @@ body {
 }
 
 /* Мобильная версия - используем вертикальное изображение */
-@media (max-width: 1200px) or (max-width: 768px) {
+@media (max-width: 1200px) {
     body {
         background-image: url('{{ asset('images/authback720х1080.png') }}') !important;
         background-size: cover !important;
@@ -70,8 +70,9 @@ body {
 /* Дополнительные стили для очень маленьких экранов */
 @media (max-width: 480px) {
     body {
-        background-position: center top !important;
-        background-size: 100% auto !important;
+        background-position: center center !important;
+        background-size: cover !important;
+        background-image: url('{{ asset('images/authback720х1080.png') }}') !important;
     }
     
     .site-title {
@@ -82,6 +83,15 @@ body {
     .container {
         margin: 10px !important;
         padding: 20px !important;
+    }
+}
+
+/* Стили для планшетов */
+@media (min-width: 481px) and (max-width: 768px) {
+    body {
+        background-image: url('{{ asset('images/authback720х1080.png') }}') !important;
+        background-size: cover !important;
+        background-position: center center !important;
     }
 }
 </style>
@@ -118,19 +128,28 @@ body {
 document.addEventListener('DOMContentLoaded', function() {
     if (window.innerWidth <= 1200) {
         const body = document.body;
-        const bgImage = '{{ asset('images/authback720х1080.png') }}';
         
-        // Создаем новый элемент изображения для предзагрузки
-        const img = new Image();
-        img.onload = function() {
-            body.style.backgroundImage = 'url(' + bgImage + ')';
+        // Сначала пробуем загрузить мобильное изображение
+        const mobileImage = new Image();
+        mobileImage.onload = function() {
+            body.style.backgroundImage = 'url({{ asset('images/authback720х1080.png') }})';
         };
-        img.src = bgImage;
-        
-        // Fallback если изображение не загрузилось
-        img.onerror = function() {
+        mobileImage.onerror = function() {
+            // Если мобильное изображение не загрузилось, используем основное
             body.style.backgroundImage = 'url({{ asset('images/first_page.png') }})';
         };
+        
+        // Устанавливаем таймаут для загрузки
+        const timeout = setTimeout(function() {
+            body.style.backgroundImage = 'url({{ asset('images/first_page.png') }})';
+        }, 3000); // 3 секунды таймаут
+        
+        mobileImage.onload = function() {
+            clearTimeout(timeout);
+            body.style.backgroundImage = 'url({{ asset('images/authback720х1080.png') }})';
+        };
+        
+        mobileImage.src = '{{ asset('images/authback720х1080.png') }}';
     }
 });
 </script>
