@@ -20,7 +20,7 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background-image: url('../images/first_page.png');
+    background-image: url('/images/first_page.png');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -41,7 +41,7 @@ body {
     }
     
     body {
-        background-image: url('../images/authback720х1080.png?v=4');
+        background-image: url('/images/authback720х1080.png?v=4');
         background-size: cover;
         background-position: center top;
         background-repeat: no-repeat;
