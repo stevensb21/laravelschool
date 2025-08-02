@@ -1,6 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
+<!-- Preload изображения для мобильных устройств -->
+<link rel="preload" href="{{ asset('images/authback720х1080.png?v=3') }}" as="image">
+
 <style>
 * {
     margin: 0 !important;
@@ -22,7 +25,7 @@ html, body {
 body {
     background-image: url('{{ asset('images/first_page.png') }}') !important;
     background-size: cover !important;
-    background-position: center center !important;
+    background-position: center top !important;
     background-repeat: no-repeat !important;
     background-attachment: fixed !important;
     display: flex !important;
@@ -33,14 +36,21 @@ body {
     width: 100% !important;
 }
 
-/* Мобильная версия - используем вертикальное изображение */
+/* Fallback для устройств без поддержки background-attachment: fixed */
+@supports not (background-attachment: fixed) {
+    body {
+        background-attachment: scroll !important;
+    }
+}
+
+/* Мобильная версия - исправляем все проблемы */
 @media (max-width: 1200px) {
     body {
-        background-image: url('{{ asset('man.jpg') }}') !important;
+        background-image: url('{{ asset('images/authback720х1080.png?v=3') }}') !important;
         background-size: cover !important;
-        background-position: center center !important;
+        background-position: center top !important;
         background-repeat: no-repeat !important;
-        background-attachment: fixed !important;
+        background-attachment: scroll !important; /* Убираем fixed для мобильных */
         background-color: #f5f5f5 !important;
         min-height: 100vh !important;
         width: 100% !important;
@@ -67,12 +77,13 @@ body {
     }
 }
 
-/* Дополнительные стили для очень маленьких экранов */
+/* Только для мелких экранов (< 480px) */
 @media (max-width: 480px) {
     body {
-        background-position: center center !important;
+        background-image: url('{{ asset('images/authback720х1080.png?v=3') }}') !important;
+        background-position: center top !important;
         background-size: cover !important;
-        background-image: url('{{ asset('images/authback720х1080.png?v=2') }}') !important;
+        background-attachment: scroll !important;
     }
     
     .site-title {
@@ -86,12 +97,13 @@ body {
     }
 }
 
-/* Стили для планшетов */
+/* Только для планшетов (481px — 768px) */
 @media (min-width: 481px) and (max-width: 768px) {
     body {
-        background-image: url('{{ asset('images/authback720х1080.png?v=2') }}') !important;
+        background-image: url('{{ asset('images/authback720х1080.png?v=3') }}') !important;
         background-size: cover !important;
-        background-position: center center !important;
+        background-position: center top !important;
+        background-attachment: scroll !important;
     }
 }
 </style>
@@ -124,32 +136,59 @@ body {
     </div>
 
 <script>
-// Принудительная перезагрузка фонового изображения на мобильных устройствах
+// Улучшенная загрузка фонового изображения на мобильных устройствах
 document.addEventListener('DOMContentLoaded', function() {
     if (window.innerWidth <= 1200) {
         const body = document.body;
+        const mobileImageUrl = '{{ asset('images/authback720х1080.png?v=3') }}';
+        const fallbackImageUrl = '{{ asset('images/first_page.png') }}';
         
-        // Сначала пробуем загрузить мобильное изображение
+        // Функция для установки фонового изображения
+        function setBackgroundImage(url) {
+            body.style.backgroundImage = 'url(' + url + ')';
+        }
+        
+        // Создаем изображение для предзагрузки
         const mobileImage = new Image();
-        mobileImage.onload = function() {
-            body.style.backgroundImage = 'url({{ asset('images/authback720х1080.png') }})';
-        };
-        mobileImage.onerror = function() {
-            // Если мобильное изображение не загрузилось, используем основное
-            body.style.backgroundImage = 'url({{ asset('images/first_page.png') }})';
-        };
         
-        // Устанавливаем таймаут для загрузки
+        // Устанавливаем таймаут
         const timeout = setTimeout(function() {
-            body.style.backgroundImage = 'url({{ asset('images/first_page.png') }})';
-        }, 3000); // 3 секунды таймаут
+            console.log('Таймаут загрузки мобильного изображения, используем fallback');
+            setBackgroundImage(fallbackImageUrl);
+        }, 5000); // 5 секунд таймаут
         
+        // Обработчик успешной загрузки
         mobileImage.onload = function() {
             clearTimeout(timeout);
-            body.style.backgroundImage = 'url({{ asset('images/authback720х1080.png') }})';
+            console.log('Мобильное изображение успешно загружено');
+            setBackgroundImage(mobileImageUrl);
         };
         
-        mobileImage.src = '{{ asset('images/authback720х1080.png') }}';
+        // Обработчик ошибки загрузки
+        mobileImage.onerror = function() {
+            clearTimeout(timeout);
+            console.log('Ошибка загрузки мобильного изображения, используем fallback');
+            setBackgroundImage(fallbackImageUrl);
+        };
+        
+        // Начинаем загрузку
+        mobileImage.src = mobileImageUrl;
+        
+        // Дополнительная проверка через 1 секунду
+        setTimeout(function() {
+            if (mobileImage.complete && mobileImage.naturalHeight === 0) {
+                console.log('Изображение не загрузилось, используем fallback');
+                setBackgroundImage(fallbackImageUrl);
+            }
+        }, 1000);
+    }
+});
+
+// Обработчик изменения размера окна
+window.addEventListener('resize', function() {
+    if (window.innerWidth <= 1200 && window.innerWidth > 1200) {
+        // Перезагружаем страницу при переходе между мобильным и десктопным режимом
+        location.reload();
     }
 });
 </script>
