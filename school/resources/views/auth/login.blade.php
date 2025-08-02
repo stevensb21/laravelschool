@@ -40,6 +40,15 @@ body {
     }
 }
 
+/* Специальные стили для iOS Safari */
+@supports (-webkit-touch-callout: none) {
+    body {
+        background-attachment: scroll !important;
+        -webkit-background-size: cover !important;
+        background-size: cover !important;
+    }
+}
+
 /* Мобильная версия - исправляем все проблемы */
 @media (max-width: 1200px) {
     body {
@@ -47,13 +56,15 @@ body {
         background-size: cover !important;
         background-position: center top !important;
         background-repeat: no-repeat !important;
-        background-attachment: scroll !important;
+        background-attachment: scroll !important; /* Убираем fixed для мобильных */
         background-color: #f5f5f5 !important;
         min-height: 100vh !important;
         width: 100% !important;
         -webkit-background-size: cover !important;
         -moz-background-size: cover !important;
         -o-background-size: cover !important;
+        -webkit-transform: translateZ(0) !important; /* Принудительный аппаратный рендеринг */
+        transform: translateZ(0) !important;
     }
     
     .site-title {
@@ -133,7 +144,7 @@ body {
     </div>
 
 <script>
-// Упрощенная загрузка фонового изображения на мобильных устройствах
+// Улучшенная загрузка фонового изображения для iOS Safari
 document.addEventListener('DOMContentLoaded', function() {
     if (window.innerWidth <= 1200) {
         const body = document.body;
@@ -143,26 +154,66 @@ document.addEventListener('DOMContentLoaded', function() {
         // Функция для установки фонового изображения
         function setBackgroundImage(url) {
             body.style.backgroundImage = 'url(' + url + ')';
+            // Принудительный пересчет стилей для iOS
+            body.offsetHeight;
         }
         
-        // Создаем изображение для проверки загрузки
-        const mobileImage = new Image();
+        // Проверяем, является ли устройство iOS
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                     (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
         
-        // Обработчик успешной загрузки
-        mobileImage.onload = function() {
-            console.log('Мобильное изображение успешно загружено');
-            setBackgroundImage(mobileImageUrl);
-        };
-        
-        // Обработчик ошибки загрузки
-        mobileImage.onerror = function() {
-            console.log('Ошибка загрузки мобильного изображения, используем fallback');
+        // Для iOS используем более агрессивный подход
+        if (isIOS) {
+            console.log('Обнаружено iOS устройство, применяем специальные настройки');
+            
+            // Сначала устанавливаем fallback изображение
             setBackgroundImage(fallbackImageUrl);
-        };
-        
-        // Начинаем загрузку
-        mobileImage.src = mobileImageUrl;
+            
+            // Затем пробуем загрузить мобильное изображение
+            const mobileImage = new Image();
+            mobileImage.crossOrigin = 'anonymous'; // Для CORS
+            
+            mobileImage.onload = function() {
+                console.log('Мобильное изображение успешно загружено на iOS');
+                setBackgroundImage(mobileImageUrl);
+            };
+            
+            mobileImage.onerror = function() {
+                console.log('Ошибка загрузки мобильного изображения на iOS, оставляем fallback');
+            };
+            
+            // Добавляем задержку для iOS
+            setTimeout(function() {
+                mobileImage.src = mobileImageUrl;
+            }, 100);
+            
+        } else {
+            // Для других устройств используем стандартный подход
+            const mobileImage = new Image();
+            mobileImage.crossOrigin = 'anonymous';
+            
+            mobileImage.onload = function() {
+                console.log('Мобильное изображение успешно загружено');
+                setBackgroundImage(mobileImageUrl);
+            };
+            
+            mobileImage.onerror = function() {
+                console.log('Ошибка загрузки мобильного изображения, используем fallback');
+                setBackgroundImage(fallbackImageUrl);
+            };
+            
+            mobileImage.src = mobileImageUrl;
+        }
     }
+});
+
+// Дополнительная проверка при изменении ориентации экрана
+window.addEventListener('orientationchange', function() {
+    setTimeout(function() {
+        if (window.innerWidth <= 1200) {
+            location.reload(); // Перезагружаем страницу при смене ориентации
+        }
+    }, 500);
 });
 </script>
 @endsection
