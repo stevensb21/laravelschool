@@ -47,16 +47,7 @@ body {
 @media (max-width: 1200px) {
     body {
         background-image: url('{{ asset('images/authback720х1080.png?v=3') }}') !important;
-        background-size: cover !important;
-        background-position: center top !important;
-        background-repeat: no-repeat !important;
-        background-attachment: scroll !important; /* Убираем fixed для мобильных */
-        background-color: #f5f5f5 !important;
-        min-height: 100vh !important;
-        width: 100% !important;
-        -webkit-background-size: cover !important;
-        -moz-background-size: cover !important;
-        -o-background-size: cover !important;
+       
     }
     
     .site-title {
@@ -81,9 +72,6 @@ body {
 @media (max-width: 480px) {
     body {
         background-image: url('{{ asset('images/authback720х1080.png?v=3') }}') !important;
-        background-position: center top !important;
-        background-size: cover !important;
-        background-attachment: scroll !important;
     }
     
     .site-title {
@@ -101,9 +89,7 @@ body {
 @media (min-width: 481px) and (max-width: 768px) {
     body {
         background-image: url('{{ asset('images/authback720х1080.png?v=3') }}') !important;
-        background-size: cover !important;
-        background-position: center top !important;
-        background-attachment: scroll !important;
+       
     }
 }
 </style>
