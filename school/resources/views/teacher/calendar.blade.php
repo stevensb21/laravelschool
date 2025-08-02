@@ -278,6 +278,16 @@
                     <option value="{{ $i+1 }}">{{ $day }}</option>
                 @endforeach
             </select>
+            
+            <!-- Кнопка добавления урока в мобильной версии -->
+            @if(request('edit_mode'))
+                <div class="mobile-add-lesson">
+                    <button type="button" class="add-lesson-btn" onclick="showMobileAddModal()">
+                        <span>+</span> Добавить урок
+                    </button>
+                </div>
+            @endif
+            
             @foreach($weekdays as $i => $day)
                 @php
                     $hasLessons = false;
@@ -292,19 +302,38 @@
                     <h4>{{ $day }}</h4>
                     @if($hasLessons)
                         <ul class="mobile-lesson-list">
+                            @php
+                                $displayedLessons = [];
+                            @endphp
                             @for ($hour = 8; $hour <= 22; $hour++)
                                 @php
                                     $lesson = $data['schedule'][$i+1][$hour] ?? null;
                                 @endphp
-                                @if ($lesson)
+                                @if ($lesson && !in_array($lesson['id'] ?? '', $displayedLessons))
+                                    @php
+                                        $displayedLessons[] = $lesson['id'] ?? '';
+                                    @endphp
                                     <li>
-                                        <span class="lesson-time">{{ $hour }}:00</span>
-                                        <span class="lesson-title">{{ $lesson['subject'] ?? $lesson['name_group'] ?? '' }}</span>
-                                        @if(isset($lesson['teacher']))
-                                            <span class="lesson-teacher">{{ $lesson['teacher'] }}</span>
-                                        @endif
-                                        @if(isset($lesson['name_group']))
-                                            <span class="lesson-group">{{ $lesson['name_group'] }}</span>
+                                        <div class="lesson-info">
+                                            <span class="lesson-time">{{ $lesson['start_time'] ?? $hour . ':00' }} - {{ $lesson['end_time'] ?? ($hour + 1) . ':00' }}</span>
+                                            <span class="lesson-title">{{ $lesson['subject'] ?? $lesson['name_group'] ?? '' }}</span>
+                                            @if(isset($lesson['teacher']))
+                                                <span class="lesson-teacher">{{ $lesson['teacher'] }}</span>
+                                            @endif
+                                            @if(isset($lesson['name_group']))
+                                                <span class="lesson-group">{{ $lesson['name_group'] }}</span>
+                                            @endif
+                                        </div>
+                                        @if(request('edit_mode'))
+                                            <div class="lesson-actions">
+                                                <form method="POST" action="{{ route('calendar.delete-lesson') }}" class="delete-lesson-form" style="display: inline;">
+                                                    @csrf
+                                                    <input type="hidden" name="lesson_id" value="{{ $lesson['id'] ?? '' }}">
+                                                    <button type="submit" class="delete-lesson-btn" onclick="return confirm('Удалить урок?')">
+                                                        <span>×</span>
+                                                    </button>
+                                                </form>
+                                            </div>
                                         @endif
                                     </li>
                                 @endif
@@ -392,6 +421,61 @@
             margin: 0 10px;
         }
 
+        /* Новые стили для мобильной версии */
+        .mobile-add-lesson {
+            margin-bottom: 16px;
+        }
+        .add-lesson-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .add-lesson-btn:hover {
+            background: var(--primary-color-hover, #0056b3);
+        }
+        .mobile-lesson-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .lesson-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .lesson-actions {
+            flex-shrink: 0;
+        }
+        .delete-lesson-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+        .delete-lesson-btn:hover {
+            background: #c82333;
+        }
+
 
         @media (max-width: 768px) {
           .calendar-desktop, .grid-container-calendar { display: none !important; }
@@ -402,6 +486,14 @@
         <!-- JS для переключения дней -->
         <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Сохраняем даты недели в sessionStorage для использования в мобильной версии
+            const monday = '{{ session("monday") }}';
+            const sunday = '{{ session("sunday") }}';
+            if (monday && sunday) {
+                sessionStorage.setItem('monday', monday);
+                sessionStorage.setItem('sunday', sunday);
+            }
+            
             const select = document.getElementById('weekday-select');
             function showScheduleForDay(day) {
                 document.querySelectorAll('.mobile-day-schedule').forEach(el => {
@@ -415,6 +507,28 @@
                 });
             }
         });
+        
+        // Функция для показа модального окна добавления урока в мобильной версии
+        function showMobileAddModal() {
+            const select = document.getElementById('weekday-select');
+            const selectedDay = parseInt(select.value);
+            const monday = sessionStorage.getItem('monday');
+            
+            if (monday) {
+                const selectedDate = new Date(monday);
+                selectedDate.setDate(selectedDate.getDate() + (selectedDay - 1));
+                const dateStr = selectedDate.toISOString().split('T')[0];
+                showModal(dateStr, '09:00');
+            } else {
+                // Fallback если дата не найдена
+                const today = new Date();
+                const dayOfWeek = today.getDay();
+                const daysToAdd = selectedDay - (dayOfWeek === 0 ? 7 : dayOfWeek);
+                today.setDate(today.getDate() + daysToAdd);
+                const dateStr = today.toISOString().split('T')[0];
+                showModal(dateStr, '09:00');
+            }
+        }
         </script>
     </main>
 </div> 

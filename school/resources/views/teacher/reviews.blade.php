@@ -11,6 +11,7 @@
     @include('teacher.nav')
 @endif
 
+<div class="container">
 <div class="content">
     @if(isset($isAdmin) && $isAdmin)
         <div class="admin-header" style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
@@ -152,7 +153,7 @@ $errors->any())
         </div>
     </div>
 </div>
-
+</div>
 <script>
 function showReviewForm() {
     const form = document.getElementById('reviewForm');

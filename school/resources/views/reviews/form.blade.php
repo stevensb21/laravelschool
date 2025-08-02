@@ -7,7 +7,7 @@
         
         <div class="form-group">
             <label for="review_text">Ваш отзыв:</label>
-            <textarea name="review_text" id="review_text" required placeholder="Поделитесь своими впечатлениями..." minlength="10"></textarea>
+            <textarea name="review_text" id="review_text" required placeholder="Поделитесь своими впечатлениями..."></textarea>
         </div>
         
         <div class="form-group">

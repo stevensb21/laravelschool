@@ -15,6 +15,8 @@ html, body {
     position: fixed !important;
     top: 0 !important;
     left: 0 !important;
+    -webkit-overflow-scrolling: touch !important;
+    -webkit-tap-highlight-color: transparent !important;
 }
 
 body {
@@ -22,25 +24,36 @@ body {
     background-size: cover !important;
     background-position: center !important;
     background-repeat: no-repeat !important;
+    background-attachment: fixed !important;
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
     flex-direction: column !important;
+    min-height: 100vh !important;
+    width: 100% !important;
 }
 
 /* Мобильная версия - используем вертикальное изображение */
-@media (max-width: 1200px) {
+@media (max-width: 1200px) or (max-width: 768px) {
     body {
         background-image: url('{{ asset('images/authback720х1080.png') }}') !important;
         background-size: cover !important;
-        background-position: center top !important;
+        background-position: center center !important;
         background-repeat: no-repeat !important;
+        background-attachment: fixed !important;
         background-color: #f5f5f5 !important;
+        min-height: 100vh !important;
+        width: 100% !important;
+        -webkit-background-size: cover !important;
+        -moz-background-size: cover !important;
+        -o-background-size: cover !important;
     }
     
     .site-title {
         color: #ffffff !important;
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8) !important;
+        font-size: 2rem !important;
+        margin-bottom: 20px !important;
     }
     
     .container {
@@ -48,6 +61,27 @@ body {
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
         backdrop-filter: blur(10px) !important;
         border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        margin: 20px !important;
+        padding: 30px !important;
+        border-radius: 15px !important;
+    }
+}
+
+/* Дополнительные стили для очень маленьких экранов */
+@media (max-width: 480px) {
+    body {
+        background-position: center top !important;
+        background-size: 100% auto !important;
+    }
+    
+    .site-title {
+        font-size: 1.5rem !important;
+        margin-bottom: 15px !important;
+    }
+    
+    .container {
+        margin: 10px !important;
+        padding: 20px !important;
     }
 }
 </style>
@@ -78,4 +112,26 @@ body {
             </div>
         </form>
     </div>
+
+<script>
+// Принудительная перезагрузка фонового изображения на мобильных устройствах
+document.addEventListener('DOMContentLoaded', function() {
+    if (window.innerWidth <= 1200) {
+        const body = document.body;
+        const bgImage = '{{ asset('images/authback720х1080.png') }}';
+        
+        // Создаем новый элемент изображения для предзагрузки
+        const img = new Image();
+        img.onload = function() {
+            body.style.backgroundImage = 'url(' + bgImage + ')';
+        };
+        img.src = bgImage;
+        
+        // Fallback если изображение не загрузилось
+        img.onerror = function() {
+            body.style.backgroundImage = 'url({{ asset('images/first_page.png') }})';
+        };
+    }
+});
+</script>
 @endsection

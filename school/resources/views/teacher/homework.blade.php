@@ -109,6 +109,44 @@
         </main>
     </div>
 
+    <!-- Модальное окно для продления срока -->
+    <div id="extendModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h3>Продлить срок домашнего задания</h3>
+            <form id="extendForm">
+                @csrf
+                <input type="hidden" id="homeworkId" name="homework_id">
+                <div class="form-group">
+                    <label for="currentDeadline">Текущий срок:</label>
+                    <input type="text" id="currentDeadline" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="newDeadline">Новый срок:</label>
+                    <input type="date" id="newDeadline" name="new_deadline" required>
+                </div>
+                <div class="form-buttons">
+                    <button type="submit" class="submit-btn">Продлить</button>
+                    <button type="button" class="cancel-btn" onclick="closeExtendModal()">Отмена</button>
+                </div>
+            </form>
+            <span class="close" onclick="closeExtendModal()">&times;</span>
+        </div>
+    </div>
+
+    <!-- Модальное окно для удаления -->
+    <div id="deleteModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h3>Удалить домашнее задание</h3>
+            <p>Вы действительно хотите удалить задание "<span id="deleteHomeworkName"></span>"?</p>
+            <p style="color: #dc3545; font-weight: 500;">Это действие нельзя отменить!</p>
+            <div class="form-buttons">
+                <button type="button" class="submit-btn" style="background-color: #dc3545;" onclick="confirmDelete()">Удалить</button>
+                <button type="button" class="cancel-btn" onclick="closeDeleteModal()">Отмена</button>
+            </div>
+            <span class="close" onclick="closeDeleteModal()">&times;</span>
+        </div>
+    </div>
+
     <!-- Toast уведомление -->
 <div id="toast" class="toast"></div>
 
@@ -136,6 +174,111 @@
     pointer-events: auto;
     transform: translateY(0);
 }
+
+/* Стили для модального окна */
+.modal {
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: auto;
+    padding: 24px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+.modal-content h3 {
+    margin: 0 0 20px 0;
+    color: #333;
+    font-size: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+    color: #555;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.form-group input[readonly] {
+    background-color: #f5f5f5;
+    color: #666;
+}
+
+.form-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 24px;
+}
+
+.submit-btn, .cancel-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.submit-btn {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.submit-btn:hover {
+    background-color: var(--primary-color);
+}
+
+.cancel-btn {
+    background-color: #6c757d;
+    color: white;
+}
+
+.cancel-btn:hover {
+    background-color: #545b62;
+}
+
+.close {
+    position: absolute;
+    right: 16px;
+    top: 16px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #aaa;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.close:hover {
+    color: #333;
+}
 </style>
 
    
@@ -144,20 +287,35 @@
 
     <script>
     function openExtendModal(homeworkId, currentDeadline) {
-        document.getElementById('homeworkId').value = homeworkId;
-        document.getElementById('currentDeadline').value = currentDeadline;
+        const homeworkIdElement = document.getElementById('homeworkId');
+        const currentDeadlineElement = document.getElementById('currentDeadline');
+        const newDeadlineElement = document.getElementById('newDeadline');
+        const extendModalElement = document.getElementById('extendModal');
+        
+        // Проверяем, что все элементы существуют
+        if (!homeworkIdElement || !currentDeadlineElement || !newDeadlineElement || !extendModalElement) {
+            console.error('Не найдены необходимые элементы модального окна');
+            alert('Ошибка: не удалось открыть модальное окно');
+            return;
+        }
+        
+        homeworkIdElement.value = homeworkId;
+        currentDeadlineElement.value = currentDeadline;
         
         // Устанавливаем минимальную дату как завтра
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
         const tomorrowStr = tomorrow.toISOString().split('T')[0];
-        document.getElementById('newDeadline').min = tomorrowStr;
+        newDeadlineElement.min = tomorrowStr;
         
-        document.getElementById('extendModal').style.display = 'flex';
+        extendModalElement.style.display = 'flex';
     }
 
     function closeExtendModal() {
-        document.getElementById('extendModal').style.display = 'none';
+        const extendModalElement = document.getElementById('extendModal');
+        if (extendModalElement) {
+            extendModalElement.style.display = 'none';
+        }
     }
 
     // Закрытие модального окна при клике вне его
@@ -170,55 +328,75 @@
 
     function showToast(message) {
         const toast = document.getElementById('toast');
-        toast.textContent = message;
-        toast.classList.add('show');
-        setTimeout(() => {
-            toast.classList.remove('show');
-        }, 2000);
+        if (toast) {
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
     }
 
     // Обработка отправки формы продления срока
-    document.getElementById('extendForm').onsubmit = function(e) {
-        e.preventDefault();
-        
-        const formData = new FormData(this);
-        const homeworkId = formData.get('homework_id');
-        const newDeadline = formData.get('new_deadline');
-        
-        fetch(`/homework/${homeworkId}/extend-deadline`, {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-            },
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                closeExtendModal();
-                showToast(data.message); // Показываем toast
-                setTimeout(() => location.reload(), 2000); // Перезагрузка через 2 сек
-            } else {
-                showToast('Ошибка при продлении срока: ' + data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showToast('Произошла ошибка при продлении срока');
-        });
-    };
+    document.addEventListener('DOMContentLoaded', function() {
+        const extendForm = document.getElementById('extendForm');
+        if (extendForm) {
+            extendForm.onsubmit = function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(this);
+                const homeworkId = formData.get('homework_id');
+                const newDeadline = formData.get('new_deadline');
+                
+                fetch(`/homework/${homeworkId}/extend-deadline`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        closeExtendModal();
+                        showToast(data.message); // Показываем toast
+                        // Обновляем страницу сразу, чтобы показать новый статус
+                        location.reload();
+                    } else {
+                        showToast('Ошибка при продлении срока: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('Произошла ошибка при продлении срока. Попробуйте еще раз.');
+                });
+            };
+        }
+    });
 
     // Функции для модального окна удаления
     let homeworkToDelete = null;
 
     function openDeleteModal(homeworkId, homeworkName) {
+        const deleteHomeworkNameElement = document.getElementById('deleteHomeworkName');
+        const deleteModalElement = document.getElementById('deleteModal');
+        
+        if (!deleteHomeworkNameElement || !deleteModalElement) {
+            console.error('Не найдены необходимые элементы модального окна удаления');
+            alert('Ошибка: не удалось открыть модальное окно удаления');
+            return;
+        }
+        
         homeworkToDelete = homeworkId;
-        document.getElementById('deleteHomeworkName').textContent = homeworkName;
-        document.getElementById('deleteModal').style.display = 'flex';
+        deleteHomeworkNameElement.textContent = homeworkName;
+        deleteModalElement.style.display = 'flex';
     }
 
     function closeDeleteModal() {
-        document.getElementById('deleteModal').style.display = 'none';
+        const deleteModalElement = document.getElementById('deleteModal');
+        if (deleteModalElement) {
+            deleteModalElement.style.display = 'none';
+        }
         homeworkToDelete = null;
     }
 

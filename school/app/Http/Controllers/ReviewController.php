@@ -97,7 +97,7 @@ class ReviewController extends Controller
         \Log::info('Попытка отправки отзыва', $request->all());
         $request->validate([
             'recipient_id' => 'required|integer',
-            'review_text' => 'required|string|min:10',
+            'review_text' => 'required|string',
             'rating' => 'required|integer|min:1|max:5',
         ]);
 

@@ -236,9 +236,24 @@ class CalendarController extends Controller
         // --- Проверка для преподавателя ---
         if ($role === 'teacher') {
             $teacher = $user->teacher;
-            // Получаем только свои группы и предметы
-            $groups = \App\Models\Group::whereJsonContains('courses', $teacher->subjects)->pluck('name')->toArray();
-            $subjects = $teacher->subjects ?? [];
+            
+            // Получаем группы, где этот преподаватель записан в teacher_id
+            $groups = \App\Models\Group::where('teacher_id', $teacher->id)->pluck('name')->toArray();
+            
+            // Получаем предметы из курсов этих групп
+            $courseIds = [];
+            $teacherGroups = \App\Models\Group::where('teacher_id', $teacher->id)->get();
+            foreach ($teacherGroups as $group) {
+                if ($group->courses) {
+                    $groupCourses = is_array($group->courses) ? $group->courses : json_decode($group->courses, true);
+                    if (is_array($groupCourses)) {
+                        $courseIds = array_merge($courseIds, $groupCourses);
+                    }
+                }
+            }
+            $courseIds = array_unique($courseIds);
+            $subjects = \App\Models\Course::whereIn('id', $courseIds)->pluck('name')->toArray();
+            
             if (!in_array($validated['name_group'], $groups) || !in_array($validated['subject'], $subjects) || $validated['teacher'] !== $teacher->fio) {
                 return redirect()->back()->with('error', 'Вы можете добавлять уроки только для своих групп и предметов.');
             }
@@ -257,10 +272,17 @@ class CalendarController extends Controller
         $lesson = new Calendar();
         $lesson->createItem($lessonData);
 
-        if (request()->has('edit_mode')) {
-            return redirect()->route('calendar', ['edit_mode' => 1]);
+        if ($role === 'teacher') {
+            if (request()->has('edit_mode')) {
+                return redirect()->route('teacher.calendar', ['edit_mode' => 1]);
+            }
+            return redirect()->route('teacher.calendar');
+        } else {
+            if (request()->has('edit_mode')) {
+                return redirect()->route('calendar', ['edit_mode' => 1]);
+            }
+            return redirect('calendar');
         }
-        return redirect('calendar');
     }
 
     public function editMode(Request $request)
@@ -283,12 +305,21 @@ class CalendarController extends Controller
             $lesson->delete();
         }
         
-        // Возвращаемся в режим редактирования, если пользователь был в нем
-        if (request()->has('edit_mode')) {
-            return redirect()->route('calendar', ['edit_mode' => 1]);
-        }
+        $user = auth()->user();
+        $role = $user->role;
         
-        return redirect('calendar');
+        // Возвращаемся в режим редактирования, если пользователь был в нем
+        if ($role === 'teacher') {
+            if (request()->has('edit_mode')) {
+                return redirect()->route('teacher.calendar', ['edit_mode' => 1]);
+            }
+            return redirect()->route('teacher.calendar');
+        } else {
+            if (request()->has('edit_mode')) {
+                return redirect()->route('calendar', ['edit_mode' => 1]);
+            }
+            return redirect('calendar');
+        }
     }
 
     public function AddRow() {

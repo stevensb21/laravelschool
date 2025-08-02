@@ -44,6 +44,15 @@
         </div>
     </main>
 </div>
+
+<style>
+/* Адаптивность для списка чатов */
+@media (max-width: 768px) {
+    .index {
+        padding: 20px !important;
+    }
+}
+</style>
 @endsection
 
 

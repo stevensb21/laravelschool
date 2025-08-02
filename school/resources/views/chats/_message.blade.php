@@ -32,4 +32,5 @@
         @endif
         <div style="font-size:12px; color:var(--text-muted);">{{ $msg->created_at->format('d.m.Y H:i') }}</div>
     </div>
-</div> 
+</div>
+

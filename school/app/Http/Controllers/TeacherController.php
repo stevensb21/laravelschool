@@ -23,7 +23,7 @@ class TeacherController extends Controller
                 'name' => 'required|unique:users,name,' . $request->users_id,
                 'fio' => 'required',
                 'job_title' => 'required',
-                'email' => 'required|email|unique:teachers,email,' . $request->users_id . ',users_id',
+                'email' => 'required|email',
                 'subjects' => 'required',
                 'education' => 'required',
                 'achievements' => 'nullable'
@@ -36,7 +36,6 @@ class TeacherController extends Controller
                 'job_title.required' => 'Должность обязательна для заполнения',
                 'email.required' => 'Email обязателен для заполнения',
                 'email.email' => 'Введите корректный email',
-                'email.unique' => 'Преподаватель с таким email уже существует',
                 'subjects.required' => 'Предметы обязательны для заполнения',
                 'education.required' => 'Образование обязательно для заполнения',
             ]);
@@ -178,7 +177,7 @@ class TeacherController extends Controller
                 'password' => 'required',
                 'fio' => 'required',
                 'job_title' => 'required',
-                'email' => 'required|email|unique:teachers,email',
+                'email' => 'required|email',
                 'subjects' => 'required',
                 'education' => 'required',
                 'achievements' => 'nullable'
@@ -190,7 +189,6 @@ class TeacherController extends Controller
                 'job_title.required' => 'Должность обязательна для заполнения',
                 'email.required' => 'Email обязателен для заполнения',
                 'email.email' => 'Введите корректный email',
-                'email.unique' => 'Преподаватель с таким email уже существует',
                 'subjects.required' => 'Предметы обязательны для заполнения',
                 'education.required' => 'Образование обязательно для заполнения',
             ]);
@@ -518,6 +516,12 @@ class TeacherController extends Controller
         
         $homeworks = $query->orderBy('created_at', 'desc')->get();
         
+        // Принудительно обновляем статус всех домашних заданий
+        foreach ($homeworks as $homework) {
+            $homework->updateStatusIfNeeded();
+            $homework->saveQuietly();
+        }
+        
         $isAdmin = auth()->user()->role === 'admin';
         return view('teacher.homework', compact('homeworks', 'teacher', 'courses', 'groups', 'isAdmin'));
     }
@@ -680,7 +684,7 @@ class TeacherController extends Controller
             'groups' => $groups,
             'subjects' => $subjects,
             'teachers' => [$teacher],
-            'user' => $teacher->user,
+            'user' => $teacher,
             'schedule' => $schedule,
             'selectedGroup' => request('group', ''),
             'selectedSubject' => request('subject', ''),
@@ -688,6 +692,7 @@ class TeacherController extends Controller
             'isAdmin' => auth()->user()->role === 'admin',
             'isTeacher' => true,
             'isStudent' => false,
+            'edit_mode' => request('edit_mode'),
         ];
         return view('teacher.calendar', compact('data'));
     }
@@ -695,14 +700,17 @@ class TeacherController extends Controller
     private function buildSchedule($lessons) {
         $schedule = array_fill(1, 7, array_fill(8, 22, null));
         foreach ($lessons as $lesson) {
-            $day = date('w', strtotime($lesson['date_']));
+            // Преобразуем урок в массив, если это объект
+            $lessonArray = is_array($lesson) ? $lesson : $lesson->toArray();
+            
+            $day = date('w', strtotime($lessonArray['date_']));
             if($day == 0) {
                 $day = 7;
             }
             
             // Получаем время начала и окончания
-            $start_timestamp = strtotime($lesson['start_time']);
-            $end_timestamp = strtotime($lesson['end_time']);
+            $start_timestamp = strtotime($lessonArray['start_time']);
+            $end_timestamp = strtotime($lessonArray['end_time']);
             
             $start_hour = (int)date('G', $start_timestamp);
             $start_minute = (int)date('i', $start_timestamp);
@@ -712,16 +720,16 @@ class TeacherController extends Controller
             // Заполняем массив расписания
             for ($hour = $start_hour; $hour <= $end_hour; $hour++) {
                 if ($hour == $start_hour) {
-                    $schedule[$day][$hour] = $lesson;
+                    $schedule[$day][$hour] = $lessonArray;
                 } 
                 elseif ($hour == $end_hour) {
                     if ($end_minute == 0 && $hour > $start_hour) {
                         continue;
                     }
-                    $schedule[$day][$hour] = $lesson;
+                    $schedule[$day][$hour] = $lessonArray;
                 } 
                 else {
-                    $schedule[$day][$hour] = $lesson;
+                    $schedule[$day][$hour] = $lessonArray;
                 }
             }
         }

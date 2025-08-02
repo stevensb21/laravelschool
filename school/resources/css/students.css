@@ -1,5 +1,9 @@
 /* Импорт цветовых переменных */
 @import './colors.css';
+.container {
+    max-width: 100vw;
+    overflow-y: auto;
+}
 
 .students-container {
     max-width: 100%;
@@ -605,6 +609,10 @@
 
 
 @media (max-width: 768px) {
+    .container {
+        max-width: 100vw;
+        overflow-y: auto;
+    }
 
     .students-filters {
         flex-direction: column;

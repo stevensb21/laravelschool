@@ -11,10 +11,11 @@
     @include('student.nav')
 @endif
 
+<div class="container">
 <main class="content">
-    <div class="chat-box" style="background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 4px 6px #0001; border: 1px solid #eee;">
-        <h2 style="text-align:center; margin-bottom: 30px;">{{ $chat->name }}</h2>
-        <div style="margin-bottom: 18px; text-align:center;">
+    <div class="chat-box" style="background: #fff; border-radius: 15px; padding: 20px; box-shadow: 0 4px 6px #0001; border: 1px solid #eee; height: calc(100vh - 100px); display: flex; flex-direction: column;">
+        <h2 style="text-align:center; margin-bottom: 15px; flex-shrink: 0;">{{ $chat->name }}</h2>
+        <div style="margin-bottom: 10px; text-align:center; flex-shrink: 0;">
             <button id="showParticipantsBtn" class="participants-btn" style="background:var(--btn-primary);color:var(--text-light);padding:7px 18px;border:none;border-radius:6px;font-weight:500;cursor:pointer;">
                 Участники чата ({{ $participants->count() }})
             </button>
@@ -37,7 +38,7 @@
                 @endforeach
             </div>
         </div>
-        <div class="chat-messages" id="chatMessages" style="background: #f9f9f9; border-radius: 10px; padding: 18px 16px; min-height: 320px; max-height: 400px; overflow-y: auto; margin-bottom: 18px;">
+        <div class="chat-messages" id="chatMessages" style="background: #f9f9f9; border-radius: 10px; padding: 15px; flex: 1; overflow-y: auto; margin-bottom: 15px; min-height: 0;">
             @php $lastId = 0; @endphp
             @forelse($messages as $msg)
                 @php $lastId = $msg->id; @endphp
@@ -46,7 +47,7 @@
                 <div style="text-align:center; color:#aaa;">Нет сообщений</div>
             @endforelse
         </div>
-        <form id="chatSendForm" method="POST" action="{{ route('chats.send', $chat->id) }}" style="display:flex; gap:10px; align-items:center; justify-content:center;" enctype="multipart/form-data">
+        <form id="chatSendForm" method="POST" action="{{ route('chats.send', $chat->id) }}" style="display:flex; gap:10px; align-items:center; justify-content:center; flex-shrink: 0;" enctype="multipart/form-data">
             @csrf
             <input type="text" name="message" id="msgInput" placeholder="Введите сообщение..." style="flex:1; padding:8px 12px; border-radius:6px; border:1px solid #ccc; height:40px;">
             <label for="fileInput" class="file-attach-btn" title="Прикрепить файл" style="display:flex !important;align-items:center !important;justify-content:center !important;color:var(--text-light);border:none;border-radius:6px;width:40px;height:40px;cursor:pointer;transition:background 0.18s;">
@@ -123,14 +124,68 @@
         });
         </script>
         @if($isTeacher)
-            <form method="POST" action="{{ route('chats.clear', $chat->id) }}" style="margin-top:18px; text-align:right;">
+            <form method="POST" action="{{ route('chats.clear', $chat->id) }}" style="margin-top:10px; text-align:right; flex-shrink: 0;">
                 @csrf
                 <button type="submit" class="btn btn-danger" style="background:var(--error-color); color:#fff; border-radius:6px; padding:7px 16px; font-weight:500;">Очистить историю чата</button>
             </form>
         @endif
-        <div style="margin-top:18px; text-align:center;">
+        <div style="margin-top:10px; text-align:center; flex-shrink: 0;">
             <a href="{{ route('chats.index') }}" style="color:var(--link-color); text-decoration:underline; transition:color 0.2s;" onmouseover="this.style.color='var(--link-hover)'" onmouseout="this.style.color='var(--link-color)'">← К списку чатов</a>
         </div>
     </div>
 </main>
+</div>
+
+<style>
+/* Адаптивность для чата */
+.container {
+    height: 100vh;
+    overflow-y: auto;
+}
+
+.content {
+    height: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.chat-box {
+    height: calc(100vh - 40px) !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.chat-messages {
+    flex: 1 !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+}
+
+@media (max-width: 768px) {
+    .content {
+        padding: 10px;
+    }
+    
+    .chat-box {
+        height: calc(100vh - 100px) !important;
+        padding: 15px !important;
+    }
+    
+    .chat-messages {
+        padding: 10px !important;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .chat-box {
+        height: calc(100vh - 40px) !important;
+    }
+}
+
+@media (min-width: 1025px) {
+    .chat-box {
+        height: calc(100vh - 40px) !important;
+    }
+}
+</style>
 @endsection 

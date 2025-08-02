@@ -48,27 +48,19 @@ class HomeWorkController extends Controller
         }
 
         $homeworks = $query->get();
-        $this->checkDeadline($homeworks);
+        
+        // Принудительно обновляем статус всех домашних заданий
+        foreach ($homeworks as $homework) {
+            $homework->updateStatusIfNeeded();
+            $homework->saveQuietly();
+        }
+        
         $courses = Course::all();
         $groups = Group::all();
         $teachers = Teacher::all();
         
         return view('admin/homework', compact('homeworks', 'courses', 'groups', 'teachers'));
     }   
-
-    private function checkDeadline($homeworks) {
-        foreach ($homeworks as $homework) {
-            if ($homework->deadline < now()) {
-                if($homework->homeWorkStudents->whereNotNull('grade')->count() == $homework->group->students->count()) {    
-                    $homework->status = 'Завершено';
-                    $homework->save();
-                } else {
-                    $homework->status = 'Просрочено';
-                    $homework->save();
-                }
-            }
-        }
-    }
 
     public function submissions($id)
     {
@@ -158,17 +150,9 @@ class HomeWorkController extends Controller
                 'deadline' => $request->new_deadline
             ]);
 
-            // Пересчёт статуса после продления срока
-            $homework->refresh();
-            $allGraded = $homework->homeWorkStudents->whereNotNull('grade')->count() == $homework->group->students->count();
-            if ($allGraded) {
-                $homework->status = 'Завершено';
-            } elseif ($homework->deadline < now()) {
-                $homework->status = 'Просрочено';
-            } else {
-                $homework->status = 'Активно';
-            }
-            $homework->save();
+            // Обновляем статус после изменения даты
+            $homework->updateStatusIfNeeded();
+            $homework->saveQuietly();
 
             return response()->json([
                 'success' => true,
@@ -181,6 +165,12 @@ class HomeWorkController extends Controller
                 'message' => 'Ошибка валидации: ' . implode(', ', $e->errors())
             ], 422);
         } catch (\Exception $e) {
+            \Log::error('Ошибка при продлении срока домашнего задания', [
+                'homework_id' => $id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
             return response()->json([
                 'success' => false,
                 'message' => 'Ошибка при продлении срока: ' . $e->getMessage()
