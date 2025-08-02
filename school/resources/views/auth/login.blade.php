@@ -36,7 +36,7 @@ body {
 /* Мобильная версия - используем вертикальное изображение */
 @media (max-width: 1200px) {
     body {
-        background-image: url('{{ asset('images/authback720х1080.png') }}') !important;
+        background-image: url('{{ asset('man.jpg') }}') !important;
         background-size: cover !important;
         background-position: center center !important;
         background-repeat: no-repeat !important;
@@ -72,7 +72,7 @@ body {
     body {
         background-position: center center !important;
         background-size: cover !important;
-        background-image: url('{{ asset('images/authback720х1080.png') }}') !important;
+        background-image: url('{{ asset('images/authback720х1080.png?v=2') }}') !important;
     }
     
     .site-title {
@@ -89,7 +89,7 @@ body {
 /* Стили для планшетов */
 @media (min-width: 481px) and (max-width: 768px) {
     body {
-        background-image: url('{{ asset('images/authback720х1080.png') }}') !important;
+        background-image: url('{{ asset('images/authback720х1080.png?v=2') }}') !important;
         background-size: cover !important;
         background-position: center center !important;
     }
