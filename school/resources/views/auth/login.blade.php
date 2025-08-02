@@ -43,7 +43,7 @@ body {
 /* Мобильная версия - исправляем все проблемы */
 @media (max-width: 1200px) {
     body {
-        background-image: url('{{ asset('images/authback720х1080.png?v=3') }}') !important;
+        background-image: url('{{ asset('images/authback720х1080.png?v=4') }}') !important;
         background-size: cover !important;
         background-position: center top !important;
         background-repeat: no-repeat !important;
@@ -77,7 +77,7 @@ body {
 /* Только для мелких экранов (< 480px) */
 @media (max-width: 480px) {
     body {
-        background-image: url('{{ asset('images/authback720х1080.png?v=3') }}') !important;
+        background-image: url('{{ asset('images/authback720х1080.png?v=4') }}') !important;
         background-position: center top !important;
         background-size: cover !important;
         background-attachment: scroll !important;
@@ -97,7 +97,7 @@ body {
 /* Только для планшетов (481px — 768px) */
 @media (min-width: 481px) and (max-width: 768px) {
     body {
-        background-image: url('{{ asset('images/authback720х1080.png?v=3') }}') !important;
+        background-image: url('{{ asset('images/authback720х1080.png?v=4') }}') !important;
         background-size: cover !important;
         background-position: center top !important;
         background-attachment: scroll !important;
@@ -137,7 +137,7 @@ body {
 document.addEventListener('DOMContentLoaded', function() {
     if (window.innerWidth <= 1200) {
         const body = document.body;
-        const mobileImageUrl = '{{ asset('images/authback720х1080.png?v=3') }}';
+        const mobileImageUrl = '{{ asset('images/authback720х1080.png?v=4') }}';
         const fallbackImageUrl = '{{ asset('images/first_page.png') }}';
         
         // Функция для установки фонового изображения
