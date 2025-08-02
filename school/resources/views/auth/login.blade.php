@@ -1,6 +1,11 @@
 @extends('layouts.app')
 
 @section('content')
+<!-- Скрытое изображение для iOS Safari -->
+<div id="iosBackgroundImage" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0; pointer-events: none;">
+    <img src="{{ asset('images/authback720х1080.png?v=5') }}" alt="background" style="width: 100%; height: 100%; object-fit: cover; object-position: center top;">
+</div>
+
 <style>
 * {
     margin: 0 !important;
@@ -52,7 +57,7 @@ body {
 /* Мобильная версия - исправляем все проблемы */
 @media (max-width: 1200px) {
     body {
-        background-image: url('{{ asset('images/authback720х1080.png?v=4') }}') !important;
+        background-image: url('{{ asset('images/authback720х1080.png?v=5') }}') !important;
         background-size: cover !important;
         background-position: center top !important;
         background-repeat: no-repeat !important;
@@ -88,7 +93,7 @@ body {
 /* Только для мелких экранов (< 480px) */
 @media (max-width: 480px) {
     body {
-        background-image: url('{{ asset('images/authback720х1080.png?v=4') }}') !important;
+        background-image: url('{{ asset('images/authback720х1080.png?v=5') }}') !important;
         background-position: center top !important;
         background-size: cover !important;
         background-attachment: scroll !important;
@@ -108,7 +113,7 @@ body {
 /* Только для планшетов (481px — 768px) */
 @media (min-width: 481px) and (max-width: 768px) {
     body {
-        background-image: url('{{ asset('images/authback720х1080.png?v=4') }}') !important;
+        background-image: url('{{ asset('images/authback720х1080.png?v=5') }}') !important;
         background-size: cover !important;
         background-position: center top !important;
         background-attachment: scroll !important;
@@ -144,62 +149,57 @@ body {
     </div>
 
 <script>
-// Улучшенная загрузка фонового изображения для iOS Safari
+// Радикальное решение для iOS Safari - используем img элемент
 document.addEventListener('DOMContentLoaded', function() {
     if (window.innerWidth <= 1200) {
         const body = document.body;
-        const mobileImageUrl = '{{ asset('images/authback720х1080.png?v=4') }}';
+        const iosBackgroundDiv = document.getElementById('iosBackgroundImage');
+        const mobileImageUrl = '{{ asset('images/authback720х1080.png?v=5') }}';
         const fallbackImageUrl = '{{ asset('images/first_page.png') }}';
-        
-        // Функция для установки фонового изображения
-        function setBackgroundImage(url) {
-            body.style.backgroundImage = 'url(' + url + ')';
-            // Принудительный пересчет стилей для iOS
-            body.offsetHeight;
-        }
         
         // Проверяем, является ли устройство iOS
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
                      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
         
-        // Для iOS используем более агрессивный подход
+        console.log('Устройство iOS:', isIOS);
+        console.log('Ширина экрана:', window.innerWidth);
+        
         if (isIOS) {
-            console.log('Обнаружено iOS устройство, применяем специальные настройки');
+            console.log('Применяем iOS-специфичное решение');
             
-            // Сначала устанавливаем fallback изображение
-            setBackgroundImage(fallbackImageUrl);
+            // Для iOS используем img элемент вместо background-image
+            const img = iosBackgroundDiv.querySelector('img');
             
-            // Затем пробуем загрузить мобильное изображение
-            const mobileImage = new Image();
-            mobileImage.crossOrigin = 'anonymous'; // Для CORS
-            
-            mobileImage.onload = function() {
-                console.log('Мобильное изображение успешно загружено на iOS');
-                setBackgroundImage(mobileImageUrl);
+            img.onload = function() {
+                console.log('Изображение загружено для iOS, показываем его');
+                iosBackgroundDiv.style.opacity = '1';
+                // Убираем background-image с body
+                body.style.backgroundImage = 'none';
             };
             
-            mobileImage.onerror = function() {
-                console.log('Ошибка загрузки мобильного изображения на iOS, оставляем fallback');
+            img.onerror = function() {
+                console.log('Ошибка загрузки изображения для iOS, используем fallback');
+                body.style.backgroundImage = 'url(' + fallbackImageUrl + ')';
             };
             
-            // Добавляем задержку для iOS
-            setTimeout(function() {
-                mobileImage.src = mobileImageUrl;
-            }, 100);
+            // Принудительно загружаем изображение
+            img.src = mobileImageUrl;
             
         } else {
             // Для других устройств используем стандартный подход
+            console.log('Применяем стандартное решение для не-iOS устройств');
+            
             const mobileImage = new Image();
             mobileImage.crossOrigin = 'anonymous';
             
             mobileImage.onload = function() {
                 console.log('Мобильное изображение успешно загружено');
-                setBackgroundImage(mobileImageUrl);
+                body.style.backgroundImage = 'url(' + mobileImageUrl + ')';
             };
             
             mobileImage.onerror = function() {
                 console.log('Ошибка загрузки мобильного изображения, используем fallback');
-                setBackgroundImage(fallbackImageUrl);
+                body.style.backgroundImage = 'url(' + fallbackImageUrl + ')';
             };
             
             mobileImage.src = mobileImageUrl;
@@ -209,11 +209,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Дополнительная проверка при изменении ориентации экрана
 window.addEventListener('orientationchange', function() {
+    console.log('Изменение ориентации экрана');
     setTimeout(function() {
         if (window.innerWidth <= 1200) {
-            location.reload(); // Перезагружаем страницу при смене ориентации
+            console.log('Перезагружаем страницу при смене ориентации');
+            location.reload();
         }
     }, 500);
+});
+
+// Проверка при загрузке страницы
+window.addEventListener('load', function() {
+    console.log('Страница полностью загружена');
+    if (window.innerWidth <= 1200) {
+        const iosBackgroundDiv = document.getElementById('iosBackgroundImage');
+        if (iosBackgroundDiv) {
+            const img = iosBackgroundDiv.querySelector('img');
+            if (img.complete && img.naturalHeight !== 0) {
+                console.log('Изображение уже загружено, показываем его');
+                iosBackgroundDiv.style.opacity = '1';
+            }
+        }
+    }
 });
 </script>
 @endsection
