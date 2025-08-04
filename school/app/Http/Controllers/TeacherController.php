@@ -9,6 +9,8 @@ use App\Models\Course;
 use Illuminate\Support\Facades\DB;
 use App\Models\Student;
 use App\Models\Review;
+use App\Models\GroupChat;
+use App\Models\UserChat;
 
 class TeacherController extends Controller
 {
@@ -239,6 +241,30 @@ class TeacherController extends Controller
 
             if (!$teacher) {
                 throw new \Exception('Не удалось создать преподавателя');
+            }
+
+            // Добавляем преподавателя в чат преподавателей
+            try {
+                $teachersChat = GroupChat::where('name', 'Чат с преподавателями')->first();
+                if ($teachersChat) {
+                    UserChat::firstOrCreate([
+                        'group_chat_id' => $teachersChat->id,
+                        'user_id' => $user->id
+                    ]);
+                    \Log::info('Преподаватель добавлен в чат', [
+                        'teacher_id' => $teacher->id,
+                        'user_id' => $user->id,
+                        'chat_id' => $teachersChat->id
+                    ]);
+                } else {
+                    \Log::warning('Чат с преподавателями не найден, преподаватель не добавлен в чат');
+                }
+            } catch (\Exception $e) {
+                \Log::error('Ошибка при добавлении преподавателя в чат', [
+                    'teacher_id' => $teacher->id,
+                    'error' => $e->getMessage()
+                ]);
+                // Не прерываем создание преподавателя из-за ошибки добавления в чат
             }
 
             DB::commit();
