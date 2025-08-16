@@ -21,6 +21,7 @@ class ManagementController extends Controller
         $groups = Group::with('students')->get();
         $groupsList = $groups->pluck('name')->toArray();
         $totalGroups = $groups->count();
+        
         $totalStudentsInGroups = $groups->sum(function($group) {
             return $group->students->count();
         });

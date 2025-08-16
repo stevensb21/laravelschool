@@ -117,29 +117,33 @@
                         <button class="action-btn" onclick="openEditGroupsModal()">Редактировать группы</button>
                         <button class="action-btn" onclick="openDeleteGroupModal()">Удалить группу</button>
                         <button class="action-btn" onclick="window.location.href='{{ route('admin.groups.list') }}'">Просмотр студентов групп</button>
+                        <h4>Существующие группы ({{ $totalGroups }})</h4>
                         <div class="groups-list">
-                            <h4>Существующие группы ({{ $totalGroups }})</h4>
                             <ul>
                                 @foreach($groupsList as $groupName)
                                     <li>{{ $groupName }}</li>
                                 @endforeach
                             </ul>
-                            <p><strong>Всего студентов в группах:</strong> {{ $totalStudentsInGroups }}</p>
                         </div>
+                        <p><strong>Всего студентов в группах:</strong> {{ $totalStudentsInGroups }}</p>
                     </div>
                 </div>
 
                 <div class="management-card">
                     <h3>Управление курсами</h3>
-                    <div class="card-content">
+                    <div class="card-content ">
                         <button class="action-btn" onclick="openCreateCourseModal()">Создать курс</button>
                         <button class="action-btn" onclick="openEditCoursesModal()">Редактировать курсы</button>
                         <button class="action-btn" onclick="openDeleteCourseModal()">Удалить курс</button>
-                        <div class="courses-stats">
-                            <h4>Статистика курсов</h4>
-                            <p>Всего курсов: {{ $totalCourses }}</p>
-                            <p>Активных курсов: {{ $activeCourses }}</p>
-                            <p>Студентов на курсах: {{ $totalStudentsOnCourses }}</p>
+                        
+                        <h4>Существующие курсы ({{ $totalCourses }})</h4>
+                        <div class="course-list" >
+                            
+                            <ul>
+                                @foreach($courses as $course)
+                                    <li value="{{ $course->id }}">{{ $course->name }}</li>
+                                @endforeach
+                            </ul>
                         </div>
                     </div>
                 </div>
