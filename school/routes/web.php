@@ -164,86 +164,40 @@ Route::get('/storage/{path}', function($path) {
         'file_exists' => file_exists($filePath)
     ]);
     
-    if (file_exists($filePath) && is_file($filePath)) {
-        // Проверяем доступ к файлу в зависимости от роли
-        if ($user->role === 'admin') {
-            // Администратор имеет доступ ко всем файлам
-            $mimeType = mime_content_type($filePath);
-            return response()->file($filePath, [
-                'Content-Type' => $mimeType,
-                'Content-Disposition' => 'inline; filename="' . basename($filePath) . '"'
-            ]);
-        } elseif ($user->role === 'teacher') {
-            // Преподаватель может получить доступ к файлам курсов, которые он ведет
-            if (strpos($path, 'methodfile/') === 0) {
-                // Для файлов методики проверяем доступ к курсу
-                $method = \App\Models\Method::where(function($q) use ($path) {
-                    $fileFields = ['homework', 'lesson', 'exercise', 'book', 'presentation', 'test', 'article'];
-                    foreach ($fileFields as $field) {
-                        $q->orWhereJsonContains($field, '/storage/' . $path);
-                    }
-                })->first();
-                
-                if ($method) {
-                    $course = $method->course;
-                    $teacher = $user->teacher;
-                    
-                    if ($course && $teacher && 
-                        (in_array($teacher->users_id, $course->access_['teachers'] ?? []) || 
-                         in_array((string)$teacher->users_id, $course->access_['teachers'] ?? []))) {
-                        
-                        $mimeType = mime_content_type($filePath);
-                        return response()->file($filePath, [
-                            'Content-Type' => $mimeType,
-                            'Content-Disposition' => 'inline; filename="' . basename($filePath) . '"'
-                        ]);
-                    }
-                }
-            }
-        } elseif ($user->role === 'student') {
-            // Студент может получить доступ к файлам курсов своей группы
-            if (strpos($path, 'methodfile/') === 0) {
-                $student = $user->student;
-                if ($student) {
-                    // Получаем группы студента
-                    $studentGroups = $student->groups;
-                    $courseIds = [];
-                    
-                    foreach ($studentGroups as $group) {
-                        $groupCourses = $group->courses;
-                        foreach ($groupCourses as $course) {
-                            $courseIds[] = $course->id;
-                        }
-                    }
-                    
-                    // Проверяем, принадлежит ли файл к курсам студента
-                    $method = \App\Models\Method::whereIn('course_id', $courseIds)
-                        ->where(function($q) use ($path) {
-                            $fileFields = ['homework', 'lesson', 'exercise', 'book', 'presentation', 'test', 'article'];
-                            foreach ($fileFields as $field) {
-                                $q->orWhereJsonContains($field, '/storage/' . $path);
-                            }
-                        })->first();
-                    
-                    if ($method) {
-                        $mimeType = mime_content_type($filePath);
-                        return response()->file($filePath, [
-                            'Content-Type' => $mimeType,
-                            'Content-Disposition' => 'inline; filename="' . basename($filePath) . '"'
-                        ]);
-                    }
-                }
-            }
-        }
+    if (!file_exists($filePath) || !is_file($filePath)) {
+        \Log::warning('File not found', ['path' => $path]);
+        abort(404, 'File not found');
     }
     
-    \Log::warning('File access denied', [
+    // Упрощенная проверка прав доступа
+    if ($user->role === 'admin') {
+        // Администратор имеет доступ ко всем файлам
+        $mimeType = mime_content_type($filePath);
+        return response()->file($filePath, [
+            'Content-Type' => $mimeType,
+            'Content-Disposition' => 'inline; filename="' . basename($filePath) . '"'
+        ]);
+    }
+    
+    // Для преподавателей и студентов - проверяем только файлы методики
+    if (strpos($path, 'methodfile/') === 0) {
+        // Временно разрешаем доступ всем аутентифицированным пользователям к файлам методики
+        // TODO: Добавить более детальную проверку прав доступа позже
+        $mimeType = mime_content_type($filePath);
+        return response()->file($filePath, [
+            'Content-Type' => $mimeType,
+            'Content-Disposition' => 'inline; filename="' . basename($filePath) . '"'
+        ]);
+    }
+    
+    // Для других файлов - только администратор
+    \Log::warning('Access denied to non-method file', [
         'user_id' => $user->id,
         'user_role' => $user->role,
-        'requested_path' => $path
+        'file_path' => $path
     ]);
     
-    abort(404, 'File not found or access denied');
+    abort(403, 'Access denied');
 })->where('path', '.*')->middleware('auth');
 
 // Альтернативный маршрут для доступа к файлам методики
@@ -415,6 +369,40 @@ Route::get('/test-file-access/{filename}', function($filename) {
                 $result['student_has_access'] = $hasAccess;
             }
         }
+    }
+    
+    return response()->json($result);
+})->middleware('auth');
+
+// Простой тестовый маршрут для проверки доступа к файлам
+Route::get('/test-file/{filename}', function($filename) {
+    $user = auth()->user();
+    
+    if (!$user) {
+        return response()->json(['error' => 'Unauthorized'], 401);
+    }
+    
+    $filePath = storage_path('app/public/methodfile/' . $filename);
+    
+    $result = [
+        'user_id' => $user->id,
+        'user_role' => $user->role,
+        'filename' => $filename,
+        'full_path' => $filePath,
+        'file_exists' => file_exists($filePath),
+        'is_file' => is_file($filePath),
+        'readable' => is_readable($filePath),
+        'size' => file_exists($filePath) ? filesize($filePath) : 0,
+        'permissions' => file_exists($filePath) ? substr(sprintf('%o', fileperms($filePath)), -4) : 'N/A'
+    ];
+    
+    // Если файл существует и пользователь аутентифицирован - возвращаем файл
+    if (file_exists($filePath) && is_file($filePath)) {
+        $mimeType = mime_content_type($filePath);
+        return response()->file($filePath, [
+            'Content-Type' => $mimeType,
+            'Content-Disposition' => 'inline; filename="' . basename($filePath) . '"'
+        ]);
     }
     
     return response()->json($result);

@@ -83,10 +83,42 @@ foreach ($students as $student) {
     foreach ($student->groups as $group) {
         echo "     Группа: {$group->name} (ID: {$group->id})\n";
         foreach ($group->courses as $course) {
-            echo "       Курс: {$course->name} (ID: {$course->id})\n";
+            // Проверяем, что $course является объектом, а не строкой
+            if (is_object($course)) {
+                echo "       Курс: {$course->name} (ID: {$course->id})\n";
+            } else {
+                echo "       Курс: {$course} (не объект)\n";
+            }
         }
     }
     echo "\n";
 }
 
-echo "=== КОНЕЦ ДИАГНОСТИКИ ===\n"; 
+// 6. Дополнительная диагностика - проверяем конкретный файл
+echo "6. Проверка конкретного файла:\n";
+$testFile = "presentation/1756127572_68ac6154c71aa.pdf";
+$testFilePath = storage_path('app/public/methodfile/' . $testFile);
+echo "   Тестовый файл: {$testFile}\n";
+echo "   Полный путь: {$testFilePath}\n";
+echo "   Существует: " . (file_exists($testFilePath) ? 'ДА' : 'НЕТ') . "\n";
+echo "   Размер: " . (file_exists($testFilePath) ? filesize($testFilePath) . ' байт' : 'НЕТ') . "\n";
+echo "   Права доступа: " . (file_exists($testFilePath) ? substr(sprintf('%o', fileperms($testFilePath)), -4) : 'НЕТ') . "\n";
+
+// 7. Проверяем доступ через веб
+echo "\n7. Проверка веб-доступа:\n";
+$webPath = "/storage/methodfile/" . $testFile;
+echo "   Веб-путь: {$webPath}\n";
+echo "   Полный URL: http://your-domain.com{$webPath}\n";
+
+// 8. Проверяем Apache статус
+echo "\n8. Проверка Apache:\n";
+$apacheStatus = shell_exec('systemctl is-active apache2 2>/dev/null');
+echo "   Apache статус: " . trim($apacheStatus) . "\n";
+
+if (trim($apacheStatus) !== 'active') {
+    echo "   Ошибка Apache:\n";
+    $apacheError = shell_exec('systemctl status apache2 2>&1 | tail -10');
+    echo $apacheError;
+}
+
+echo "\n=== КОНЕЦ ДИАГНОСТИКИ ===\n"; 
