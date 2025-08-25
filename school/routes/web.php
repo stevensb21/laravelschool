@@ -147,9 +147,132 @@ Route::post('/method/update', [MethodController::class, 'update'])->middleware('
 
 // Маршрут для обслуживания файлов
 Route::get('/storage/{path}', function($path) {
+    $user = auth()->user();
+    
+    if (!$user) {
+        abort(401, 'Unauthorized');
+    }
+    
     $filePath = storage_path('app/public/' . $path);
     
+    // Логируем запрос для диагностики
+    \Log::info('File access request', [
+        'user_id' => $user->id,
+        'user_role' => $user->role,
+        'requested_path' => $path,
+        'full_path' => $filePath,
+        'file_exists' => file_exists($filePath)
+    ]);
+    
     if (file_exists($filePath) && is_file($filePath)) {
+        // Проверяем доступ к файлу в зависимости от роли
+        if ($user->role === 'admin') {
+            // Администратор имеет доступ ко всем файлам
+            $mimeType = mime_content_type($filePath);
+            return response()->file($filePath, [
+                'Content-Type' => $mimeType,
+                'Content-Disposition' => 'inline; filename="' . basename($filePath) . '"'
+            ]);
+        } elseif ($user->role === 'teacher') {
+            // Преподаватель может получить доступ к файлам курсов, которые он ведет
+            if (strpos($path, 'methodfile/') === 0) {
+                // Для файлов методики проверяем доступ к курсу
+                $method = \App\Models\Method::where(function($q) use ($path) {
+                    $fileFields = ['homework', 'lesson', 'exercise', 'book', 'presentation', 'test', 'article'];
+                    foreach ($fileFields as $field) {
+                        $q->orWhereJsonContains($field, '/storage/' . $path);
+                    }
+                })->first();
+                
+                if ($method) {
+                    $course = $method->course;
+                    $teacher = $user->teacher;
+                    
+                    if ($course && $teacher && 
+                        (in_array($teacher->users_id, $course->access_['teachers'] ?? []) || 
+                         in_array((string)$teacher->users_id, $course->access_['teachers'] ?? []))) {
+                        
+                        $mimeType = mime_content_type($filePath);
+                        return response()->file($filePath, [
+                            'Content-Type' => $mimeType,
+                            'Content-Disposition' => 'inline; filename="' . basename($filePath) . '"'
+                        ]);
+                    }
+                }
+            }
+        } elseif ($user->role === 'student') {
+            // Студент может получить доступ к файлам курсов своей группы
+            if (strpos($path, 'methodfile/') === 0) {
+                $student = $user->student;
+                if ($student) {
+                    // Получаем группы студента
+                    $studentGroups = $student->groups;
+                    $courseIds = [];
+                    
+                    foreach ($studentGroups as $group) {
+                        $groupCourses = $group->courses;
+                        foreach ($groupCourses as $course) {
+                            $courseIds[] = $course->id;
+                        }
+                    }
+                    
+                    // Проверяем, принадлежит ли файл к курсам студента
+                    $method = \App\Models\Method::whereIn('course_id', $courseIds)
+                        ->where(function($q) use ($path) {
+                            $fileFields = ['homework', 'lesson', 'exercise', 'book', 'presentation', 'test', 'article'];
+                            foreach ($fileFields as $field) {
+                                $q->orWhereJsonContains($field, '/storage/' . $path);
+                            }
+                        })->first();
+                    
+                    if ($method) {
+                        $mimeType = mime_content_type($filePath);
+                        return response()->file($filePath, [
+                            'Content-Type' => $mimeType,
+                            'Content-Disposition' => 'inline; filename="' . basename($filePath) . '"'
+                        ]);
+                    }
+                }
+            }
+        }
+    }
+    
+    \Log::warning('File access denied', [
+        'user_id' => $user->id,
+        'user_role' => $user->role,
+        'requested_path' => $path
+    ]);
+    
+    abort(404, 'File not found or access denied');
+})->where('path', '.*')->middleware('auth');
+
+// Альтернативный маршрут для доступа к файлам методики
+Route::get('/methodfile/{path}', function($path) {
+    $user = auth()->user();
+    
+    if (!$user) {
+        abort(401, 'Unauthorized');
+    }
+    
+    $filePath = storage_path('app/public/methodfile/' . $path);
+    
+    // Логируем запрос для диагностики
+    \Log::info('Method file access request', [
+        'user_id' => $user->id,
+        'user_role' => $user->role,
+        'requested_path' => $path,
+        'full_path' => $filePath,
+        'file_exists' => file_exists($filePath)
+    ]);
+    
+    if (!file_exists($filePath) || !is_file($filePath)) {
+        \Log::warning('Method file not found', ['path' => $path]);
+        abort(404, 'File not found');
+    }
+    
+    // Проверяем доступ в зависимости от роли
+    if ($user->role === 'admin') {
+        // Администратор имеет доступ ко всем файлам
         $mimeType = mime_content_type($filePath);
         return response()->file($filePath, [
             'Content-Type' => $mimeType,
@@ -157,8 +280,145 @@ Route::get('/storage/{path}', function($path) {
         ]);
     }
     
-    abort(404);
+    // Для преподавателей и студентов проверяем доступ к курсу
+    $method = \App\Models\Method::where(function($q) use ($path) {
+        $fileFields = ['homework', 'lesson', 'exercise', 'book', 'presentation', 'test', 'article'];
+        foreach ($fileFields as $field) {
+            $q->orWhereJsonContains($field, '/storage/methodfile/' . $path);
+        }
+    })->with('course')->first();
+    
+    if (!$method || !$method->course) {
+        \Log::warning('Method or course not found for file', ['path' => $path]);
+        abort(404, 'File not found or access denied');
+    }
+    
+    $course = $method->course;
+    $hasAccess = false;
+    
+    if ($user->role === 'teacher') {
+        $teacher = $user->teacher;
+        if ($teacher) {
+            $hasAccess = in_array($teacher->users_id, $course->access_['teachers'] ?? []) || 
+                        in_array((string)$teacher->users_id, $course->access_['teachers'] ?? []);
+        }
+    } elseif ($user->role === 'student') {
+        $student = $user->student;
+        if ($student) {
+            // Проверяем, есть ли у студента доступ к курсу через группы
+            $studentGroups = $student->groups;
+            foreach ($studentGroups as $group) {
+                $groupCourses = $group->courses;
+                foreach ($groupCourses as $groupCourse) {
+                    if ($groupCourse->id === $course->id) {
+                        $hasAccess = true;
+                        break 2;
+                    }
+                }
+            }
+        }
+    }
+    
+    if ($hasAccess) {
+        $mimeType = mime_content_type($filePath);
+        return response()->file($filePath, [
+            'Content-Type' => $mimeType,
+            'Content-Disposition' => 'inline; filename="' . basename($filePath) . '"'
+        ]);
+    }
+    
+    \Log::warning('Access denied to method file', [
+        'user_id' => $user->id,
+        'user_role' => $user->role,
+        'file_path' => $path,
+        'course_id' => $course->id
+    ]);
+    
+    abort(403, 'Access denied');
 })->where('path', '.*')->middleware('auth');
+
+// Тестовый маршрут для проверки доступа к файлам
+Route::get('/test-file-access/{filename}', function($filename) {
+    $user = auth()->user();
+    
+    if (!$user) {
+        return response()->json(['error' => 'Unauthorized'], 401);
+    }
+    
+    $filePath = storage_path('app/public/methodfile/' . $filename);
+    
+    $result = [
+        'user_id' => $user->id,
+        'user_role' => $user->role,
+        'filename' => $filename,
+        'full_path' => $filePath,
+        'file_exists' => file_exists($filePath),
+        'is_file' => is_file($filePath),
+        'readable' => is_readable($filePath),
+        'size' => file_exists($filePath) ? filesize($filePath) : 0,
+        'permissions' => file_exists($filePath) ? substr(sprintf('%o', fileperms($filePath)), -4) : 'N/A'
+    ];
+    
+    // Проверяем доступ к курсу
+    if (strpos($filename, '/') !== false) {
+        $folder = explode('/', $filename)[0];
+        $methods = \App\Models\Method::where(function($q) use ($filename) {
+            $fileFields = ['homework', 'lesson', 'exercise', 'book', 'presentation', 'test', 'article'];
+            foreach ($fileFields as $field) {
+                $q->orWhereJsonContains($field, '/storage/methodfile/' . $filename);
+            }
+        })->with('course')->get();
+        
+        $result['methods_found'] = $methods->count();
+        $result['courses'] = $methods->map(function($method) {
+            return [
+                'method_id' => $method->id,
+                'course_id' => $method->course ? $method->course->id : null,
+                'course_name' => $method->course ? $method->course->name : null,
+                'course_access' => $method->course ? $method->course->access_ : null
+            ];
+        })->toArray();
+        
+        // Проверяем права доступа
+        if ($user->role === 'teacher') {
+            $teacher = $user->teacher;
+            if ($teacher) {
+                $hasAccess = false;
+                foreach ($methods as $method) {
+                    if ($method->course) {
+                        $course = $method->course;
+                        if (in_array($teacher->users_id, $course->access_['teachers'] ?? []) || 
+                            in_array((string)$teacher->users_id, $course->access_['teachers'] ?? [])) {
+                            $hasAccess = true;
+                            break;
+                        }
+                    }
+                }
+                $result['teacher_has_access'] = $hasAccess;
+            }
+        } elseif ($user->role === 'student') {
+            $student = $user->student;
+            if ($student) {
+                $hasAccess = false;
+                $studentGroups = $student->groups;
+                foreach ($studentGroups as $group) {
+                    $groupCourses = $group->courses;
+                    foreach ($groupCourses as $groupCourse) {
+                        foreach ($methods as $method) {
+                            if ($method->course && $method->course->id === $groupCourse->id) {
+                                $hasAccess = true;
+                                break 3;
+                            }
+                        }
+                    }
+                }
+                $result['student_has_access'] = $hasAccess;
+            }
+        }
+    }
+    
+    return response()->json($result);
+})->middleware('auth');
 
 Route::get( '/account', [AccountController::class, 'index'])->middleware('auth')->name('account.index');
 
