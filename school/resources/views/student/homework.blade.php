@@ -16,16 +16,7 @@
                     @forelse($homeworks as $homework)
                         @php
                             $submission = $homework->homeWorkStudents->first();
-                            $filePath = $homework->file_path;
-                            if (strpos($filePath, 'http') === 0) {
-                                $fileUrl = $filePath;
-                            } elseif (strpos($filePath, '/storage/') === 0) {
-                                $fileUrl = asset(ltrim($filePath, '/'));
-                            } elseif (strpos($filePath, 'storage/') === 0) {
-                                $fileUrl = asset($filePath);
-                            } else {
-                                $fileUrl = asset('storage/' . ltrim($filePath, '/'));
-                            }
+                            $fileUrl = \App\Helpers\FileHelper::getFileUrl($homework->file_path);
                         @endphp
                         <div class="homework-item" style="background:var(--bg-secondary);border-radius:12px;padding:24px 20px;box-shadow:0 2px 8px var(--card-shadow);">
                             <div class="homework-header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
@@ -41,7 +32,7 @@
                                 <p style="margin:6px 0;">
                                     <strong>Файл задания:</strong>
                                     @if($homework->file_path)
-                                        <a href="{{ asset('storage/' . ltrim($homework->file_path, '/')) }}" target="_blank" style="color:var(--primary-color);text-decoration:underline;font-weight:500;">
+                                        <a href="{{ $fileUrl }}" target="_blank" style="color:var(--primary-color);text-decoration:underline;font-weight:500;">
                                             Скачать
                                         </a>
                                     @else
@@ -50,9 +41,9 @@
                                 </p>
                                 @if($submission)
                                     <p style="margin:6px 0;"><strong>Ваша работа:</strong>
-                                        @if($submission && $submission->file_path)
-                                            <a href="{{ asset('storage/' . $submission->file_path) }}" target="_blank" style="color:var(--info-color);text-decoration:underline;" download>Скачать</a>
-                                        @else
+                                                                        @if($submission && $submission->file_path)
+                                    <a href="{{ \App\Helpers\FileHelper::getFileUrl($submission->file_path) }}" target="_blank" style="color:var(--info-color);text-decoration:underline;" download>Скачать</a>
+                                @else
                                             <span style="color:var(--text-light);">Не загружена</span>
                                         @endif
                                     </p>

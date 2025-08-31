@@ -922,6 +922,7 @@ class TeacherController extends Controller
 
         // Определяем course_id и method_id
         $method = null;
+        $methodId = null; // инициализируем как null
         $groupId = $students->first()->group->id ?? null;
         if ($lesson->subject) {
             $course = \App\Models\Course::where('name', $lesson->subject)->first();
@@ -933,13 +934,21 @@ class TeacherController extends Controller
                 }
             }
         }
+        
+        // Логируем для диагностики
+        \Log::info('Определение method_id', [
+            'lesson_subject' => $lesson->subject,
+            'course_id' => $courseId ?? null,
+            'method_id' => $methodId,
+            'method_found' => $method ? true : false
+        ]);
 
         // Проверяем, что файл действительно загружен и не пустой
         if ($homeworkFile && $homeworkFile->isValid() && $homeworkFile->getSize() > 0) {
             // Загружаем файл
             $homeworkFilePath = $homeworkFile->store('homework_teacher', 'public');
             $description = 'Загружено преподавателем';
-            $methodId = 0; // всегда 0 для файла
+            $methodId = null; // null для файла преподавателя
         } elseif ($homeworkFromMethod && !empty($homeworkFromMethod) && $methodId) {
             // Удаляем storage/ или /storage/ из начала пути, если есть
             if (strpos($homeworkFromMethod, '/storage/') === 0) {
@@ -960,7 +969,7 @@ class TeacherController extends Controller
                 $homeworkFilePath = $homeworkFromMethod;
             }
             $description = 'Из методпакета';
-            $methodId = 0;
+            $methodId = null;
         }
 
         // Проверка: если нет курса или группы — не сохраняем домашку
@@ -972,7 +981,7 @@ class TeacherController extends Controller
                 'name' => $lesson->subject . ' ' . $lesson->name_group,
                 'groups_id' => $groupId,
                 'course_id' => $courseId,
-                'method_id' => 1, // всегда определён
+                'method_id' => $methodId, // используем найденный method_id или null
                 'teachers_id' => $teacher->id,
                 'deadline' => now()->addDays(7)->toDateString(),
                 'file_path' => $homeworkFilePath,

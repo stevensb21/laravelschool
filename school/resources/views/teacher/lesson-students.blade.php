@@ -126,16 +126,7 @@
                                     @endif
                                     @if($currentHomework->file_path)
                                         @php
-                                            $filePath = $currentHomework->file_path;
-                                            if (strpos($filePath, 'http') === 0) {
-                                                $fileUrl = $filePath;
-                                            } elseif (strpos($filePath, '/storage/') === 0) {
-                                                $fileUrl = asset(ltrim($filePath, '/'));
-                                            } elseif (strpos($filePath, 'storage/') === 0) {
-                                                $fileUrl = asset($filePath);
-                                            } else {
-                                                $fileUrl = asset('storage/' . ltrim($filePath, '/'));
-                                            }
+                                            $fileUrl = \App\Helpers\FileHelper::getFileUrl($currentHomework->file_path);
                                         @endphp
                                         <a href="{{ $fileUrl }}" target="_blank" class="homework-link">Открыть файл</a>
                                     @endif

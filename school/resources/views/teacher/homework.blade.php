@@ -87,7 +87,7 @@
                                     <button class="export-results">Экспорт</button> --> 
                              
                                     <a href="{{ route('homework.submissions', $homework->id) }}" class="view-submissions">Просмотр работ</a>
-                                    <a class="view-submissions" href="{{ asset('storage/' . ltrim($homework->file_path, '/')) }}" target="_blank">Просмотр задания</a>
+                                    <a class="view-submissions" href="{{ \App\Helpers\FileHelper::getFileUrl($homework->file_path) }}" target="_blank">Просмотр задания</a>
                                     <button class="extend-btn" onclick="openExtendModal({{ $homework->id }}, '{{ $homework->deadline }}')">Продлить срок</button>
                                     <form method="POST" action="{{ route('homework.destroy', $homework->id) }}" style="display:inline;" onsubmit="return confirm('Удалить это домашнее задание?')">
                                         @csrf

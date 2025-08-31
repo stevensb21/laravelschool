@@ -82,7 +82,7 @@ class HomeWorkController extends Controller
                 'student' => $student,
                 'submission' => $submission,
                 'hasSubmitted' => $submission !== null,
-                'filePath' => $submission && $submission->file_path ? ('/storage/' . ltrim($submission->file_path, '/')) : null,
+                'filePath' => $submission && $submission->file_path ? \App\Helpers\FileHelper::getFileUrl($submission->file_path) : null,
                 'grade' => $submission ? $submission->grade : null,
                 'feedback' => $submission ? $submission->feedback : null,
             ];

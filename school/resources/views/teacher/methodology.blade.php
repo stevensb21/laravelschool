@@ -80,7 +80,7 @@
                             <td>
                                 @if($method->title_homework && is_array($method->title_homework) && $method->homework && is_array($method->homework))
                                     @for($i = 0; $i < min(count($method->title_homework), count($method->homework)); $i++)
-                                        <a href="{{ asset('storage/' . ltrim($method->homework[$i], '/')) }}" class="btn btn-primary" target="_blank">
+                                        <a href="{{ \App\Helpers\FileHelper::getFileUrl($method->homework[$i]) }}" class="btn btn-primary" target="_blank">
                                             {{ $method->title_homework[$i] }}
                                         </a>
                                     @endfor
@@ -91,7 +91,7 @@
                             <td>
                                 @if($method->title_lesson && is_array($method->title_lesson) && $method->lesson && is_array($method->lesson))
                                     @for($i = 0; $i < min(count($method->title_lesson), count($method->lesson)); $i++)
-                                        <a href="{{ asset('storage/' . ltrim($method->lesson[$i], '/')) }}" class="btn btn-primary" target="_blank">
+                                        <a href="{{ \App\Helpers\FileHelper::getFileUrl($method->lesson[$i]) }}" class="btn btn-primary" target="_blank">
                                             {{ $method->title_lesson[$i] }}
                                         </a>
                                     @endfor
@@ -102,7 +102,7 @@
                             <td>
                                 @if($method->title_exercise && is_array($method->title_exercise) && $method->exercise && is_array($method->exercise))
                                     @for($i = 0; $i < min(count($method->title_exercise), count($method->exercise)); $i++)
-                                        <a href="{{ asset('storage/' . ltrim($method->exercise[$i], '/')) }}" class="btn btn-primary" target="_blank">
+                                        <a href="{{ \App\Helpers\FileHelper::getFileUrl($method->exercise[$i]) }}" class="btn btn-primary" target="_blank">
                                             {{ $method->title_exercise[$i] }}
                                         </a>
                                     @endfor
@@ -113,7 +113,7 @@
                             <td>
                                 @if($method->title_book && is_array($method->title_book) && $method->book && is_array($method->book))
                                     @for($i = 0; $i < min(count($method->title_book), count($method->book)); $i++)
-                                        <a href="{{ asset('storage/' . ltrim($method->book[$i], '/')) }}" class="btn btn-primary" target="_blank">
+                                        <a href="{{ \App\Helpers\FileHelper::getFileUrl($method->book[$i]) }}" class="btn btn-primary" target="_blank">
                                             {{ $method->title_book[$i] }}
                                         </a>
                                     @endfor
@@ -124,7 +124,7 @@
                             <td>
                                 @if($method->title_video && is_array($method->title_video) && $method->video && is_array($method->video))
                                     @for($i = 0; $i < min(count($method->title_video), count($method->video)); $i++)
-                                        <a href="{{ $method->video[$i] }}" class="btn btn-primary" target="_blank">
+                                        <a href="{{ \App\Helpers\FileHelper::getFileUrl($method->video[$i]) }}" class="btn btn-primary" target="_blank">
                                             {{ $method->title_video[$i] }}
                                         </a>
                                     @endfor
@@ -135,7 +135,7 @@
                             <td>
                                 @if($method->title_presentation && is_array($method->title_presentation) && $method->presentation && is_array($method->presentation))
                                     @for($i = 0; $i < min(count($method->title_presentation), count($method->presentation)); $i++)
-                                        <a href="{{ asset('storage/' . ltrim($method->presentation[$i], '/')) }}" class="btn btn-primary" target="_blank">
+                                        <a href="{{ \App\Helpers\FileHelper::getFileUrl($method->presentation[$i]) }}" class="btn btn-primary" target="_blank">
                                             {{ $method->title_presentation[$i] }}
                                         </a>
                                     @endfor
@@ -146,7 +146,7 @@
                             <td>
                                 @if($method->title_test && is_array($method->title_test) && $method->test && is_array($method->test))
                                     @for($i = 0; $i < min(count($method->title_test), count($method->test)); $i++)
-                                        <a href="{{ asset('storage/' . ltrim($method->test[$i], '/')) }}" class="btn btn-primary" target="_blank">
+                                        <a href="{{ \App\Helpers\FileHelper::getFileUrl($method->test[$i]) }}" class="btn btn-primary" target="_blank">
                                             {{ $method->title_test[$i] }}
                                         </a>
                                     @endfor
@@ -157,7 +157,7 @@
                             <td>
                                 @if($method->title_article && is_array($method->title_article) && $method->article && is_array($method->article))
                                     @for($i = 0; $i < min(count($method->title_article), count($method->article)); $i++)
-                                        <a href="{{ $method->article[$i] }}" class="btn btn-primary" target="_blank">
+                                        <a href="{{ \App\Helpers\FileHelper::getFileUrl($method->article[$i]) }}" class="btn btn-primary" target="_blank">
                                             {{ $method->title_article[$i] }}
                                         </a>
                                     @endfor
