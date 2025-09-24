@@ -6,7 +6,7 @@
         </button>
     </div>
     <div class="sidebar-links" id="teacherSidebarLinks">
-        <div class="photoNav"><img src="{{ asset('images/man.png') }}" alt="Картинка"></div>
+        <div class="photoNav"><img src="{{ asset('images/man.jpg') }}" alt="Картинка"></div>
         <a href="{{ route('teacher.account') }}">Личный кабинет</a>
         <a href="{{ route('teacher.calendar') }}">Календарь</a>
         <a href="{{ route('teacher.students') }}">Студенты</a>

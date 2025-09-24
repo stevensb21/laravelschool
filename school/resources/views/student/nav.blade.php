@@ -6,7 +6,7 @@
         </button>
     </div>
     <div class="sidebar-links" id="studentSidebarLinks">
-        <div class="photoNav"><img src="{{ asset('images/man.png') }}" alt="Картинка"></div>
+        <div class="photoNav"><img src="{{ asset('images/man.jpg') }}" alt="Картинка"></div>
         <a href="{{ route('student.account') }}">Личный кабинет</a>
         <a href="{{ route('student.calendar') }}">Календарь</a>
         <a href="{{ route('student.homework') }}">Домашние задания</a>

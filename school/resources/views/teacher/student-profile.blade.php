@@ -10,7 +10,7 @@
         <h2>Информация о студенте</h2>
         <div class="profile-info">
             <div class="profile-header">
-                <img src="{{ asset('images/man.png') }}" alt="Аватар" class="avatar">
+                <img src="{{ asset('images/man.jpg') }}" alt="Аватар" class="avatar">
                 <div class="profile-details">
                     <h3>{{ $student->fio }}</h3>
                     <p>Группа: {{ $student->group_name }}</p>

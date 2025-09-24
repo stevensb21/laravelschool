@@ -56,3 +56,34 @@ body {
     overflow-y: auto;
     background-color: var(--bg-primary);
 }
+
+/* Предотвращение автоматического приближения на мобильных устройствах */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+input[type="tel"],
+input[type="url"],
+textarea,
+select {
+    font-size: 16px !important;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+/* Дополнительная защита для полей ввода сообщений */
+input[name="message"],
+textarea[name="comment"],
+textarea[name="feedback"],
+textarea[name="review_text"] {
+    font-size: 16px !important;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+}
+
+/* Специально для полей поиска */
+input[placeholder*="Поиск"],
+input[placeholder*="поиск"] {
+    font-size: 16px !important;
+}

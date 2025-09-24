@@ -1,5 +1,5 @@
 <div class="chat-message" style="margin-bottom: 14px; display: flex; align-items: flex-start;">
-    <img src="{{ asset('images/man.png') }}" alt="avatar" style="width:36px; height:36px; border-radius:50%; margin-right:12px;">
+    <img src="{{ asset('images/man.jpg') }}" alt="avatar" style="width:36px; height:36px; border-radius:50%; margin-right:12px;">
     <div style="flex:1;">
         <div style="font-weight:600; color:var(--link-color); font-size:15px;">
             @php

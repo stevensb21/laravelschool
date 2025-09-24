@@ -13,7 +13,7 @@
             <!-- Информация о преподавателе -->
             <div class="profile-section" style="background:var(--card-bg);border-radius:12px;box-shadow:0 2px 8px var(--card-shadow);padding:24px;">
                 <div class="teacher-avatar">
-                    <img src="{{ asset('images/man.png') }}" alt="{{ $teacher->fio }}">
+                    <img src="{{ asset('images/man.jpg') }}" alt="{{ $teacher->fio }}">
                 </div>
                 <div class="teacher-details">
                     <h3>{{ $teacher->fio }}</h3>
@@ -91,7 +91,7 @@
                             <div class="review-card approved">
                                 <div class="review-header">
                                     <div class="review-sender">
-                                        <img src="{{ asset('images/man.png') }}" alt="Avatar">
+                                        <img src="{{ asset('images/man.jpg') }}" alt="Avatar">
                                         <div class="sender-info">
                                             <h4>{{ $review->sender_name }}</h4>
                                             <span class="sender-type">{{ $review->sender_type == 'teacher' ? 'Преподаватель' : 'Студент' }}</span>

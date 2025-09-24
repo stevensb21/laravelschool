@@ -53,7 +53,7 @@
                         <div class="review-card {{ $review->status }}" data-status="{{ $review->status }}" data-type="{{ $review->sender_type }}">
                             <div class="review-header">
                                 <div class="review-sender">
-                                    <img src="{{ asset('images/man.png') }}" alt="Avatar">
+                                    <img src="{{ asset('images/man.jpg') }}" alt="Avatar">
                                     <div class="sender-info">
                                         <h4>{{ $review->sender_name }}</h4>
                                         <span class="sender-type">{{ $review->sender_type == 'teacher' ? 'Преподаватель' : 'Студент' }}</span>

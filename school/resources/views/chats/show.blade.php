@@ -29,7 +29,7 @@
                 </div>
                 @foreach($participants as $p)
                     <div class="participant-row" style="display:flex;align-items:center;margin-bottom:12px;padding:6px 0;border-bottom:1px solid var(--border-light);">
-                        <img src="{{ asset('images/man.png') }}" alt="avatar" style="width:32px;height:32px;border-radius:50%;margin-right:12px;">
+                        <img src="{{ asset('images/man.jpg') }}" alt="avatar" style="width:32px;height:32px;border-radius:50%;margin-right:12px;">
                         <div style="flex:1;">
                             <span style="font-weight:500;">{{ $p['fio'] }}</span>
                             <span class="role-badge {{ $p['role'] }}" style="margin-left:8px;padding:2px 8px;border-radius:5px;font-size:12px;font-weight:500;background:var(--{{ $p['role'] == 'admin' ? 'accent-dark' : ($p['role'] == 'teacher' ? 'success-color' : 'info-color') }});color:var(--text-light);">{{ $p['role'] }}</span>
@@ -49,7 +49,7 @@
         </div>
         <form id="chatSendForm" method="POST" action="{{ route('chats.send', $chat->id) }}" style="display:flex; gap:10px; align-items:center; justify-content:center; flex-shrink: 0;" enctype="multipart/form-data">
             @csrf
-            <input type="text" name="message" id="msgInput" placeholder="Введите сообщение..." style="flex:1; padding:8px 12px; border-radius:6px; border:1px solid #ccc; height:40px;">
+            <input type="text" name="message" id="msgInput" placeholder="Введите сообщение..." style="flex:1; padding:8px 12px; border-radius:6px; border:1px solid #ccc; height:40px; font-size:16px;">
             <label for="fileInput" class="file-attach-btn" title="Прикрепить файл" style="display:flex !important;align-items:center !important;justify-content:center !important;color:var(--text-light);border:none;border-radius:6px;width:40px;height:40px;cursor:pointer;transition:background 0.18s;">
                 <svg width="22" height="22" fill="none" stroke="#333" stroke-width="2" viewBox="0 0 24 24" style="display:block !important;margin:0 !important;position:relative !important;top:0 !important;left:0 !important;transform:none !important;"><path d="M21 12.3V17a5 5 0 0 1-10 0V7a3 3 0 0 1 6 0v9a1 1 0 0 1-2 0V8" /></svg>
             </label>

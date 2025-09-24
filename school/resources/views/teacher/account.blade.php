@@ -21,7 +21,7 @@
     <div class="profileReviews">
         <div class="profile">
             <div class="photo">
-                <img src="{{ asset('images/man.png') }}" alt="Аватар">
+                <img src="{{ asset('images/man.jpg') }}" alt="Аватар">
             </div>
             <div class="info">
                 <p style="font-size: 15pt;">{{ $teacher->fio }}</p>

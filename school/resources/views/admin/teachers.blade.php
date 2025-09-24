@@ -45,7 +45,7 @@
                         <?php foreach ($teachers as $teacher): ?>
                         <div class="teacher-card">
                             <div class="teacher-header">
-                            <img src="{{ asset('images/man.png') }}" alt="{{ htmlspecialchars($teacher['fio']) }}">
+                            <img src="{{ asset('images/man.jpg') }}" alt="{{ htmlspecialchars($teacher['fio']) }}">
                                 <div class="teacher-status active">Активный</div>
                             </div>
                             <div class="teacher-info">
